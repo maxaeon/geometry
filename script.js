@@ -208,6 +208,7 @@ function keyPressed() {
 
 function draw() {
     background(255);
+    updateCursor();
     for (const s of shapes) s.draw();
     drawIntersections();
 }
@@ -235,6 +236,10 @@ class Circle {
             strokeWeight(2);
             noFill();
             ellipse(this.x,this.y,this.r*2+6,this.r*2+6);
+            fill('yellow');
+            noStroke();
+            rectMode(CENTER);
+            rect(this.x + this.r, this.y, 6, 6);
             pop();
         }
     }
@@ -273,6 +278,10 @@ class Point {
             strokeWeight(2);
             noFill();
             ellipse(this.x, this.y, this.r * 2 + 6, this.r * 2 + 6);
+            fill('yellow');
+            noStroke();
+            rectMode(CENTER);
+            rect(this.x, this.y, 6, 6);
             pop();
         }
     }
@@ -344,6 +353,30 @@ function findShape(px,py){
         if(shapes[i].hitTest && shapes[i].hitTest(px,py)) return shapes[i];
     }
     return null;
+}
+
+function updateCursor(){
+    if(resizeMode){
+        cursor('nwse-resize');
+        return;
+    }
+    if(currentTool !== 'move'){
+        cursor('default');
+        return;
+    }
+    const shape = findShape(mouseX, mouseY);
+    if(shape){
+        const mode = shape.hitTest(mouseX, mouseY);
+        if(mode === 'start' || mode === 'end' || mode === 'radius'){
+            cursor('nwse-resize');
+        } else if(mode){
+            cursor('move');
+        } else {
+            cursor('default');
+        }
+    } else {
+        cursor('default');
+    }
 }
 
 function drawIntersections(){
