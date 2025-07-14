@@ -111,10 +111,11 @@ function setup() {
         selectedShape = null;
         if(mode === 'kids'){
             loadKidsActivity(currentActivity);
+            // loadKidsActivity already saves state
         } else {
             feedbackElem.textContent = '';
+            saveState();
         }
-        saveState();
     });
     document.getElementById('example-select').addEventListener('change', e => {
         loadExample(e.target.value);
