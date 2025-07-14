@@ -18,6 +18,7 @@ let lineDashed = false;
 let fillLayer;
 let showGrid = true;
 let triangleGuide = {};
+let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
 
 function setTool(tool){
     currentTool = tool;
@@ -124,6 +125,21 @@ function setup() {
 
     document.getElementById('undo-btn').addEventListener('click', undo);
     document.getElementById('redo-btn').addEventListener('click', redo);
+    document.getElementById('delete-btn').addEventListener('click', () => {
+        if(selectedShape){
+            const idx = shapes.indexOf(selectedShape);
+            if(idx !== -1) shapes.splice(idx,1);
+            selectedShape = null;
+            saveState();
+        }
+    });
+    document.getElementById('add-color-btn').addEventListener('click', () => {
+        const color = prompt('Enter color hex code (#RRGGBB):', '#000000');
+        if(color && /^#([0-9a-fA-F]{6})$/.test(color)){
+            paletteColors.push(color);
+            createColorPalette();
+        }
+    });
 
     document.addEventListener('keydown', e => {
         if((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z'){
@@ -149,6 +165,7 @@ function setup() {
     document.getElementById('kids-mode').addEventListener('click', startKidsMode);
     document.getElementById('advanced-mode').addEventListener('click', startAdvancedMode);
 
+    createColorPalette();
     setTool('move');
     saveState();
 }
@@ -517,6 +534,23 @@ function hexToRgb(hex){
         g: parseInt(m[2],16),
         b: parseInt(m[3],16)
     };
+}
+
+function createColorPalette(){
+    const palette = document.getElementById('color-palette');
+    if(!palette) return;
+    palette.innerHTML = '';
+    paletteColors.forEach(color => {
+        const btn = document.createElement('button');
+        btn.className = 'color-swatch';
+        btn.style.background = color;
+        btn.title = color;
+        btn.addEventListener('click', () => {
+            currentColor = color;
+            document.getElementById('color-input').value = color;
+        });
+        palette.appendChild(btn);
+    });
 }
 
 function bucketFill(x,y,color){
