@@ -13,12 +13,44 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(255, 255, 255, 0.95);
+    overflow: hidden;
+    z-index: 100;
+}
+
+#mode-content {
+    position: relative;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    z-index: 100;
+    z-index: 1;
+}
+
+#bg-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+svg.shape {
+    position: absolute;
+    top: -100px;
+    fill: none;
+    stroke-width: 3px;
+    opacity: 0.5;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    from {transform: translateY(-150%);}
+    to {transform: translateY(150%);}
 }
 
 #toolbar {
