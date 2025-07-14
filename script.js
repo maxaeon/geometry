@@ -24,9 +24,7 @@ function cloneShapeList(list){
             return new Point(s.x, s.y, s.color);
         }
         if(s instanceof LineSeg){
-            const l = new LineSeg(s.x1, s.y1, s.x2, s.y2, s.dotted);
-            if(s.color) l.color = s.color;
-            return l;
+            return new LineSeg(s.x1, s.y1, s.x2, s.y2, s.dotted, s.color, s.weight);
         }
         return null;
     });
@@ -281,13 +279,16 @@ class Point {
 }
 
 class LineSeg {
-    constructor(x1,y1,x2,y2,dotted=false){
+    constructor(x1,y1,x2,y2,dotted=false,color='black',weight=1){
         this.x1=x1; this.y1=y1; this.x2=x2; this.y2=y2; this.dotted=dotted;
+        this.color=color; this.weight=weight;
     }
     get x(){ return this.x1; }
     get y(){ return this.y1; }
     draw(){
         push();
+        stroke(this.color);
+        strokeWeight(this.weight);
         if(this.dotted){ drawingContext.setLineDash([5,5]); }
         line(this.x1,this.y1,this.x2,this.y2);
         drawingContext.setLineDash([]);
