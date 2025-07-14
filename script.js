@@ -20,6 +20,9 @@ function cloneShapeList(list){
             c.clicked = s.clicked;
             return c;
         }
+        if(s instanceof Point){
+            return new Point(s.x, s.y, s.color);
+        }
         if(s instanceof LineSeg){
             const l = new LineSeg(s.x1, s.y1, s.x2, s.y2, s.dotted);
             if(s.color) l.color = s.color;
@@ -125,7 +128,10 @@ function mousePressed() {
             }
         }
     }
-    if (currentTool === 'circle') {
+    if (currentTool === 'point') {
+        shapes.push(new Point(mouseX, mouseY));
+        actionChanged = true;
+    } else if (currentTool === 'circle') {
         drawingShape = new Circle(mouseX, mouseY, 0);
         shapes.push(drawingShape);
         actionChanged = true;
@@ -235,6 +241,42 @@ class Circle {
     resize(mode,px,py){
         if(mode==='radius') this.r=dist(this.x,this.y,px,py);
         if(mode==='center') this.move(px,py);
+    }
+}
+
+class Point {
+    constructor(x, y, color = 'black') {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.r = 4;
+    }
+    draw(){
+        push();
+        fill(this.color);
+        noStroke();
+        ellipse(this.x, this.y, this.r * 2, this.r * 2);
+        pop();
+        if (selectedShape === this) {
+            push();
+            stroke('orange');
+            strokeWeight(2);
+            noFill();
+            ellipse(this.x, this.y, this.r * 2 + 6, this.r * 2 + 6);
+            pop();
+        }
+    }
+    hitTest(px, py){
+        const d = dist(px, py, this.x, this.y);
+        if(d <= this.r + 3) return 'center';
+        return null;
+    }
+    move(nx, ny){
+        this.x = nx;
+        this.y = ny;
+    }
+    resize(mode, px, py){
+        if(mode === 'center') this.move(px, py);
     }
 }
 
