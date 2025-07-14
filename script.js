@@ -12,11 +12,14 @@ let symmetryDemo = null;
 let undoStack = [];
 let redoStack = [];
 let actionChanged = false;
+let currentColor = '#000000';
+let currentWeight = 1;
+let lineDashed = false;
 
 function cloneShapeList(list){
     return list.map(s => {
         if(s instanceof Circle){
-            const c = new Circle(s.x, s.y, s.r, s.color, s.clickable);
+            const c = new Circle(s.x, s.y, s.r, s.color, s.clickable, s.weight);
             c.clicked = s.clicked;
             return c;
         }
@@ -62,7 +65,14 @@ function setup() {
     feedbackElem = document.getElementById('feedback');
     document.getElementById('tool-select').addEventListener('change', e => {
         currentTool = e.target.value;
+        lineDashed = currentTool === 'dotted';
         selectedShape = null;
+    });
+    document.getElementById('color-input').addEventListener('input', e => {
+        currentColor = e.target.value;
+    });
+    document.getElementById('thickness-input').addEventListener('input', e => {
+        currentWeight = parseInt(e.target.value, 10) || 1;
     });
     document.getElementById('clear-btn').addEventListener('click', () => {
         shapes = [];
@@ -130,11 +140,11 @@ function mousePressed() {
         shapes.push(new Point(mouseX, mouseY));
         actionChanged = true;
     } else if (currentTool === 'circle') {
-        drawingShape = new Circle(mouseX, mouseY, 0);
+        drawingShape = new Circle(mouseX, mouseY, 0, currentColor, false, currentWeight);
         shapes.push(drawingShape);
         actionChanged = true;
     } else if (currentTool === 'line' || currentTool === 'dotted') {
-        drawingShape = new LineSeg(mouseX, mouseY, mouseX, mouseY, currentTool === 'dotted');
+        drawingShape = new LineSeg(mouseX, mouseY, mouseX, mouseY, lineDashed, currentColor, currentWeight);
         shapes.push(drawingShape);
         actionChanged = true;
     } else if (currentTool === 'move') {
@@ -203,13 +213,15 @@ function draw() {
 }
 
 class Circle {
-    constructor(x,y,r,color='black',clickable=false){
+    constructor(x,y,r,color='black',clickable=false,weight=1){
         this.x=x; this.y=y; this.r=r; this.color=color;
         this.clickable=clickable; this.clicked=false;
+        this.weight=weight;
     }
     draw(){
         push();
         stroke(this.color);
+        strokeWeight(this.weight);
         if(this.clickable||this.clicked){
             fill(this.clicked? 'lightgreen' : this.color);
         }else{

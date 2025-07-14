@@ -45,6 +45,11 @@ body.kids #example-select {
     display: none;
 }
 
+body.kids #color-input,
+body.kids #thickness-input {
+    display: none;
+}
+
 body.kids #feedback {
     flex: 1;
     text-align: center;
