@@ -8,6 +8,7 @@ let selectedShape = null;
 let dragOffset = {x:0, y:0};
 let resizeMode = null; // 'start','end','radius'
 let feedbackElem;
+let symmetryDemo = null;
 
 function setup() {
     const container = document.getElementById('canvas-container');
@@ -75,6 +76,10 @@ function mouseDragged() {
             selectedShape.resize(resizeMode, mouseX, mouseY);
         } else {
             selectedShape.move(mouseX - dragOffset.x, mouseY - dragOffset.y);
+            if(symmetryDemo && selectedShape === symmetryDemo.moveDot){
+                const dx = selectedShape.x - symmetryDemo.centerX;
+                symmetryDemo.mirrorDot.move(symmetryDemo.centerX - dx, selectedShape.y);
+            }
         }
     }
 }
@@ -111,9 +116,10 @@ class Circle {
         pop();
         if (selectedShape===this){
             push();
-            stroke('blue');
+            stroke('orange');
+            strokeWeight(2);
             noFill();
-            ellipse(this.x,this.y,this.r*2+4,this.r*2+4);
+            ellipse(this.x,this.y,this.r*2+6,this.r*2+6);
             pop();
         }
     }
@@ -146,8 +152,14 @@ class LineSeg {
         pop();
         if(selectedShape===this){
             push();
-            stroke('blue');
+            stroke('orange');
+            strokeWeight(2);
             line(this.x1,this.y1,this.x2,this.y2);
+            fill('yellow');
+            noStroke();
+            rectMode(CENTER);
+            rect(this.x1,this.y1,6,6);
+            rect(this.x2,this.y2,6,6);
             pop();
         }
     }
@@ -372,4 +384,35 @@ function checkKidsActivity(){
     if(act.check && act.check()){
         feedbackElem.textContent = 'Great job!';
     }
+}
+
+// ----- Additional Demonstrations -----
+function placeTriangleDots(){
+    const x1 = width/2 - 100;
+    const x2 = width/2 + 100;
+    const y1 = height/2 + 80;
+    const x3 = width/2;
+    const y3 = height/2 - 80;
+    shapes.push(new Circle(x1, y1, 6, 'magenta'));
+    shapes.push(new Circle(x2, y1, 6, 'magenta'));
+    shapes.push(new Circle(x3, y3, 6, 'magenta'));
+    feedbackElem.textContent = 'Connect the dots to form a triangle!';
+}
+
+function demonstrateCircleSymmetry(){
+    shapes = [];
+    const centerX = width/2;
+    const centerY = height/2;
+    const radius = 80;
+    const c = new Circle(centerX, centerY, radius);
+    const axis = new LineSeg(centerX, centerY - radius - 30, centerX, centerY + radius + 30, false);
+    const dot = new Circle(centerX + radius, centerY, 6, 'blue');
+    const mirror = new Circle(centerX - radius, centerY, 6, 'green');
+    shapes.push(c, axis, dot, mirror);
+    symmetryDemo = {centerX, moveDot: dot, mirrorDot: mirror};
+    feedbackElem.textContent = 'Move the blue dot. The green dot mirrors it across the line.';
+}
+
+function showEqualSidesPrompt(){
+    feedbackElem.textContent = 'Can you make this triangle have two equal sides?';
 }
