@@ -41,7 +41,7 @@ body {
 
 svg.shape {
     position: absolute;
-    top: -100px;
+    top: -10vh;
     fill: none;
     stroke-width: 3px;
     opacity: 0.5;
@@ -49,8 +49,8 @@ svg.shape {
 }
 
 @keyframes fall {
-    from {transform: translateY(-150%);}
-    to {transform: translateY(150%);}
+    from {transform: translateY(0);}
+    to {transform: translateY(120vh);}
 }
 
 #toolbar {
