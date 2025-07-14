@@ -15,6 +15,8 @@ let actionChanged = false;
 let currentColor = '#000000';
 let currentWeight = 1;
 let lineDashed = false;
+let fillLayer;
+let showGrid = false;
 
 function cloneShapeList(list){
     return list.map(s => {
@@ -33,8 +35,21 @@ function cloneShapeList(list){
     });
 }
 
+function cloneState(){
+    return {
+        shapes: cloneShapeList(shapes),
+        fill: fillLayer.get()
+    };
+}
+
+function restoreState(state){
+    shapes = cloneShapeList(state.shapes);
+    fillLayer.clear();
+    fillLayer.image(state.fill, 0, 0);
+}
+
 function saveState(){
-    undoStack.push(cloneShapeList(shapes));
+    undoStack.push(cloneState());
     redoStack = [];
 }
 
@@ -42,7 +57,7 @@ function undo(){
     if(undoStack.length > 1){
         const current = undoStack.pop();
         redoStack.push(current);
-        shapes = cloneShapeList(undoStack[undoStack.length-1]);
+        restoreState(undoStack[undoStack.length-1]);
         selectedShape = null;
         drawingShape = null;
     }
@@ -51,8 +66,8 @@ function undo(){
 function redo(){
     if(redoStack.length){
         const state = redoStack.pop();
-        shapes = cloneShapeList(state);
-        undoStack.push(cloneShapeList(state));
+        restoreState(state);
+        undoStack.push(cloneState());
         selectedShape = null;
         drawingShape = null;
     }
@@ -62,6 +77,8 @@ function setup() {
     const container = document.getElementById('canvas-container');
     const canvas = createCanvas(window.innerWidth, window.innerHeight);
     canvas.parent('canvas-container');
+    fillLayer = createGraphics(window.innerWidth, window.innerHeight);
+    fillLayer.pixelDensity(1);
     feedbackElem = document.getElementById('feedback');
     document.getElementById('tool-select').addEventListener('change', e => {
         currentTool = e.target.value;
@@ -73,6 +90,9 @@ function setup() {
     });
     document.getElementById('thickness-input').addEventListener('input', e => {
         currentWeight = parseInt(e.target.value, 10) || 1;
+    });
+    document.getElementById('grid-toggle').addEventListener('change', e => {
+        showGrid = e.target.checked;
     });
     document.getElementById('clear-btn').addEventListener('click', () => {
         shapes = [];
@@ -121,6 +141,9 @@ function setup() {
 
 function windowResized() {
     resizeCanvas(window.innerWidth, window.innerHeight);
+    if(fillLayer){
+        fillLayer.resizeCanvas(window.innerWidth, window.innerHeight);
+    }
 }
 
 function mousePressed() {
@@ -147,6 +170,9 @@ function mousePressed() {
         drawingShape = new LineSeg(mouseX, mouseY, mouseX, mouseY, lineDashed, currentColor, currentWeight);
         shapes.push(drawingShape);
         actionChanged = true;
+    } else if (currentTool === 'fill') {
+        bucketFill(mouseX, mouseY, currentColor);
+        saveState();
     } else if (currentTool === 'move') {
         selectedShape = findShape(mouseX, mouseY);
         if (selectedShape) {
@@ -208,9 +234,23 @@ function keyPressed() {
 
 function draw() {
     background(255);
+    if(showGrid) drawGrid();
+    image(fillLayer, 0, 0);
     updateCursor();
     for (const s of shapes) s.draw();
     drawIntersections();
+}
+
+function drawGrid(){
+    const step = 25;
+    stroke(230);
+    strokeWeight(1);
+    for(let x=0;x<width;x+=step){
+        line(x,0,x,height);
+    }
+    for(let y=0;y<height;y+=step){
+        line(0,y,width,y);
+    }
 }
 
 class Circle {
@@ -219,18 +259,19 @@ class Circle {
         this.clickable=clickable; this.clicked=false;
         this.weight=weight;
     }
-    draw(){
-        push();
-        stroke(this.color);
-        strokeWeight(this.weight);
+    draw(pg){
+        const g = pg || this;
+        g.push();
+        g.stroke(this.color);
+        g.strokeWeight(this.weight);
         if(this.clickable||this.clicked){
-            fill(this.clicked? 'lightgreen' : this.color);
+            g.fill(this.clicked? 'lightgreen' : this.color);
         }else{
-            noFill();
+            g.noFill();
         }
-        ellipse(this.x,this.y,this.r*2,this.r*2);
-        pop();
-        if (selectedShape===this){
+        g.ellipse(this.x,this.y,this.r*2,this.r*2);
+        g.pop();
+        if(!pg && selectedShape===this){
             push();
             stroke('orange');
             strokeWeight(2);
@@ -266,13 +307,14 @@ class Point {
         this.color = color;
         this.r = 4;
     }
-    draw(){
-        push();
-        fill(this.color);
-        noStroke();
-        ellipse(this.x, this.y, this.r * 2, this.r * 2);
-        pop();
-        if (selectedShape === this) {
+    draw(pg){
+        const g = pg || this;
+        g.push();
+        g.fill(this.color);
+        g.noStroke();
+        g.ellipse(this.x, this.y, this.r * 2, this.r * 2);
+        g.pop();
+        if(!pg && selectedShape === this) {
             push();
             stroke('orange');
             strokeWeight(2);
@@ -306,15 +348,16 @@ class LineSeg {
     }
     get x(){ return this.x1; }
     get y(){ return this.y1; }
-    draw(){
-        push();
-        stroke(this.color);
-        strokeWeight(this.weight);
-        if(this.dotted){ drawingContext.setLineDash([5,5]); }
-        line(this.x1,this.y1,this.x2,this.y2);
-        drawingContext.setLineDash([]);
-        pop();
-        if(selectedShape===this){
+    draw(pg){
+        const g = pg || this;
+        g.push();
+        g.stroke(this.color);
+        g.strokeWeight(this.weight);
+        if(this.dotted){ g.drawingContext.setLineDash([5,5]); }
+        g.line(this.x1,this.y1,this.x2,this.y2);
+        g.drawingContext.setLineDash([]);
+        g.pop();
+        if(!pg && selectedShape===this){
             push();
             stroke('orange');
             strokeWeight(2);
@@ -450,6 +493,65 @@ function circleLineIntersection(c,l){
     const ix2=(D*dy-sign*dx*sqrtDisc)/dr2 + c.x;
     const iy2=(-D*dx-abs(dy)*sqrtDisc)/dr2 + c.y;
     return [{x:ix1,y:iy1},{x:ix2,y:iy2}];
+}
+
+function hexToRgb(hex){
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if(!m) return {r:0,g:0,b:0};
+    return {
+        r: parseInt(m[1],16),
+        g: parseInt(m[2],16),
+        b: parseInt(m[3],16)
+    };
+}
+
+function bucketFill(x,y,color){
+    const temp = createGraphics(width, height);
+    temp.pixelDensity(1);
+    temp.image(fillLayer,0,0);
+    for(const s of shapes){
+        s.draw(temp);
+    }
+    temp.loadPixels();
+    fillLayer.loadPixels();
+    const startX=Math.floor(x), startY=Math.floor(y);
+    const idx = (startY*width + startX)*4;
+    const target = {
+        r: temp.pixels[idx],
+        g: temp.pixels[idx+1],
+        b: temp.pixels[idx+2],
+        a: temp.pixels[idx+3]
+    };
+    const fc = hexToRgb(color);
+    if(target.r===fc.r && target.g===fc.g && target.b===fc.b && target.a===255) {
+        return;
+    }
+    const stack=[[startX,startY]];
+    const visited = new Uint8Array(width*height);
+    while(stack.length){
+        const [cx,cy] = stack.pop();
+        if(cx<0||cy<0||cx>=width||cy>=height) continue;
+        const pos = cy*width+cx;
+        if(visited[pos]) continue;
+        const pidx = pos*4;
+        if(temp.pixels[pidx]===target.r && temp.pixels[pidx+1]===target.g && temp.pixels[pidx+2]===target.b && temp.pixels[pidx+3]===target.a){
+            visited[pos]=1;
+            temp.pixels[pidx]=fc.r;
+            temp.pixels[pidx+1]=fc.g;
+            temp.pixels[pidx+2]=fc.b;
+            temp.pixels[pidx+3]=255;
+            fillLayer.pixels[pidx]=fc.r;
+            fillLayer.pixels[pidx+1]=fc.g;
+            fillLayer.pixels[pidx+2]=fc.b;
+            fillLayer.pixels[pidx+3]=255;
+            stack.push([cx+1,cy]);
+            stack.push([cx-1,cy]);
+            stack.push([cx,cy+1]);
+            stack.push([cx,cy-1]);
+        }
+    }
+    temp.updatePixels();
+    fillLayer.updatePixels();
 }
 
 function loadExample(name){
