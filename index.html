@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Geometry</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+</head>
+<body>
+    <div id="toolbar">
+        <select id="tool-select">
+            <option value="move">Move</option>
+            <option value="circle">Circle</option>
+            <option value="line">Solid Line</option>
+            <option value="dotted">Dotted Line</option>
+        </select>
+        <button id="clear-btn">Clear Canvas</button>
+        <select id="example-select">
+            <option value="">Examples</option>
+            <option value="equilateral">Equilateral Triangle</option>
+            <option value="triangle-inequality">Triangle Inequality</option>
+            <option value="circle-midpoint">Circle Midpoint</option>
+        </select>
+        <span id="feedback"></span>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="script.js"></script>
+</body>
+</html>

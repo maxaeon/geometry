@@ -1,0 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#toolbar {
+    background: #f0f0f0;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#canvas-container {
+    flex: 1;
+}
+
+canvas {
+    border: 1px solid #ccc;
+}
+
+#feedback {
+    margin-left: auto;
+}
