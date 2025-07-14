@@ -1,5 +1,5 @@
 let shapes = [];
-let currentTool = 'move';
+let currentTool = 'select';
 let mode = null; // 'kids' or 'advanced'
 let kidsActivities = [];
 let currentActivity = 0;
@@ -166,7 +166,7 @@ function setup() {
     document.getElementById('advanced-mode').addEventListener('click', startAdvancedMode);
 
     createColorPalette();
-    setTool('move');
+    setTool('select');
     saveState();
 }
 
@@ -204,7 +204,7 @@ function mousePressed() {
     } else if (currentTool === 'fill') {
         bucketFill(mouseX, mouseY, currentColor);
         saveState();
-    } else if (currentTool === 'move') {
+    } else if (currentTool === 'select') {
         selectedShape = findShape(mouseX, mouseY);
         if (selectedShape) {
             const hit = selectedShape.hitTest(mouseX, mouseY);
@@ -434,7 +434,7 @@ function updateCursor(){
         cursor('nwse-resize');
         return;
     }
-    if(currentTool !== 'move'){
+    if(currentTool !== 'select'){
         cursor('default');
         return;
     }
