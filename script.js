@@ -9,6 +9,50 @@ let dragOffset = {x:0, y:0};
 let resizeMode = null; // 'start','end','radius'
 let feedbackElem;
 let symmetryDemo = null;
+let undoStack = [];
+let redoStack = [];
+let actionChanged = false;
+
+function cloneShapeList(list){
+    return list.map(s => {
+        if(s instanceof Circle){
+            const c = new Circle(s.x, s.y, s.r, s.color, s.clickable);
+            c.clicked = s.clicked;
+            return c;
+        }
+        if(s instanceof LineSeg){
+            const l = new LineSeg(s.x1, s.y1, s.x2, s.y2, s.dotted);
+            if(s.color) l.color = s.color;
+            return l;
+        }
+        return null;
+    });
+}
+
+function saveState(){
+    undoStack.push(cloneShapeList(shapes));
+    redoStack = [];
+}
+
+function undo(){
+    if(undoStack.length > 1){
+        const current = undoStack.pop();
+        redoStack.push(current);
+        shapes = cloneShapeList(undoStack[undoStack.length-1]);
+        selectedShape = null;
+        drawingShape = null;
+    }
+}
+
+function redo(){
+    if(redoStack.length){
+        const state = redoStack.pop();
+        shapes = cloneShapeList(state);
+        undoStack.push(cloneShapeList(state));
+        selectedShape = null;
+        drawingShape = null;
+    }
+}
 
 function setup() {
     const container = document.getElementById('canvas-container');
@@ -27,10 +71,24 @@ function setup() {
         } else {
             feedbackElem.textContent = '';
         }
+        saveState();
     });
     document.getElementById('example-select').addEventListener('change', e => {
         loadExample(e.target.value);
         e.target.value = '';
+    });
+
+    document.getElementById('undo-btn').addEventListener('click', undo);
+    document.getElementById('redo-btn').addEventListener('click', redo);
+
+    document.addEventListener('keydown', e => {
+        if((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z'){
+            undo();
+            e.preventDefault();
+        } else if((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))){
+            redo();
+            e.preventDefault();
+        }
     });
 
     document.getElementById('next-activity').addEventListener('click', () => {
@@ -46,6 +104,8 @@ function setup() {
 
     document.getElementById('kids-mode').addEventListener('click', startKidsMode);
     document.getElementById('advanced-mode').addEventListener('click', startAdvancedMode);
+
+    saveState();
 }
 
 function windowResized() {
@@ -68,9 +128,11 @@ function mousePressed() {
     if (currentTool === 'circle') {
         drawingShape = new Circle(mouseX, mouseY, 0);
         shapes.push(drawingShape);
+        actionChanged = true;
     } else if (currentTool === 'line' || currentTool === 'dotted') {
         drawingShape = new LineSeg(mouseX, mouseY, mouseX, mouseY, currentTool === 'dotted');
         shapes.push(drawingShape);
+        actionChanged = true;
     } else if (currentTool === 'move') {
         selectedShape = findShape(mouseX, mouseY);
         if (selectedShape) {
@@ -89,15 +151,19 @@ function mouseDragged() {
     if (drawingShape) {
         if (drawingShape instanceof Circle) {
             drawingShape.r = dist(drawingShape.x, drawingShape.y, mouseX, mouseY);
+            actionChanged = true;
         } else if (drawingShape instanceof LineSeg) {
             drawingShape.x2 = mouseX;
             drawingShape.y2 = mouseY;
+            actionChanged = true;
         }
     } else if (selectedShape) {
         if (resizeMode) {
             selectedShape.resize(resizeMode, mouseX, mouseY);
+            actionChanged = true;
         } else {
             selectedShape.move(mouseX - dragOffset.x, mouseY - dragOffset.y);
+            actionChanged = true;
             if(symmetryDemo && selectedShape === symmetryDemo.moveDot){
                 const dx = selectedShape.x - symmetryDemo.centerX;
                 symmetryDemo.mirrorDot.move(symmetryDemo.centerX - dx, selectedShape.y);
@@ -107,6 +173,10 @@ function mouseDragged() {
 }
 
 function mouseReleased() {
+    if(actionChanged){
+        saveState();
+        actionChanged = false;
+    }
     drawingShape = null;
     resizeMode = null;
     checkKidsActivity();
@@ -117,6 +187,8 @@ function keyPressed() {
         const idx = shapes.indexOf(selectedShape);
         if (idx !== -1) shapes.splice(idx,1);
         selectedShape = null;
+        actionChanged = true;
+        saveState();
     }
 }
 
@@ -356,6 +428,7 @@ function loadExample(name){
     } else {
         feedbackElem.textContent='';
     }
+    saveState();
 }
 
 // ----- Mode Switching -----
@@ -490,6 +563,7 @@ function loadKidsActivity(i){
     feedbackElem.textContent = act.prompt;
     document.getElementById('prev-activity').disabled = i === 0;
     document.getElementById('next-activity').disabled = i === kidsActivities.length - 1;
+    saveState();
 }
 
 function checkKidsActivity(){
