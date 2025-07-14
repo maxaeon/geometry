@@ -502,7 +502,44 @@ function startAdvancedMode(){
 function setupKidsActivities(){
     kidsActivities = [
         {
-            prompt: 'Connect the 3 magenta dots to form a triangle. Can you make two sides equal?',
+            prompt: 'Place a point anywhere on the canvas. A point is an exact position with no size.',
+            setup: function(){
+                // nothing pre-drawn
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Point){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            prompt: 'Draw a line segment connecting the two magenta points. A line segment is the straight path between points.',
+            setup: function(){
+                const x1 = width/2 - 60;
+                const x2 = width/2 + 60;
+                const y = height/2;
+                shapes.push(new Circle(x1, y, 6, 'magenta'));
+                shapes.push(new Circle(x2, y, 6, 'magenta'));
+            },
+            check: function(){
+                const x1 = width/2 - 60;
+                const x2 = width/2 + 60;
+                const y = height/2;
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        const c1 = dist(s.x1,s.y1,x1,y) < 10 && dist(s.x2,s.y2,x2,y) < 10;
+                        const c2 = dist(s.x1,s.y1,x2,y) < 10 && dist(s.x2,s.y2,x1,y) < 10;
+                        if(c1 || c2) return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            prompt: 'Use line segments to connect the 3 magenta points into a triangle. Can you make two line segments equal?',
             setup: function(){
                 placeTriangleDots();
             },
@@ -541,7 +578,7 @@ function setupKidsActivities(){
             }
         },
         {
-            prompt: 'Use a dotted line to complete the base of the triangle.',
+            prompt: 'Use a dotted line segment to complete the base of the triangle.',
             setup: function(){
                 const x1 = width/2 - 80;
                 const x2 = width/2 + 80;
@@ -566,7 +603,7 @@ function setupKidsActivities(){
             }
         },
         {
-            prompt: 'Click each corner of the square to find the right angles.',
+            prompt: 'Click each corner point of the square to find the right angles.',
             setup: function(){
                 const size=120;
                 const cx=width/2;
