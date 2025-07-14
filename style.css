@@ -78,6 +78,31 @@ svg.shape {
     background: #cce5ff;
 }
 
+#delete-btn {
+    width: 32px;
+    height: 32px;
+}
+
+#color-palette {
+    display: flex;
+    gap: 4px;
+}
+
+.color-swatch {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #000;
+    padding: 0;
+    cursor: pointer;
+}
+
+#add-color-btn {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    line-height: 16px;
+}
+
 #tool-select {
     display: none;
 }
