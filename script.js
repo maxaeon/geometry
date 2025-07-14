@@ -16,7 +16,7 @@ let currentColor = '#000000';
 let currentWeight = 1;
 let lineDashed = false;
 let fillLayer;
-let showGrid = false;
+let showGrid = true;
 let triangleGuide = {};
 
 function setTool(tool){
