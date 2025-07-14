@@ -17,6 +17,7 @@ let currentWeight = 1;
 let lineDashed = false;
 let fillLayer;
 let showGrid = false;
+let triangleGuide = {};
 
 function cloneShapeList(list){
     return list.map(s => {
@@ -631,6 +632,7 @@ function startKidsMode(){
     document.getElementById('prev-activity').style.display = 'inline-block';
     document.getElementById('next-activity').style.display = 'inline-block';
     resizeCanvas(window.innerWidth, window.innerHeight);
+    triangleGuide = {};
     setupKidsActivities();
     loadKidsActivity(0);
 }
@@ -777,15 +779,139 @@ function setupKidsActivities(){
                 }
                 return allClicked;
             }
+        },
+        {
+            prompt: 'Place the first point (point A) anywhere on the canvas.',
+            keepShapes: false,
+            setup: function(){
+                triangleGuide = {};
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Point){
+                        triangleGuide.A = {x:s.x, y:s.y};
+                        return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            prompt: 'Draw a circle centered at point A.',
+            keepShapes: true,
+            setup: function(){
+                if(triangleGuide.A){
+                    shapes.push(new Circle(triangleGuide.A.x, triangleGuide.A.y, 6, 'magenta'));
+                }
+            },
+            check: function(){
+                if(!triangleGuide.A) return false;
+                for(const s of shapes){
+                    if(s instanceof Circle && s.r > 10){
+                        if(dist(s.x,s.y,triangleGuide.A.x,triangleGuide.A.y) < 5){
+                            triangleGuide.radius = s.r;
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            prompt: 'Place a second point (point B) on the circle\u2019s circumference.',
+            keepShapes: true,
+            setup: function(){
+                if(triangleGuide.A){
+                    shapes.push(new Circle(triangleGuide.A.x, triangleGuide.A.y, 6, 'magenta'));
+                }
+            },
+            check: function(){
+                if(!triangleGuide.A || !triangleGuide.radius) return false;
+                for(const s of shapes){
+                    if(s instanceof Point){
+                        const d = dist(s.x,s.y,triangleGuide.A.x,triangleGuide.A.y);
+                        if(abs(d - triangleGuide.radius) < 5){
+                            triangleGuide.B = {x:s.x, y:s.y};
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            prompt: 'Draw a second circle centered at B with the same radius as the first.',
+            keepShapes: true,
+            setup: function(){
+                if(triangleGuide.B){
+                    shapes.push(new Circle(triangleGuide.B.x, triangleGuide.B.y, 6, 'magenta'));
+                }
+            },
+            check: function(){
+                if(!triangleGuide.B || !triangleGuide.radius) return false;
+                for(const s of shapes){
+                    if(s instanceof Circle && s.r > 10){
+                        if(dist(s.x,s.y,triangleGuide.B.x,triangleGuide.B.y) < 5 && abs(s.r - triangleGuide.radius) < 5){
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            prompt: 'Mark the intersection of both circles as point C and connect A-B-C with line segments.',
+            keepShapes: true,
+            setup: function(){
+                if(triangleGuide.A && triangleGuide.B && triangleGuide.radius){
+                    shapes.push(new Circle(triangleGuide.A.x, triangleGuide.A.y, 6, 'magenta'));
+                    shapes.push(new Circle(triangleGuide.B.x, triangleGuide.B.y, 6, 'magenta'));
+                    const c1 = new Circle(triangleGuide.A.x, triangleGuide.A.y, triangleGuide.radius);
+                    const c2 = new Circle(triangleGuide.B.x, triangleGuide.B.y, triangleGuide.radius);
+                    const inter = circleCircleIntersection(c1,c2);
+                    if(inter && inter.length){
+                        triangleGuide.C = inter[0];
+                        shapes.push(new Circle(triangleGuide.C.x, triangleGuide.C.y, 6, 'magenta'));
+                    }
+                }
+            },
+            check: function(){
+                if(!triangleGuide.C) return false;
+                let cPoint = null;
+                for(const s of shapes){
+                    if(s instanceof Point){
+                        if(dist(s.x,s.y,triangleGuide.C.x,triangleGuide.C.y) < 5){
+                            cPoint = {x:s.x, y:s.y};
+                            break;
+                        }
+                    }
+                }
+                if(!cPoint) return false;
+                let ab=false, bc=false, ca=false;
+                function near(px,py,qx,qy){ return dist(px,py,qx,qy) < 5; }
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        if((near(s.x1,s.y1,triangleGuide.A.x,triangleGuide.A.y) && near(s.x2,s.y2,triangleGuide.B.x,triangleGuide.B.y)) ||
+                           (near(s.x2,s.y2,triangleGuide.A.x,triangleGuide.A.y) && near(s.x1,s.y1,triangleGuide.B.x,triangleGuide.B.y))) ab=true;
+                        if((near(s.x1,s.y1,triangleGuide.B.x,triangleGuide.B.y) && near(s.x2,s.y2,cPoint.x,cPoint.y)) ||
+                           (near(s.x2,s.y2,triangleGuide.B.x,triangleGuide.B.y) && near(s.x1,s.y1,cPoint.x,cPoint.y))) bc=true;
+                        if((near(s.x1,s.y1,triangleGuide.A.x,triangleGuide.A.y) && near(s.x2,s.y2,cPoint.x,cPoint.y)) ||
+                           (near(s.x2,s.y2,triangleGuide.A.x,triangleGuide.A.y) && near(s.x1,s.y1,cPoint.x,cPoint.y))) ca=true;
+                    }
+                }
+                return ab && bc && ca;
+            }
         }
     ];
 }
 
 function loadKidsActivity(i){
     currentActivity = i;
-    shapes = [];
-    symmetryDemo = null;
     const act = kidsActivities[i];
+    if(!act.keepShapes){
+        shapes = [];
+    }
+    symmetryDemo = null;
     act.setup();
     feedbackElem.textContent = act.prompt;
     document.getElementById('prev-activity').disabled = i === 0;
