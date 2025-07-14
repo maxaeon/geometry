@@ -9,3 +9,4 @@ Open `index.html` in a modern web browser to choose between a **For Younger Kids
 
 Shapes can be dragged, resized and combined. Intersections are highlighted automatically for visual feedback.
 Use the **Fill** tool to color enclosed regions and toggle the **Grid** checkbox for a graph-paper background.
+The toolbar now provides icon-style buttons for common tools, similar to classic paint programs.

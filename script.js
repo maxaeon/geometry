@@ -19,6 +19,16 @@ let fillLayer;
 let showGrid = false;
 let triangleGuide = {};
 
+function setTool(tool){
+    currentTool = tool;
+    lineDashed = tool === 'dotted';
+    selectedShape = null;
+    document.getElementById('tool-select').value = tool;
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tool === tool);
+    });
+}
+
 function cloneShapeList(list){
     return list.map(s => {
         if(s instanceof Circle){
@@ -82,9 +92,10 @@ function setup() {
     fillLayer.pixelDensity(1);
     feedbackElem = document.getElementById('feedback');
     document.getElementById('tool-select').addEventListener('change', e => {
-        currentTool = e.target.value;
-        lineDashed = currentTool === 'dotted';
-        selectedShape = null;
+        setTool(e.target.value);
+    });
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.addEventListener('click', () => setTool(btn.dataset.tool));
     });
     document.getElementById('color-input').addEventListener('input', e => {
         currentColor = e.target.value;
@@ -137,6 +148,7 @@ function setup() {
     document.getElementById('kids-mode').addEventListener('click', startKidsMode);
     document.getElementById('advanced-mode').addEventListener('click', startAdvancedMode);
 
+    setTool('move');
     saveState();
 }
 
@@ -261,7 +273,7 @@ class Circle {
         this.weight=weight;
     }
     draw(pg){
-        const g = pg || this;
+        const g = pg || window;
         g.push();
         g.stroke(this.color);
         g.strokeWeight(this.weight);
@@ -309,7 +321,7 @@ class Point {
         this.r = 4;
     }
     draw(pg){
-        const g = pg || this;
+        const g = pg || window;
         g.push();
         g.fill(this.color);
         g.noStroke();
@@ -350,7 +362,7 @@ class LineSeg {
     get x(){ return this.x1; }
     get y(){ return this.y1; }
     draw(pg){
-        const g = pg || this;
+        const g = pg || window;
         g.push();
         g.stroke(this.color);
         g.strokeWeight(this.weight);
@@ -666,7 +678,7 @@ function setupKidsActivities(){
             }
         },
         {
-            prompt: 'Draw a line segment connecting the two magenta points. A line segment is the straight path between points.',
+            prompt: 'Draw a line segment connecting the two red points. A line segment is the straight path between points.',
             setup: function(){
                 const x1 = width/2 - 60;
                 const x2 = width/2 + 60;
@@ -689,7 +701,7 @@ function setupKidsActivities(){
             }
         },
         {
-            prompt: 'Use line segments to connect the 3 magenta points into a triangle. Can you make two line segments equal?',
+            prompt: 'Use line segments to connect the 3 red points into a triangle. Can you make two line segments equal?',
             setup: function(){
                 placeTriangleDots();
             },
