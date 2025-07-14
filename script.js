@@ -1,5 +1,8 @@
 let shapes = [];
 let currentTool = 'move';
+let mode = null; // 'kids' or 'advanced'
+let kidsActivities = [];
+let currentActivity = 0;
 let drawingShape = null;
 let selectedShape = null;
 let dragOffset = {x:0, y:0};
@@ -8,7 +11,7 @@ let feedbackElem;
 
 function setup() {
     const container = document.getElementById('canvas-container');
-    const canvas = createCanvas(container.clientWidth, container.clientHeight);
+    const canvas = createCanvas(window.innerWidth, window.innerHeight);
     canvas.parent('canvas-container');
     feedbackElem = document.getElementById('feedback');
     document.getElementById('tool-select').addEventListener('change', e => {
@@ -18,17 +21,23 @@ function setup() {
     document.getElementById('clear-btn').addEventListener('click', () => {
         shapes = [];
         selectedShape = null;
-        feedbackElem.textContent = '';
+        if(mode === 'kids'){
+            loadKidsActivity(currentActivity);
+        } else {
+            feedbackElem.textContent = '';
+        }
     });
     document.getElementById('example-select').addEventListener('change', e => {
         loadExample(e.target.value);
         e.target.value = '';
     });
+
+    document.getElementById('kids-mode').addEventListener('click', startKidsMode);
+    document.getElementById('advanced-mode').addEventListener('click', startAdvancedMode);
 }
 
 function windowResized() {
-    const container = document.getElementById('canvas-container');
-    resizeCanvas(container.clientWidth, container.clientHeight);
+    resizeCanvas(window.innerWidth, window.innerHeight);
 }
 
 function mousePressed() {
@@ -73,6 +82,7 @@ function mouseDragged() {
 function mouseReleased() {
     drawingShape = null;
     resizeMode = null;
+    checkKidsActivity();
 }
 
 function keyPressed() {
@@ -90,13 +100,13 @@ function draw() {
 }
 
 class Circle {
-    constructor(x,y,r){
-        this.x=x; this.y=y; this.r=r;
+    constructor(x,y,r,color='black'){
+        this.x=x; this.y=y; this.r=r; this.color=color;
     }
     draw(){
         push();
         noFill();
-        stroke(0);
+        stroke(this.color);
         ellipse(this.x,this.y,this.r*2,this.r*2);
         pop();
         if (selectedShape===this){
@@ -270,5 +280,96 @@ function loadExample(name){
         feedbackElem.textContent='Intersecting circles create midpoint';
     } else {
         feedbackElem.textContent='';
+    }
+}
+
+// ----- Mode Switching -----
+function startKidsMode(){
+    mode = 'kids';
+    document.body.classList.add('kids');
+    document.getElementById('mode-selector').style.display = 'none';
+    document.getElementById('toolbar').style.display = 'flex';
+    document.getElementById('canvas-container').style.display = 'block';
+    resizeCanvas(window.innerWidth, window.innerHeight);
+    setupKidsActivities();
+    loadKidsActivity(0);
+}
+
+function startAdvancedMode(){
+    mode = 'advanced';
+    document.body.classList.remove('kids');
+    document.getElementById('mode-selector').style.display = 'none';
+    document.getElementById('toolbar').style.display = 'flex';
+    document.getElementById('canvas-container').style.display = 'block';
+    resizeCanvas(window.innerWidth, window.innerHeight);
+    feedbackElem.textContent = '';
+}
+
+function setupKidsActivities(){
+    kidsActivities = [
+        {
+            prompt: 'Connect the two red points with a line.',
+            setup: function(){
+                const x1 = width/2 - 100;
+                const x2 = width/2 + 100;
+                const y = height/2;
+                shapes.push(new Circle(x1, y, 5, 'red'));
+                shapes.push(new Circle(x2, y, 5, 'red'));
+            },
+            check: function(){
+                const x1 = width/2 - 100;
+                const x2 = width/2 + 100;
+                const y = height/2;
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        const c1 = dist(s.x1,s.y1,x1,y) < 10 && dist(s.x2,s.y2,x2,y) < 10;
+                        const c2 = dist(s.x1,s.y1,x2,y) < 10 && dist(s.x2,s.y2,x1,y) < 10;
+                        if(c1 || c2) return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            prompt: 'Complete the triangle by drawing the base.',
+            setup: function(){
+                const x1 = width/2 - 80;
+                const x2 = width/2 + 80;
+                const y1 = height/2 + 60;
+                const x3 = width/2;
+                const y3 = height/2 - 60;
+                shapes.push(new LineSeg(x1,y1,x3,y3,false));
+                shapes.push(new LineSeg(x3,y3,x2,y1,false));
+            },
+            check: function(){
+                const x1 = width/2 - 80;
+                const x2 = width/2 + 80;
+                const y1 = height/2 + 60;
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        const c1 = dist(s.x1,s.y1,x1,y1) < 10 && dist(s.x2,s.y2,x2,y1) < 10;
+                        const c2 = dist(s.x1,s.y1,x2,y1) < 10 && dist(s.x2,s.y2,x1,y1) < 10;
+                        if(c1 || c2) return true;
+                    }
+                }
+                return false;
+            }
+        }
+    ];
+}
+
+function loadKidsActivity(i){
+    currentActivity = i;
+    shapes = [];
+    const act = kidsActivities[i];
+    act.setup();
+    feedbackElem.textContent = act.prompt;
+}
+
+function checkKidsActivity(){
+    if(mode !== 'kids') return;
+    const act = kidsActivities[currentActivity];
+    if(act.check && act.check()){
+        feedbackElem.textContent = 'Great job!';
     }
 }

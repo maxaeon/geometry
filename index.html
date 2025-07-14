@@ -8,7 +8,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
 </head>
 <body>
-    <div id="toolbar">
+    <div id="mode-selector">
+        <h2>Select Mode</h2>
+        <button id="kids-mode">For Younger Kids</button>
+        <button id="advanced-mode">For Older/Advanced Users</button>
+    </div>
+    <div id="toolbar" style="display:none">
         <select id="tool-select">
             <option value="move">Move</option>
             <option value="circle">Circle</option>
@@ -24,7 +29,7 @@
         </select>
         <span id="feedback"></span>
     </div>
-    <div id="canvas-container"></div>
+    <div id="canvas-container" style="display:none"></div>
     <script src="script.js"></script>
 </body>
 </html>
