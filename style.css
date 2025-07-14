@@ -49,3 +49,12 @@ body.kids #feedback {
     flex: 1;
     text-align: center;
 }
+
+#prev-activity, #next-activity {
+    display: none;
+}
+
+body.kids #prev-activity,
+body.kids #next-activity {
+    display: inline-block;
+}

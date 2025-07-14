@@ -33,6 +33,17 @@ function setup() {
         e.target.value = '';
     });
 
+    document.getElementById('next-activity').addEventListener('click', () => {
+        if(currentActivity < kidsActivities.length - 1){
+            loadKidsActivity(currentActivity + 1);
+        }
+    });
+    document.getElementById('prev-activity').addEventListener('click', () => {
+        if(currentActivity > 0){
+            loadKidsActivity(currentActivity - 1);
+        }
+    });
+
     document.getElementById('kids-mode').addEventListener('click', startKidsMode);
     document.getElementById('advanced-mode').addEventListener('click', startAdvancedMode);
 }
@@ -43,6 +54,17 @@ function windowResized() {
 
 function mousePressed() {
     if (mouseButton !== LEFT) return;
+    if(mode==='kids'){
+        for(const s of shapes){
+            if(s instanceof Circle && s.clickable){
+                if(dist(mouseX,mouseY,s.x,s.y) <= s.r + 5){
+                    s.clicked = true;
+                    checkKidsActivity();
+                    return;
+                }
+            }
+        }
+    }
     if (currentTool === 'circle') {
         drawingShape = new Circle(mouseX, mouseY, 0);
         shapes.push(drawingShape);
@@ -105,13 +127,18 @@ function draw() {
 }
 
 class Circle {
-    constructor(x,y,r,color='black'){
+    constructor(x,y,r,color='black',clickable=false){
         this.x=x; this.y=y; this.r=r; this.color=color;
+        this.clickable=clickable; this.clicked=false;
     }
     draw(){
         push();
-        noFill();
         stroke(this.color);
+        if(this.clickable||this.clicked){
+            fill(this.clicked? 'lightgreen' : this.color);
+        }else{
+            noFill();
+        }
         ellipse(this.x,this.y,this.r*2,this.r*2);
         pop();
         if (selectedShape===this){
@@ -124,6 +151,7 @@ class Circle {
         }
     }
     hitTest(px,py){
+        if(this.clickable) return null;
         const d=dist(px,py,this.x,this.y);
         if(abs(d-this.r)<6) return 'radius';
         if(d<this.r) return 'center';
@@ -279,17 +307,52 @@ function loadExample(name){
         shapes.push(new LineSeg(x2,y2,x3,y3,false));
         shapes.push(new LineSeg(x3,y3,x1,y1,false));
         feedbackElem.textContent='Equilateral triangle constructed';
-    } else if(name==='triangle-inequality'){
-        const a=new LineSeg(200,200,400,200,false);
-        const b=new LineSeg(400,200,550,250,false);
-        const c=new LineSeg(550,250,200,200,false);
-        shapes.push(a,b,c);
-        feedbackElem.textContent='Triangle inequality illustrated';
-    } else if(name==='circle-midpoint'){
-        const c1=new Circle(width/2-100,height/2,100);
-        const c2=new Circle(width/2+100,height/2,100);
-        shapes.push(c1,c2);
-        feedbackElem.textContent='Intersecting circles create midpoint';
+    } else if(name==='triangle-congruency'){
+        const left=[{x:200,y:300},{x:300,y:150},{x:400,y:300}];
+        shapes.push(new LineSeg(left[0].x,left[0].y,left[1].x,left[1].y,false));
+        shapes.push(new LineSeg(left[1].x,left[1].y,left[2].x,left[2].y,false));
+        shapes.push(new LineSeg(left[2].x,left[2].y,left[0].x,left[0].y,false));
+        const dx=250;
+        for(let i=0;i<3;i++){
+            const j=(i+1)%3;
+            shapes.push(new LineSeg(left[i].x+dx,left[i].y,left[j].x+dx,left[j].y,false));
+        }
+        feedbackElem.textContent='Two triangles with equal sides - congruent (SSS)';
+    } else if(name==='circle-theorem'){
+        const c=new Circle(width/2, height/2, 120);
+        const aAngle=PI/6, bAngle=-PI/6, cAngle=PI/2;
+        const ax=c.x+cos(aAngle)*c.r, ay=c.y+sin(aAngle)*c.r;
+        const bx=c.x+cos(bAngle)*c.r, by=c.y+sin(bAngle)*c.r;
+        const cxp=c.x+cos(cAngle)*c.r, cyp=c.y+sin(cAngle)*c.r;
+        shapes.push(c);
+        shapes.push(new LineSeg(ax,ay,bx,by,false));
+        shapes.push(new LineSeg(ax,ay,cxp,cyp,false));
+        shapes.push(new LineSeg(bx,by,cxp,cyp,false));
+        feedbackElem.textContent='Angles subtended by the same arc are equal';
+    } else if(name==='pythagorean'){
+        const base=160;
+        const x=width/2-base/2, y=height/2+base/2;
+        shapes.push(new LineSeg(x,y,x+base,y,false));
+        shapes.push(new LineSeg(x+base,y,x+base,y-base,false));
+        shapes.push(new LineSeg(x+base,y-base,x,y,false));
+        // squares
+        shapes.push(new LineSeg(x,y,x,y-base,false));
+        shapes.push(new LineSeg(x,y-base,x+base,y-base,false));
+        shapes.push(new LineSeg(x+base,y-base,x+base,y-base-base,false));
+        shapes.push(new LineSeg(x+base,y-base-base,x,y-base-base,false));
+        shapes.push(new LineSeg(x,y-base-base,x,y-base,false));
+        shapes.push(new LineSeg(x+base,y,x+base+base,y,false));
+        shapes.push(new LineSeg(x+base+base,y,x+base+base,y-base,false));
+        shapes.push(new LineSeg(x+base+base,y-base,x+base,y-base,false));
+        feedbackElem.textContent='Right triangle with squares demonstrates a^2+b^2=c^2';
+    } else if(name==='parallel-lines'){
+        const y1=height/2-60, y2=height/2+60;
+        const x1=width/2-120, x2=width/2+120;
+        shapes.push(new LineSeg(x1,y1,x2,y1,false));
+        shapes.push(new LineSeg(x1,y2,x2,y2,false));
+        const tx=width/2, ty1=height/2-100, ty2=height/2+100;
+        shapes.push(new LineSeg(tx,ty1,tx,ty2,false));
+        feedbackElem.textContent='Parallel lines with a transversal';
     } else {
         feedbackElem.textContent='';
     }
@@ -302,6 +365,8 @@ function startKidsMode(){
     document.getElementById('mode-selector').style.display = 'none';
     document.getElementById('toolbar').style.display = 'flex';
     document.getElementById('canvas-container').style.display = 'block';
+    document.getElementById('prev-activity').style.display = 'inline-block';
+    document.getElementById('next-activity').style.display = 'inline-block';
     resizeCanvas(window.innerWidth, window.innerHeight);
     setupKidsActivities();
     loadKidsActivity(0);
@@ -313,6 +378,8 @@ function startAdvancedMode(){
     document.getElementById('mode-selector').style.display = 'none';
     document.getElementById('toolbar').style.display = 'flex';
     document.getElementById('canvas-container').style.display = 'block';
+    document.getElementById('prev-activity').style.display = 'none';
+    document.getElementById('next-activity').style.display = 'none';
     resizeCanvas(window.innerWidth, window.innerHeight);
     feedbackElem.textContent = '';
 }
@@ -320,30 +387,46 @@ function startAdvancedMode(){
 function setupKidsActivities(){
     kidsActivities = [
         {
-            prompt: 'Connect the two red points with a line.',
+            prompt: 'Connect the 3 magenta dots to form a triangle. Can you make two sides equal?',
             setup: function(){
-                const x1 = width/2 - 100;
-                const x2 = width/2 + 100;
-                const y = height/2;
-                shapes.push(new Circle(x1, y, 5, 'red'));
-                shapes.push(new Circle(x2, y, 5, 'red'));
+                placeTriangleDots();
             },
             check: function(){
-                const x1 = width/2 - 100;
-                const x2 = width/2 + 100;
-                const y = height/2;
+                const pts=[
+                    {x: width/2 - 100, y: height/2 + 80},
+                    {x: width/2 + 100, y: height/2 + 80},
+                    {x: width/2, y: height/2 - 80}
+                ];
+                const lines=[];
                 for(const s of shapes){
                     if(s instanceof LineSeg){
-                        const c1 = dist(s.x1,s.y1,x1,y) < 10 && dist(s.x2,s.y2,x2,y) < 10;
-                        const c2 = dist(s.x1,s.y1,x2,y) < 10 && dist(s.x2,s.y2,x1,y) < 10;
-                        if(c1 || c2) return true;
+                        for(let i=0;i<3;i++){
+                            for(let j=i+1;j<3;j++){
+                                const c1 = dist(s.x1,s.y1,pts[i].x,pts[i].y) < 10 && dist(s.x2,s.y2,pts[j].x,pts[j].y) < 10;
+                                const c2 = dist(s.x1,s.y1,pts[j].x,pts[j].y) < 10 && dist(s.x2,s.y2,pts[i].x,pts[i].y) < 10;
+                                if(c1 || c2){
+                                    lines.push({seg:s,len:dist(pts[i].x,pts[i].y,pts[j].x,pts[j].y)});
+                                }
+                            }
+                        }
+                    }
+                }
+                if(lines.length>=3){
+                    for(let i=0;i<lines.length;i++){
+                        for(let j=i+1;j<lines.length;j++){
+                            if(abs(lines[i].len-lines[j].len)<15){
+                                lines[i].seg.color='blue';
+                                lines[j].seg.color='blue';
+                                return true;
+                            }
+                        }
                     }
                 }
                 return false;
             }
         },
         {
-            prompt: 'Complete the triangle by drawing the base.',
+            prompt: 'Use a dotted line to complete the base of the triangle.',
             setup: function(){
                 const x1 = width/2 - 80;
                 const x2 = width/2 + 80;
@@ -358,13 +441,41 @@ function setupKidsActivities(){
                 const x2 = width/2 + 80;
                 const y1 = height/2 + 60;
                 for(const s of shapes){
-                    if(s instanceof LineSeg){
+                    if(s instanceof LineSeg && s.dotted){
                         const c1 = dist(s.x1,s.y1,x1,y1) < 10 && dist(s.x2,s.y2,x2,y1) < 10;
                         const c2 = dist(s.x1,s.y1,x2,y1) < 10 && dist(s.x2,s.y2,x1,y1) < 10;
                         if(c1 || c2) return true;
                     }
                 }
                 return false;
+            }
+        },
+        {
+            prompt: 'Click each corner of the square to find the right angles.',
+            setup: function(){
+                const size=120;
+                const cx=width/2;
+                const cy=height/2;
+                const half=size/2;
+                shapes.push(new LineSeg(cx-half,cy-half,cx+half,cy-half,false));
+                shapes.push(new LineSeg(cx+half,cy-half,cx+half,cy+half,false));
+                shapes.push(new LineSeg(cx+half,cy+half,cx-half,cy+half,false));
+                shapes.push(new LineSeg(cx-half,cy+half,cx-half,cy-half,false));
+                shapes.push(new Circle(cx-half,cy-half,8,'gray',true));
+                shapes.push(new Circle(cx+half,cy-half,8,'gray',true));
+                shapes.push(new Circle(cx+half,cy+half,8,'gray',true));
+                shapes.push(new Circle(cx-half,cy+half,8,'gray',true));
+            },
+            check: function(){
+                let allClicked=true;
+                for(const s of shapes){
+                    if(s instanceof Circle && s.clickable){
+                        if(!s.clicked){
+                            allClicked=false;
+                        }
+                    }
+                }
+                return allClicked;
             }
         }
     ];
@@ -373,9 +484,12 @@ function setupKidsActivities(){
 function loadKidsActivity(i){
     currentActivity = i;
     shapes = [];
+    symmetryDemo = null;
     const act = kidsActivities[i];
     act.setup();
     feedbackElem.textContent = act.prompt;
+    document.getElementById('prev-activity').disabled = i === 0;
+    document.getElementById('next-activity').disabled = i === kidsActivities.length - 1;
 }
 
 function checkKidsActivity(){
