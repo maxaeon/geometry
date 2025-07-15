@@ -556,13 +556,19 @@ function mouseDragged() {
             drawingShape.r = dist(drawingShape.x, drawingShape.y, mouseX, mouseY);
             actionChanged = true;
         } else if (drawingShape instanceof LineSeg) {
-            drawingShape.x2 = mouseX;
-            drawingShape.y2 = mouseY;
+            const snap = snapToPoint(mouseX, mouseY);
+            drawingShape.x2 = snap.x;
+            drawingShape.y2 = snap.y;
             actionChanged = true;
         }
     } else if (selectedShape) {
         if (resizeMode) {
-            selectedShape.resize(resizeMode, mouseX, mouseY);
+            if(selectedShape instanceof LineSeg && (resizeMode === 'start' || resizeMode === 'end')){
+                const snap = snapToPoint(mouseX, mouseY);
+                selectedShape.resize(resizeMode, snap.x, snap.y);
+            } else {
+                selectedShape.resize(resizeMode, mouseX, mouseY);
+            }
             actionChanged = true;
         } else {
             selectedShape.move(mouseX - dragOffset.x, mouseY - dragOffset.y);
@@ -588,6 +594,20 @@ function mouseDragged() {
 
 function mouseReleased() {
     if(!isMouseOnCanvas()) return;
+    if(drawingShape && drawingShape instanceof LineSeg){
+        let snap = snapToPoint(drawingShape.x1, drawingShape.y1);
+        drawingShape.x1 = snap.x;
+        drawingShape.y1 = snap.y;
+        snap = snapToPoint(drawingShape.x2, drawingShape.y2);
+        drawingShape.x2 = snap.x;
+        drawingShape.y2 = snap.y;
+        actionChanged = true;
+    }
+    if(selectedShape && selectedShape instanceof LineSeg && resizeMode && (resizeMode === 'start' || resizeMode === 'end')){
+        const snap = snapToPoint(mouseX, mouseY);
+        selectedShape.resize(resizeMode, snap.x, snap.y);
+        actionChanged = true;
+    }
     if(actionChanged){
         saveState();
         actionChanged = false;
@@ -850,6 +870,21 @@ function findShape(px,py){
         if(shapes[i].hitTest && shapes[i].hitTest(px,py)) return shapes[i];
     }
     return null;
+}
+
+function snapToPoint(x, y, threshold = 10){
+    let closest = null;
+    let bestDist = threshold;
+    for(const s of shapes){
+        if(s instanceof Point || s instanceof Circle){
+            const d = dist(x, y, s.x, s.y);
+            if(d < bestDist){
+                closest = {x: s.x, y: s.y};
+                bestDist = d;
+            }
+        }
+    }
+    return closest || {x, y};
 }
 
 function isMouseOnCanvas(){
