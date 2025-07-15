@@ -899,20 +899,31 @@ function populateActivitySelect(){
     def.textContent = 'Activities';
     select.appendChild(def);
     if(Array.isArray(kidsActivities)){
-        kidsActivities.forEach((_, i) => {
+        const groups = {};
+        kidsActivities.forEach((act, i) => {
+            const cat = act.category || 'Other';
+            if(!groups[cat]){
+                const og = document.createElement('optgroup');
+                og.label = cat;
+                select.appendChild(og);
+                groups[cat] = og;
+            }
             const opt = document.createElement('option');
             opt.value = 'kid-' + i;
-            opt.textContent = 'Activity ' + (i + 1);
-            select.appendChild(opt);
+            opt.textContent = act.title || ('Activity ' + (i + 1));
+            groups[cat].appendChild(opt);
         });
     }
     if(typeof advancedExamples === 'object'){
+        const og = document.createElement('optgroup');
+        og.label = 'Advanced';
         Object.keys(advancedExamples).forEach(key => {
             const opt = document.createElement('option');
             opt.value = key;
             opt.textContent = key.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-            select.appendChild(opt);
+            og.appendChild(opt);
         });
+        select.appendChild(og);
     }
 }
 
@@ -977,65 +988,6 @@ function populateActivitiesOverlay(){
     });
 }
 
-function populateActivityPanel(){
-    const container = document.getElementById('activity-list');
-    if(!container) return;
-    container.innerHTML = '';
-    const cats = {};
-    if(Array.isArray(kidsActivities)){
-        kidsActivities.forEach((act, i) => {
-            const cat = act.category || 'Other';
-            if(!cats[cat]){
-                const h = document.createElement('h3');
-                h.textContent = cat;
-                container.appendChild(h);
-                const ul = document.createElement('ul');
-                container.appendChild(ul);
-                cats[cat] = ul;
-            }
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = '#';
-            a.className = 'example-link';
-            a.dataset.kid = i;
-            a.textContent = act.title || ('Activity ' + (i + 1));
-            li.appendChild(a);
-            cats[cat].appendChild(li);
-        });
-    }
-    if(typeof advancedExamples === 'object'){
-        const cat = 'Advanced';
-        const h = document.createElement('h3');
-        h.textContent = cat;
-        container.appendChild(h);
-        const ul = document.createElement('ul');
-        container.appendChild(ul);
-        Object.keys(advancedExamples).forEach(key => {
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = '#';
-            a.className = 'example-link';
-            a.dataset.example = key;
-            a.textContent = key.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-            li.appendChild(a);
-            ul.appendChild(li);
-        });
-    }
-    container.querySelectorAll('.example-link').forEach(link => {
-        link.addEventListener('click', e => {
-            e.preventDefault();
-            const kid = link.dataset.kid;
-            const example = link.dataset.example;
-            if(kid !== undefined){
-                if(mode !== 'kids') startKidsMode();
-                loadKidsActivity(parseInt(kid,10));
-            } else if(example){
-                if(mode !== 'advanced') startAdvancedMode();
-                loadExample(example);
-            }
-        });
-    });
-}
 
 function bucketFill(x,y,color){
     const temp = createGraphics(width, height);
@@ -1153,7 +1105,6 @@ function startKidsMode(){
     setupKidsActivities();
     populateActivitySelect();
     populateActivitiesOverlay();
-    populateActivityPanel();
     loadKidsActivity(0);
     updateBrainButton();
     positionInstructionPanel();
@@ -1183,7 +1134,6 @@ function startAdvancedMode(){
     setupAdvancedExamples();
     populateActivitySelect();
     populateActivitiesOverlay();
-    populateActivityPanel();
     positionInstructionPanel();
 }
 
@@ -2579,7 +2529,6 @@ function closeDictionary(){
 
 function openActivities(){
     populateActivitiesOverlay();
-    populateActivityPanel();
     if(window.innerWidth < 768){
         const overlay = document.getElementById('activities-overlay');
         if(overlay){
