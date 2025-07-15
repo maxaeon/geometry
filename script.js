@@ -133,7 +133,10 @@ let flashcardDefinitions = {
     'hypotenuse': 'The longest side of a right triangle.',
     'square': 'A shape with four equal sides and four right angles.',
     'cube': 'A solid figure with six equal square faces.',
-    'dimension': 'A measurable extent like length, width, or height.'
+    'dimension': 'A measurable extent like length, width, or height.',
+    'congruent triangles': 'Triangles that are identical in size and shape.',
+    'SSS criterion': 'If all three sides of one triangle match those of another, the triangles are congruent.',
+    'corresponding sides': 'Matching sides in congruent triangles.'
 };
 
 function updateBrainButton(){
