@@ -104,7 +104,7 @@ function setup() {
     canvas.parent('canvas-container');
     fillLayer = createGraphics(window.innerWidth, window.innerHeight);
     fillLayer.pixelDensity(1);
-    feedbackElem = document.getElementById('feedback');
+    feedbackElem = document.getElementById('instruction-panel');
     document.getElementById('tool-select').addEventListener('change', e => {
         setTool(e.target.value);
     });
