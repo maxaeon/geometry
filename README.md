@@ -13,3 +13,5 @@ The toolbar now provides icon-style buttons for common tools, similar to classic
 There is also a cross-hatched swatch for choosing **transparent** fill. Bucket fill with this option clears pixels instead of painting them.
 
 Click the new **brain icon** in the toolbar to see additional context about the current activity. The pop-up shows formulas like area or circumference and you can reveal a short explanation of why they work.
+
+Use the **book icon** to open the dictionary and flashcard set. This icon is available on the start screen and in the drawing toolbar so you can quickly review terms at any time.
