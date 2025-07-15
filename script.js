@@ -11,6 +11,7 @@ let feedbackElem;
 let symmetryDemo = null;
 let undoStack = [];
 let redoStack = [];
+const HISTORY_LIMIT = 50;
 let actionChanged = false;
 let currentColor = '#000000';
 let currentWeight = 1;
@@ -114,6 +115,7 @@ function restoreState(state){
 
 function saveState(){
     undoStack.push(cloneState());
+    if(undoStack.length > HISTORY_LIMIT) undoStack.shift();
     redoStack = [];
 }
 
@@ -136,6 +138,15 @@ function redo(){
         drawingShape = null;
     }
 }
+function deleteSelectedShape(){
+    if(selectedShape){
+        const idx = shapes.indexOf(selectedShape);
+        if(idx !== -1) shapes.splice(idx,1);
+        selectedShape = null;
+        saveState();
+    }
+}
+
 
 function animatePageTurn(dir){
     const c = document.getElementById('canvas-container');
@@ -191,14 +202,7 @@ function setup() {
 
     document.getElementById('undo-btn').addEventListener('click', undo);
     document.getElementById('redo-btn').addEventListener('click', redo);
-    document.getElementById('delete-btn').addEventListener('click', () => {
-        if(selectedShape){
-            const idx = shapes.indexOf(selectedShape);
-            if(idx !== -1) shapes.splice(idx,1);
-            selectedShape = null;
-            saveState();
-        }
-    });
+    document.getElementById('delete-btn').addEventListener('click', deleteSelectedShape);
     document.getElementById('add-color-btn').addEventListener('click', () => {
         const color = prompt('Enter color hex code (#RRGGBB):', '#000000');
         if(color && /^#([0-9a-fA-F]{6})$/.test(color)){
@@ -365,12 +369,9 @@ function mouseReleased() {
 }
 
 function keyPressed() {
-    if ((keyCode === DELETE || keyCode === BACKSPACE) && selectedShape) {
-        const idx = shapes.indexOf(selectedShape);
-        if (idx !== -1) shapes.splice(idx,1);
-        selectedShape = null;
+    if ((keyCode === DELETE || keyCode === BACKSPACE)) {
+        deleteSelectedShape();
         actionChanged = true;
-        saveState();
     }
 }
 
