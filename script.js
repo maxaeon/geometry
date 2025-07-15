@@ -827,25 +827,15 @@ function bucketFill(x,y,color){
 }
 
 function loadExample(name){
+    if(name==='equilateral'){
+        if(mode!=='kids') startKidsMode();
+        loadKidsActivity(14);
+        return;
+    }
     shapes = [];
     currentExample = null;
     exampleShapes = [];
-    if(name==='equilateral'){
-        const side=200;
-        const x1=width/2-side/2;
-        const y1=height/2+side/3;
-        const x2=width/2+side/2;
-        const y2=y1;
-        const h=side*Math.sqrt(3)/2;
-        const x3=width/2;
-        const y3=y1-h;
-        shapes.push(new LineSeg(x1,y1,x2,y2,false));
-        shapes.push(new LineSeg(x2,y2,x3,y3,false));
-        shapes.push(new LineSeg(x3,y3,x1,y1,false));
-        feedbackElem.textContent='Equilateral triangle constructed';
-        currentExample = name;
-        exampleShapes = [...shapes];
-    } else if(name==='triangle-congruency'){
+    if(name==='triangle-congruency'){
         const left=[{x:200,y:300},{x:300,y:150},{x:400,y:300}];
         shapes.push(new LineSeg(left[0].x,left[0].y,left[1].x,left[1].y,false));
         shapes.push(new LineSeg(left[1].x,left[1].y,left[2].x,left[2].y,false));
