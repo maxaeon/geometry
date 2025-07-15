@@ -1312,6 +1312,126 @@ function setupKidsActivities(){
                 }
                 return ab && bc && ca;
             }
+        },
+        {
+            prompt: 'Identify each shape by clicking its center.',
+            setup: function(){
+                const cx = width/2;
+                const cy = height/2;
+                const gap = 150;
+                // circle
+                shapes.push(new Circle(cx - gap, cy, 40));
+                shapes.push(new Circle(cx - gap, cy, 8, 'magenta', true));
+                // square
+                const s = 80;
+                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2));
+                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2));
+                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2));
+                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2));
+                shapes.push(new Circle(cx, cy, 8, 'magenta', true));
+                // triangle
+                const tx = cx + gap;
+                const pts = [
+                    {x: tx - 40, y: cy + 40},
+                    {x: tx + 40, y: cy + 40},
+                    {x: tx, y: cy - 40}
+                ];
+                shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y));
+                shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y));
+                shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y));
+                shapes.push(new Circle(tx, cy, 8, 'magenta', true));
+            },
+            check: function(){
+                let clicked = 0;
+                for(const s of shapes){
+                    if(s instanceof Circle && s.clickable && s.clicked){
+                        clicked++;
+                    }
+                }
+                return clicked >= 3;
+            }
+        },
+        {
+            prompt: 'Combine two triangles to form a rectangle using the four dots.',
+            setup: function(){
+                const cx = width/2;
+                const cy = height/2;
+                const h = 60;
+                shapes.push(new Circle(cx - h, cy - h, 6, 'magenta'));
+                shapes.push(new Circle(cx + h, cy - h, 6, 'magenta'));
+                shapes.push(new Circle(cx + h, cy + h, 6, 'magenta'));
+                shapes.push(new Circle(cx - h, cy + h, 6, 'magenta'));
+            },
+            check: function(){
+                const pts = [
+                    {x: width/2 - 60, y: height/2 - 60},
+                    {x: width/2 + 60, y: height/2 - 60},
+                    {x: width/2 + 60, y: height/2 + 60},
+                    {x: width/2 - 60, y: height/2 + 60}
+                ];
+                let edges = 0;
+                let diag = false;
+                function connected(p1,p2,seg){
+                    const c1 = dist(seg.x1,seg.y1,p1.x,p1.y) < 10 && dist(seg.x2,seg.y2,p2.x,p2.y) < 10;
+                    const c2 = dist(seg.x1,seg.y1,p2.x,p2.y) < 10 && dist(seg.x2,seg.y2,p1.x,p1.y) < 10;
+                    return c1 || c2;
+                }
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        for(let i=0;i<4;i++){
+                            const j=(i+1)%4;
+                            if(connected(pts[i],pts[j],s)) edges++;
+                        }
+                        if(connected(pts[0],pts[2],s) || connected(pts[1],pts[3],s)) diag = true;
+                    }
+                }
+                return edges>=4 && diag;
+            }
+        },
+        {
+            prompt: 'Click each vertex of the triangle to count its corners.',
+            setup: function(){
+                const p = [
+                    {x: width/2, y: height/2 - 80},
+                    {x: width/2 - 70, y: height/2 + 60},
+                    {x: width/2 + 70, y: height/2 + 60}
+                ];
+                shapes.push(new LineSeg(p[0].x,p[0].y,p[1].x,p[1].y));
+                shapes.push(new LineSeg(p[1].x,p[1].y,p[2].x,p[2].y));
+                shapes.push(new LineSeg(p[2].x,p[2].y,p[0].x,p[0].y));
+                for(const pt of p){
+                    shapes.push(new Circle(pt.x, pt.y, 8, 'gray', true));
+                }
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Circle && s.clickable && !s.clicked) return false;
+                }
+                return true;
+            }
+        },
+        {
+            prompt: 'Draw a line across the circle using the red points to cut it in half.',
+            setup: function(){
+                const r = 80;
+                const cx = width/2;
+                const cy = height/2;
+                shapes.push(new Circle(cx, cy, r));
+                shapes.push(new Circle(cx - r, cy, 6, 'magenta'));
+                shapes.push(new Circle(cx + r, cy, 6, 'magenta'));
+            },
+            check: function(){
+                const p1 = {x: width/2 - 80, y: height/2};
+                const p2 = {x: width/2 + 80, y: height/2};
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        const c1 = dist(s.x1,s.y1,p1.x,p1.y) < 10 && dist(s.x2,s.y2,p2.x,p2.y) < 10;
+                        const c2 = dist(s.x1,s.y1,p2.x,p2.y) < 10 && dist(s.x2,s.y2,p1.x,p1.y) < 10;
+                        if(c1 || c2) return true;
+                    }
+                }
+                return false;
+            }
         }
     ];
 }
