@@ -413,7 +413,7 @@ function keyPressed() {
 }
 
 function draw() {
-    background(255);
+    clear();
     if(showGrid) drawGrid();
     image(fillLayer, 0, 0);
     updateCursor();
@@ -423,7 +423,7 @@ function draw() {
 
 function drawGrid(){
     const step = 25;
-    stroke(230);
+    stroke(230, 150);
     strokeWeight(1);
     for(let x=0;x<width;x+=step){
         line(x,0,x,height);
