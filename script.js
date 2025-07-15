@@ -62,6 +62,14 @@ let advancedInfo = {
         formula: 'Cube volume = side³',
         explanation: 'Cubes add height, giving a third dimension.'
     },
+    'draw-diameter': {
+        formula: 'Circle circumference = 2πr, area = πr² → sphere volume = 4/3πr³',
+        explanation: 'Cutting the circle in half highlights diameter and radius. The 3‑D analogue is a sphere where volume depends on r³.'
+    },
+    'fraction-square-quarters': {
+        formula: 'Square area = side² → cube volume = side³',
+        explanation: 'Dividing the square helps see equal areas. Extending the sides into 3‑D makes a cube whose volume uses side cubed.'
+    },
     'right-triangle-basics': {
         formula: 'Right triangle \u2192 one angle = 90\u00b0',
         explanation: 'A right triangle has a single 90\u00b0 angle. The side opposite this right angle is called the hypotenuse.'
@@ -895,11 +903,21 @@ function populateActivitySelect(){
 }
 
 function populateActivitiesOverlay(){
-    const list = document.querySelector('#activities-overlay ul');
-    if(!list) return;
-    list.innerHTML = '';
+    const container = document.querySelector('#activities-overlay #activities-list');
+    if(!container) return;
+    container.innerHTML = '';
+    const cats = {};
     if(Array.isArray(kidsActivities)){
         kidsActivities.forEach((act, i) => {
+            const cat = act.category || 'Other';
+            if(!cats[cat]){
+                const h = document.createElement('h3');
+                h.textContent = cat;
+                container.appendChild(h);
+                const ul = document.createElement('ul');
+                container.appendChild(ul);
+                cats[cat] = ul;
+            }
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.href = '#';
@@ -907,10 +925,16 @@ function populateActivitiesOverlay(){
             a.dataset.kid = i;
             a.textContent = act.title || ('Activity ' + (i + 1));
             li.appendChild(a);
-            list.appendChild(li);
+            cats[cat].appendChild(li);
         });
     }
     if(typeof advancedExamples === 'object'){
+        const cat = 'Advanced';
+        const h = document.createElement('h3');
+        h.textContent = cat;
+        container.appendChild(h);
+        const ul = document.createElement('ul');
+        container.appendChild(ul);
         Object.keys(advancedExamples).forEach(key => {
             const li = document.createElement('li');
             const a = document.createElement('a');
@@ -919,15 +943,75 @@ function populateActivitiesOverlay(){
             a.dataset.example = key;
             a.textContent = key.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             li.appendChild(a);
-            list.appendChild(li);
+            ul.appendChild(li);
         });
     }
-    list.querySelectorAll('.example-link').forEach(link => {
+    container.querySelectorAll('.example-link').forEach(link => {
         link.addEventListener('click', e => {
             e.preventDefault();
             const kid = link.dataset.kid;
             const example = link.dataset.example;
             closeActivities();
+            if(kid !== undefined){
+                if(mode !== 'kids') startKidsMode();
+                loadKidsActivity(parseInt(kid,10));
+            } else if(example){
+                if(mode !== 'advanced') startAdvancedMode();
+                loadExample(example);
+            }
+        });
+    });
+}
+
+function populateActivityPanel(){
+    const container = document.getElementById('activity-list');
+    if(!container) return;
+    container.innerHTML = '';
+    const cats = {};
+    if(Array.isArray(kidsActivities)){
+        kidsActivities.forEach((act, i) => {
+            const cat = act.category || 'Other';
+            if(!cats[cat]){
+                const h = document.createElement('h3');
+                h.textContent = cat;
+                container.appendChild(h);
+                const ul = document.createElement('ul');
+                container.appendChild(ul);
+                cats[cat] = ul;
+            }
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#';
+            a.className = 'example-link';
+            a.dataset.kid = i;
+            a.textContent = act.title || ('Activity ' + (i + 1));
+            li.appendChild(a);
+            cats[cat].appendChild(li);
+        });
+    }
+    if(typeof advancedExamples === 'object'){
+        const cat = 'Advanced';
+        const h = document.createElement('h3');
+        h.textContent = cat;
+        container.appendChild(h);
+        const ul = document.createElement('ul');
+        container.appendChild(ul);
+        Object.keys(advancedExamples).forEach(key => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#';
+            a.className = 'example-link';
+            a.dataset.example = key;
+            a.textContent = key.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            li.appendChild(a);
+            ul.appendChild(li);
+        });
+    }
+    container.querySelectorAll('.example-link').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const kid = link.dataset.kid;
+            const example = link.dataset.example;
             if(kid !== undefined){
                 if(mode !== 'kids') startKidsMode();
                 loadKidsActivity(parseInt(kid,10));
@@ -1055,6 +1139,7 @@ function startKidsMode(){
     setupKidsActivities();
     populateActivitySelect();
     populateActivitiesOverlay();
+    populateActivityPanel();
     loadKidsActivity(0);
     updateBrainButton();
     positionInstructionPanel();
@@ -1084,6 +1169,7 @@ function startAdvancedMode(){
     setupAdvancedExamples();
     populateActivitySelect();
     populateActivitiesOverlay();
+    populateActivityPanel();
     positionInstructionPanel();
 }
 
@@ -1091,6 +1177,7 @@ function setupKidsActivities(){
     kidsActivities = [
         {
             id: 'intro-plane',
+            category: 'Basics',
             prompt: 'This grid is our plane—a flat surface that goes on forever.',
             setup: function(){
                 showGrid = true;
@@ -1101,6 +1188,7 @@ function setupKidsActivities(){
         },
         {
             id: 'place-point',
+            category: 'Basics',
             prompt: 'Place a point anywhere on the plane.',
             setup: function(){
                 // nothing pre-drawn
@@ -1117,6 +1205,7 @@ function setupKidsActivities(){
         },
         {
             id: 'stretch-to-segment',
+            category: 'Basics',
             prompt: 'Stretch your point into a line segment.',
             keepShapes: true,
             setup: function(){
@@ -1140,6 +1229,7 @@ function setupKidsActivities(){
         },
         {
             id: 'connect-red-points',
+            category: 'Basics',
             prompt: 'Draw a line segment connecting the two red points. A line segment is a straight 1D path between points.',
             setup: function(){
                 const x1 = width/2 - 60;
@@ -1164,6 +1254,7 @@ function setupKidsActivities(){
         },
         {
             id: 'extend-line',
+            category: 'Basics',
             prompt: 'Extend your line segment past both red points so it keeps going in a straight path.',
             keepShapes: true,
             setup: function(){
@@ -1192,6 +1283,7 @@ function setupKidsActivities(){
         },
         {
             id: 'draw-square',
+            category: 'Shapes',
             prompt: 'Connect the 4 red points to make a square.',
             setup: function(){
                 placeSquareDots();
@@ -1225,6 +1317,7 @@ function setupKidsActivities(){
         },
         {
             id: 'cube-dotted',
+            category: 'Shapes',
             prompt: 'Use dotted line segments from each corner so the square looks like a 3-D cube.',
             keepShapes: true,
             setup: function(){
@@ -1264,6 +1357,7 @@ function setupKidsActivities(){
         },
         {
             id: 'triangle-equal',
+            category: 'Shapes',
             prompt: 'Use line segments to connect the 3 red points into a triangle. A triangle is a polygon, a closed shape made from line segments. Can you make two line segments equal?',
             setup: function(){
                 placeTriangleDots();
@@ -1304,6 +1398,7 @@ function setupKidsActivities(){
         },
         {
             id: 'triangle-dotted-base',
+            category: 'Shapes',
             prompt: 'Use a dotted line segment to complete the base of the triangle.',
             setup: function(){
                 const x1 = width/2 - 80;
@@ -1330,6 +1425,7 @@ function setupKidsActivities(){
         },
         {
             id: 'identify-right-angles',
+            category: 'Basics',
             prompt: 'Click each corner point of the square to find the right angles. An angle is the space between two lines that meet.',
             setup: function(){
                 const size=120;
@@ -1359,6 +1455,7 @@ function setupKidsActivities(){
         },
         {
             id: 'circle-basics',
+            category: 'Basics',
             prompt: 'Step 1: Place a point anywhere on the canvas. Step 2: Draw a circle centered on that point. The radius is the distance from the center to the edge. The circumference is the distance all the way around the circle.',
             setup: function(){
                 // nothing pre-drawn
@@ -1384,6 +1481,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-point-a',
+            category: 'Shapes',
             prompt: 'Place the first point (point A) anywhere on the canvas.',
             keepShapes: false,
             setup: function(){
@@ -1402,6 +1500,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-circle-a',
+            category: 'Shapes',
             prompt: 'Draw a circle centered at point A.',
             keepShapes: true,
             setup: function(){
@@ -1424,6 +1523,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-point-b',
+            category: 'Shapes',
             prompt: 'Place a second point (point B) on the circle\u2019s circumference.',
             keepShapes: true,
             setup: function(){
@@ -1448,6 +1548,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-circle-b',
+            category: 'Shapes',
             prompt: 'Draw a second circle centered at B with the same radius as the first.',
             keepShapes: true,
             setup: function(){
@@ -1469,6 +1570,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-connect',
+            category: 'Shapes',
             prompt: 'Mark the intersection of both circles as point C and connect A-B-C with line segments.',
             keepShapes: true,
             setup: function(){
@@ -1515,6 +1617,7 @@ function setupKidsActivities(){
         },
         {
             id: 'right-angle-legs',
+            category: 'Basics',
             prompt: 'Use the three red points to draw the two legs of a right angle. The small square marks a perfect 90\u00b0 corner.',
             keepShapes: false,
             setup: function(){
@@ -1552,6 +1655,7 @@ function setupKidsActivities(){
         },
         {
             id: 'right-angle-hypotenuse',
+            category: 'Basics',
             prompt: 'Finish the right triangle by drawing the hypotenuse from point A to point C.',
             keepShapes: true,
             setup: function(){
@@ -1582,6 +1686,7 @@ function setupKidsActivities(){
         },
         {
             id: 'identify-centers',
+            category: 'Basics',
             prompt: 'Click the center of the circle.',
             setup: function(){
                 const cx = width/2;
@@ -1630,6 +1735,7 @@ function setupKidsActivities(){
         },
         {
             id: 'rectangle-from-triangles',
+            category: 'Shapes',
             prompt: 'Combine two triangles to form a rectangle using the four dots.',
             setup: function(){
                 const cx = width/2;
@@ -1668,6 +1774,7 @@ function setupKidsActivities(){
         },
         {
             id: 'triangle-vertices',
+            category: 'Basics',
             prompt: 'Click each vertex of the triangle to count its corners.',
             setup: function(){
                 const p = [
@@ -1691,6 +1798,7 @@ function setupKidsActivities(){
         },
         {
             id: 'draw-diameter',
+            category: 'Area & Perimeter',
             prompt: 'Draw a line across the circle using the red points to cut it in half.',
             setup: function(){
                 const r = 80;
@@ -1715,6 +1823,7 @@ function setupKidsActivities(){
         },
         {
             id: 'acute-angle',
+            category: 'Basics',
             prompt: 'Click the acute angle (<90\u00b0).',
             setup: function(){
                 const len = 80;
@@ -1741,6 +1850,7 @@ function setupKidsActivities(){
         },
         {
             id: 'obtuse-angle',
+            category: 'Basics',
             prompt: 'Click the obtuse angle (>90\u00b0 and <180\u00b0).',
             setup: function(){
                 const len = 80;
@@ -1773,6 +1883,7 @@ function setupKidsActivities(){
         },
         {
             id: 'shape-name-clicks',
+            category: 'Shapes',
             prompt: 'Click the circle, square, and triangle to name each shape.',
             setup: function(){
                 shapeIdentify = {};
@@ -1809,6 +1920,7 @@ function setupKidsActivities(){
         },
         {
             id: 'shape-identify-sequence',
+            category: 'Shapes',
             title: 'Shape Identification',
             prompt: 'Click the circle.',
             setup: function(){
@@ -1858,6 +1970,7 @@ function setupKidsActivities(){
         },
         {
             id: 'compose-house',
+            category: 'Shapes',
             title: 'Compose Shapes',
             prompt: 'Use the dots to build a house shape.',
             setup: function(){
@@ -1885,6 +1998,7 @@ function setupKidsActivities(){
         },
         {
             id: 'shape-attributes',
+            category: 'Shapes',
             title: 'Shape Attributes',
             prompt: 'Click the shape with 3 sides.',
             setup: function(){
@@ -1946,6 +2060,7 @@ function setupKidsActivities(){
         },
         {
             id: 'fraction-square-quarters',
+            category: 'Area & Perimeter',
             title: 'Fractions with Shapes',
             prompt: 'Divide the square into 4 equal parts using line segments.',
             setup: function(){
@@ -1972,6 +2087,7 @@ function setupKidsActivities(){
         },
         {
             id: 'parallel-through-point',
+            category: 'Basics',
             prompt: 'Draw a line through the red point that stays parallel to the black line.',
             setup: function(){
                 const y = height/2 + 50;
@@ -2448,9 +2564,12 @@ function closeDictionary(){
 
 function openActivities(){
     populateActivitiesOverlay();
-    const overlay = document.getElementById('activities-overlay');
-    if(overlay){
-        overlay.style.display = 'flex';
+    populateActivityPanel();
+    if(window.innerWidth < 768){
+        const overlay = document.getElementById('activities-overlay');
+        if(overlay){
+            overlay.style.display = 'flex';
+        }
     }
 }
 
