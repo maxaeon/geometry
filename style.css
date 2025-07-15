@@ -12,7 +12,7 @@ body {
     left: 3vw;
     right: 3vw;
     bottom: 3vh;
-    background: rgba(255, 255, 255, 0.95);
+    background: none;
     overflow: visible;
     z-index: 100;
 }
@@ -168,14 +168,14 @@ svg.shape {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5vh 5vw;
+    background: rgba(255, 255, 255, 0.8);
     box-sizing: border-box;
     position: relative;
     z-index: 10;
 }
 
 canvas {
-    border: 1px solid #ccc;
+    border: none;
 }
 
 #instruction-panel {
@@ -187,6 +187,7 @@ canvas {
     font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
     border: 1px solid #ccc;
     border-radius: 4px;
+    z-index: 200;
 }
 
 body.kids #example-select {

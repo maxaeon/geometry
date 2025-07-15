@@ -108,7 +108,7 @@ function cloneShapeList(list){
             return c;
         }
         if(s instanceof Point){
-            return new Point(s.x, s.y, s.color);
+            return new Point(s.x, s.y, s.color, s.label);
         }
         if(s instanceof LineSeg){
             return new LineSeg(s.x1, s.y1, s.x2, s.y2, s.dotted, s.color, s.weight);
@@ -467,10 +467,11 @@ class Circle {
 }
 
 class Point {
-    constructor(x, y, color = 'black') {
+    constructor(x, y, color = 'black', label = '') {
         this.x = x;
         this.y = y;
         this.color = color;
+        this.label = label;
         this.r = 4;
     }
     draw(pg){
@@ -480,6 +481,15 @@ class Point {
         g.noStroke();
         g.ellipse(this.x, this.y, this.r * 2, this.r * 2);
         g.pop();
+        if(this.label){
+            g.push();
+            g.fill(this.color);
+            g.noStroke();
+            g.textSize(16);
+            g.textAlign(g.LEFT, g.TOP);
+            g.text(this.label, this.x + this.r + 4, this.y - this.r - 4);
+            g.pop();
+        }
         if(!pg && selectedShape === this) {
             push();
             stroke('orange');
@@ -1022,6 +1032,7 @@ function setupKidsActivities(){
                 for(const s of shapes){
                     if(s instanceof Point){
                         triangleGuide.A = {x:s.x, y:s.y};
+                        if(!s.label) s.label = 'A';
                         return true;
                     }
                 }
@@ -1064,6 +1075,7 @@ function setupKidsActivities(){
                         const d = dist(s.x,s.y,triangleGuide.A.x,triangleGuide.A.y);
                         if(abs(d - triangleGuide.radius) < 5){
                             triangleGuide.B = {x:s.x, y:s.y};
+                            if(!s.label) s.label = 'B';
                             return true;
                         }
                     }
@@ -1109,16 +1121,18 @@ function setupKidsActivities(){
             },
             check: function(){
                 if(!triangleGuide.C) return false;
-                let cPoint = null;
+                let cShape = null;
                 for(const s of shapes){
                     if(s instanceof Point){
                         if(dist(s.x,s.y,triangleGuide.C.x,triangleGuide.C.y) < 5){
-                            cPoint = {x:s.x, y:s.y};
+                            cShape = s;
                             break;
                         }
                     }
                 }
-                if(!cPoint) return false;
+                if(!cShape) return false;
+                cShape.label = 'C';
+                let cPoint = {x:cShape.x, y:cShape.y};
                 let ab=false, bc=false, ca=false;
                 function near(px,py,qx,qy){ return dist(px,py,qx,qy) < 5; }
                 for(const s of shapes){
