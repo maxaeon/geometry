@@ -79,8 +79,10 @@ svg.shape {
 }
 
 #delete-btn {
-    width: 32px;
     height: 32px;
+    padding: 0 8px;
+    line-height: 32px;
+    text-align: center;
 }
 
 #color-palette {
@@ -135,9 +137,40 @@ body.kids #feedback {
 
 #prev-activity, #next-activity {
     display: none;
+    position: fixed;
+    bottom: 20px;
+    padding: 8px 12px;
+}
+
+#prev-activity {
+    left: 20px;
+}
+
+#next-activity {
+    right: 20px;
 }
 
 body.kids #prev-activity,
 body.kids #next-activity {
     display: inline-block;
+}
+
+@keyframes turnForward {
+    0% {transform: perspective(600px) rotateY(0deg);}
+    50% {transform: perspective(600px) rotateY(-20deg);}
+    100% {transform: perspective(600px) rotateY(0deg);}
+}
+
+@keyframes turnBack {
+    0% {transform: perspective(600px) rotateY(0deg);}
+    50% {transform: perspective(600px) rotateY(20deg);}
+    100% {transform: perspective(600px) rotateY(0deg);}
+}
+
+.turn-forward {
+    animation: turnForward 0.5s ease;
+}
+
+.turn-back {
+    animation: turnBack 0.5s ease;
 }
