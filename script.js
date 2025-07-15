@@ -67,14 +67,13 @@ let flashcardDefinitions = {
     'circle': 'A round shape where every point is the same distance from the center.',
     'triangle': 'A shape made of three straight sides.',
     'tangent': 'A line that touches a circle at one point.',
-    'secant': 'A line that cuts through a circle at two points.',
-    'centroid': 'The point where a triangle\'s three medians meet.',
+    'hexagon': 'A polygon with six sides and six angles.',
     'similarity': 'When two shapes have the same angles and matching side ratios.',
     'circumference': 'The distance all the way around a circle.',
     'hypotenuse': 'The longest side of a right triangle.',
     'square': 'A shape with four equal sides and four right angles.',
-    'cube': 'A 3D object made of six equal square faces.',
-    'dimension': 'A measurable extent such as length, width, or height.'
+    'cube': 'A solid figure with six equal square faces.',
+    'dimension': 'A measurable extent like length, width, or height.'
 };
 
 function updateBrainButton(){
@@ -185,8 +184,10 @@ function animatePageTurn(dir){
 }
 
 function calcCanvasSize(){
-    const width = window.innerWidth * (1 - CANVAS_PADDING_PCT * 2);
-    const height = window.innerHeight * (1 - CANVAS_PADDING_PCT * 2);
+    let width = window.innerWidth * (1 - CANVAS_PADDING_PCT * 2);
+    let height = window.innerHeight * (1 - CANVAS_PADDING_PCT * 2);
+    width -= width % 25;
+    height -= height % 25;
     return {width, height};
 }
 
@@ -1411,31 +1412,13 @@ function showFlashcard(term){
             ctx.beginPath();
             ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
             ctx.stroke();
-        } else if(term === 'triangle' || term === 'hypotenuse' || term === 'centroid' || term === 'similarity'){
+        } else if(term === 'triangle' || term === 'similarity'){
             ctx.beginPath();
             ctx.moveTo(canvas.width/2, 40);
             ctx.lineTo(canvas.width-40, canvas.height-40);
             ctx.lineTo(40, canvas.height-40);
             ctx.closePath();
             ctx.stroke();
-            if(term === 'hypotenuse'){
-                ctx.strokeStyle = 'red';
-                ctx.beginPath();
-                ctx.moveTo(canvas.width-40, canvas.height-40);
-                ctx.lineTo(40, canvas.height-40);
-                ctx.stroke();
-            }
-            if(term === 'centroid'){
-                ctx.strokeStyle = 'blue';
-                ctx.beginPath();
-                ctx.moveTo(canvas.width/2, 40);
-                ctx.lineTo((canvas.width-40+40)/2, canvas.height-40);
-                ctx.moveTo(canvas.width-40, canvas.height-40);
-                ctx.lineTo(canvas.width/2, (40+canvas.height-40)/2);
-                ctx.moveTo(40, canvas.height-40);
-                ctx.lineTo(canvas.width/2, (40+canvas.height-40)/2);
-                ctx.stroke();
-            }
             if(term === 'similarity'){
                 ctx.strokeStyle = 'blue';
                 ctx.beginPath();
@@ -1445,9 +1428,36 @@ function showFlashcard(term){
                 ctx.closePath();
                 ctx.stroke();
             }
+        } else if(term === 'hypotenuse'){
+            ctx.beginPath();
+            ctx.moveTo(40, canvas.height-40);
+            ctx.lineTo(canvas.width-40, canvas.height-40);
+            ctx.lineTo(40, 40);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.strokeStyle = 'red';
+            ctx.beginPath();
+            ctx.moveTo(canvas.width-40, canvas.height-40);
+            ctx.lineTo(40, 40);
+            ctx.stroke();
+            ctx.strokeStyle = '#000';
+            ctx.strokeRect(40, canvas.height-60, 20, 20);
         } else if(term === 'square'){
             const size = canvas.width-100;
             ctx.strokeRect(50, 50, size, size);
+        } else if(term === 'hexagon'){
+            const cx = canvas.width/2;
+            const cy = canvas.height/2;
+            const r = 60;
+            ctx.beginPath();
+            for(let i=0;i<6;i++){
+                const angle = Math.PI/3*i - Math.PI/6;
+                const x = cx + r*Math.cos(angle);
+                const y = cy + r*Math.sin(angle);
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            }
+            ctx.closePath();
+            ctx.stroke();
         } else if(term === 'cube'){
             const size = 70;
             // back square
@@ -1472,14 +1482,6 @@ function showFlashcard(term){
             ctx.beginPath();
             ctx.moveTo(canvas.width/2-60, canvas.height/2+50);
             ctx.lineTo(canvas.width/2+60, canvas.height/2+50);
-            ctx.stroke();
-        } else if(term === 'secant'){
-            ctx.beginPath();
-            ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI*2);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(canvas.width/2-60, canvas.height/2-30);
-            ctx.lineTo(canvas.width/2+60, canvas.height/2+30);
             ctx.stroke();
         }
     }

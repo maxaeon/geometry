@@ -4,6 +4,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    overflow: hidden;
 }
 
 #mode-selector {
@@ -66,7 +67,7 @@ body {
     bottom: 0;
     pointer-events: none;
     z-index: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 svg.shape {
@@ -80,7 +81,7 @@ svg.shape {
 
 @keyframes fall {
     from {transform: translateY(0);}
-    to {transform: translateY(120vh);}
+    to {transform: translateY(150vh);}
 }
 
 #toolbar {
@@ -168,6 +169,7 @@ svg.shape {
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
     background: rgba(255, 255, 255, 0.8);
     box-sizing: border-box;
     position: relative;
