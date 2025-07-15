@@ -396,6 +396,11 @@ body.kids #skip-activity {
     margin: 10px 0;
 }
 
+#advanced-canvas {
+    max-width: 100%;
+    margin: 10px 0;
+}
+
 #activities-overlay {
     position: fixed;
     top: 0;
