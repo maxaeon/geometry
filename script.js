@@ -42,34 +42,6 @@ let advancedInfo = {
         formula: '<strong>Dimensions:</strong> a line is 1D and our canvas is 2D.',
         explanation: 'In 3D you add height to length and width. Time or another axis can create 4D and beyond.'
     },
-    'distance-formula': {
-        formula: 'Length = √((x₂−x₁)² + (y₂−y₁)²)',
-        explanation: 'This distance formula is derived from the Pythagorean theorem.'
-    },
-    'triangle-area': {
-        formula: 'Triangle area = base × height ÷ 2',
-        explanation: 'A triangle occupies half the area of a rectangle with the same base and height.'
-    },
-    'dotted-lines': {
-        formula: 'Dotted lines show hidden or imaginary edges.',
-        explanation: 'They are used when a side is not physically present but helpful for reasoning.'
-    },
-    'right-angle-definition': {
-        formula: 'Right angle = 90°',
-        explanation: 'Two lines that meet to form a square corner are perpendicular.'
-    },
-    'circle-math': {
-        formula: 'Circle circumference = 2πr, area = πr²',
-        explanation: 'The constant π describes the ratio between a circle’s circumference and its diameter.'
-    },
-    'square-area': {
-        formula: 'Square area = side²',
-        explanation: 'A square lives in 2‑D with only length and width.'
-    },
-    'cube-volume': {
-        formula: 'Cube volume = side³',
-        explanation: 'Cubes add height, giving a third dimension.'
-    },
     'draw-diameter': {
         formula: 'Circle circumference = 2πr, area = πr² → sphere volume = 4/3πr³',
         explanation: 'Cutting the circle in half highlights diameter and radius. The 3‑D analogue is a sphere where volume depends on r³.'
@@ -77,18 +49,6 @@ let advancedInfo = {
     'fraction-square-quarters': {
         formula: 'Square area = side² → cube volume = side³',
         explanation: 'Dividing the square helps see equal areas. Extending the sides into 3‑D makes a cube whose volume uses side cubed.'
-    },
-    'right-triangle-basics': {
-        formula: 'Right triangle \u2192 one angle = 90\u00b0',
-        explanation: 'A right triangle has a single 90\u00b0 angle. The side opposite this right angle is called the hypotenuse.'
-    },
-    'acute-angles': {
-        formula: 'Acute angle < 90\u00b0',
-        explanation: 'Angles smaller than a right angle are called acute.'
-    },
-    'obtuse-angles': {
-        formula: 'Obtuse angle > 90\u00b0 and < 180\u00b0',
-        explanation: 'Angles bigger than a right angle but less than a straight line are obtuse.'
     },
     'connect-red-points': {
         formula: "Euclid's First Postulate",
