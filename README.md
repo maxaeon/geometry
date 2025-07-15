@@ -26,6 +26,7 @@ This interactive geometry webpage is designed for users ranging from kindergarte
   * Circle Theorems
   * Pythagorean Theorem
   * Parallel Line Theorems
+  * Euclid's Five Postulates (advanced explanations under the brain icon)
 
 #### Upcoming Goals:
 

@@ -73,6 +73,26 @@ let advancedInfo = {
     'obtuse-angles': {
         formula: 'Obtuse angle > 90\u00b0 and < 180\u00b0',
         explanation: 'Angles bigger than a right angle but less than a straight line are obtuse.'
+    },
+    'connect-red-points': {
+        formula: "Euclid's First Postulate",
+        explanation: 'Any two distinct points can be joined by a straight line.'
+    },
+    'extend-line': {
+        formula: "Euclid's Second Postulate",
+        explanation: 'A straight line segment can continue indefinitely in the same direction.'
+    },
+    'circle-basics': {
+        formula: "Euclid's Third Postulate",
+        explanation: 'Given any segment as a radius, a circle can be drawn with one endpoint as its center.'
+    },
+    'identify-right-angles': {
+        formula: "Euclid's Fourth Postulate",
+        explanation: 'All right angles are congruent to one another.'
+    },
+    'parallel-through-point': {
+        formula: "Euclid's Fifth Postulate",
+        explanation: 'Through a point not on a line, exactly one line can be drawn parallel to the given line.'
     }
 };
 
@@ -1143,6 +1163,34 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'extend-line',
+            prompt: 'Extend your line segment past both red points so it keeps going in a straight path.',
+            keepShapes: true,
+            setup: function(){
+                const x1 = width/2 - 60;
+                const x2 = width/2 + 60;
+                const y = height/2;
+                shapes.push(new Circle(x1, y, 6, 'magenta'));
+                shapes.push(new Circle(x2, y, 6, 'magenta'));
+            },
+            check: function(){
+                const x1 = width/2 - 60;
+                const x2 = width/2 + 60;
+                const y = height/2;
+                const baseLen = dist(x1, y, x2, y);
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        const match1 = dist(s.x1,s.y1,x1,y) < 10 && dist(s.x2,s.y2,x2,y) < 10;
+                        const match2 = dist(s.x1,s.y1,x2,y) < 10 && dist(s.x2,s.y2,x1,y) < 10;
+                        if((match1 || match2) && dist(s.x1,s.y1,s.x2,s.y2) > baseLen + 40){
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        },
+        {
             id: 'draw-square',
             prompt: 'Connect the 4 red points to make a square.',
             setup: function(){
@@ -1921,6 +1969,31 @@ function setupKidsActivities(){
             check: function(){
                 return hasLineBetween(this.left,this.right) && hasLineBetween(this.top,this.bottom);
             }
+        },
+        {
+            id: 'parallel-through-point',
+            prompt: 'Draw a line through the red point that stays parallel to the black line.',
+            setup: function(){
+                const y = height/2 + 50;
+                const x1 = width/2 - 80;
+                const x2 = width/2 + 80;
+                this.base = new LineSeg(x1,y,x2,y,false);
+                shapes.push(this.base);
+                const px = width/2;
+                const py = height/2 - 50;
+                this.p = {x:px, y:py};
+                shapes.push(new Circle(px,py,6,'magenta'));
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof LineSeg && s !== this.base){
+                        if(lineThroughPoint(s,this.p) && areParallel(s,this.base)){
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
         }
     ];
 }
@@ -2337,6 +2410,22 @@ function hasLineBetween(p1,p2){
 
 function triangleLinesDrawn(pts){
     return hasLineBetween(pts[0],pts[1]) && hasLineBetween(pts[1],pts[2]) && hasLineBetween(pts[2],pts[0]);
+}
+
+function lineThroughPoint(seg, pt){
+    const area = abs((seg.x2 - seg.x1)*(seg.y1 - pt.y) - (seg.x1 - pt.x)*(seg.y2 - seg.y1));
+    const len = dist(seg.x1, seg.y1, seg.x2, seg.y2);
+    return area / len < 8;
+}
+
+function areParallel(l1, l2){
+    const dx1 = l1.x2 - l1.x1;
+    const dy1 = l1.y2 - l1.y1;
+    const dx2 = l2.x2 - l2.x1;
+    const dy2 = l2.y2 - l2.y1;
+    if(dx1 === 0 && dx2 === 0) return true;
+    if(dx1 === 0 || dx2 === 0) return false;
+    return abs(dy1/dx1 - dy2/dx2) < 0.05;
 }
 function openDictionary(){
     const overlay = document.getElementById('dictionary-overlay');
