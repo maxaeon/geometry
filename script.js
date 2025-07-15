@@ -200,7 +200,7 @@ function cloneShapeList(list){
             return new Point(s.x, s.y, s.color, s.label);
         }
         if(s instanceof LineSeg){
-            return new LineSeg(s.x1, s.y1, s.x2, s.y2, s.dotted, s.color, s.weight);
+            return new LineSeg(s.x1, s.y1, s.x2, s.y2, s.dotted, s.color, s.weight, s.label);
         }
         return null;
     });
@@ -712,9 +712,9 @@ class Point {
 }
 
 class LineSeg {
-    constructor(x1,y1,x2,y2,dotted=false,color='black',weight=1){
+    constructor(x1,y1,x2,y2,dotted=false,color='black',weight=1,label=''){
         this.x1=x1; this.y1=y1; this.x2=x2; this.y2=y2; this.dotted=dotted;
-        this.color=color; this.weight=weight;
+        this.color=color; this.weight=weight; this.label=label;
     }
     get x(){ return this.x1; }
     get y(){ return this.y1; }
@@ -727,6 +727,18 @@ class LineSeg {
         g.line(this.x1,this.y1,this.x2,this.y2);
         g.drawingContext.setLineDash([]);
         g.pop();
+        if(!pg && this.label){
+            const midX=(this.x1+this.x2)/2;
+            const midY=(this.y1+this.y2)/2 - 10;
+            const len=(dist(this.x1,this.y1,this.x2,this.y2)/25).toFixed(1);
+            push();
+            fill('blue');
+            noStroke();
+            textSize(16);
+            textAlign(CENTER,CENTER);
+            text(`${this.label}: ${len}`,midX,midY);
+            pop();
+        }
         if(!pg && selectedShape===this){
             push();
             stroke('orange');
@@ -789,22 +801,21 @@ class TriangleGroup {
         this.color=color;
         this.weight=1;
         this.highlight=false;
+        this.labels=null;
     }
     get x(){ return this.pts[0].x; }
     get y(){ return this.pts[0].y; }
     draw(pg){
         const g = pg || window;
-        g.push();
-        g.stroke(this.highlight? 'green' : this.color);
-        g.strokeWeight(this.weight);
-        g.noFill();
-        g.beginPath();
-        g.moveTo(this.pts[0].x, this.pts[0].y);
-        g.lineTo(this.pts[1].x, this.pts[1].y);
-        g.lineTo(this.pts[2].x, this.pts[2].y);
-        g.closePath();
-        g.stroke();
-        g.pop();
+        for(let i=0;i<3;i++){
+            const p1=this.pts[i];
+            const p2=this.pts[(i+1)%3];
+            const seg=new LineSeg(p1.x,p1.y,p2.x,p2.y,false,
+                this.highlight? 'green' : this.color,this.weight,
+                this.labels?this.labels[i]:''
+            );
+            seg.draw(pg);
+        }
     }
     hitTest(px,py){
         const d1 = pointSegDist(px,py,this.pts[0],this.pts[1]);
@@ -2200,7 +2211,6 @@ function setupAdvancedExamples(){
                     for(const p of this.pts){
                         shapes.push(new Circle(p.x,p.y,6,'magenta'));
                     }
-                    this.labels=null;
                 },
                 check: function(){
                     const done=triangleLinesDrawn(this.pts) && this.pts.every(p=>p.x%25===0 && p.y%25===0);
@@ -2209,9 +2219,8 @@ function setupAdvancedExamples(){
                         removeLineBetween(this.pts[0],this.pts[1]);
                         removeLineBetween(this.pts[1],this.pts[2]);
                         removeLineBetween(this.pts[2],this.pts[0]);
+                        triangleAGroup.labels=['AB','BC','CA'];
                         shapes.push(triangleAGroup);
-                        const labs=createSideLabels(triangleAGroup);
-                        shapes.push(...labs);
                     }
                     return done;
                 }
@@ -2241,6 +2250,7 @@ function setupAdvancedExamples(){
                         removeLineBetween(this.pts[0],this.pts[1]);
                         removeLineBetween(this.pts[1],this.pts[2]);
                         removeLineBetween(this.pts[2],this.pts[0]);
+                        triangleBGroup.labels=['AB','BC','CA'];
                         shapes.push(triangleBGroup);
                     }
                     return done;
@@ -2701,19 +2711,6 @@ function pointSegDist(px,py,a,b){
     return dist(px,py,x,y);
 }
 
-function createSideLabels(tri){
-    const names=['AB','BC','CA'];
-    const labels=[];
-    for(let i=0;i<3;i++){
-        const p1=tri.pts[i];
-        const p2=tri.pts[(i+1)%3];
-        const midX=(p1.x+p2.x)/2;
-        const midY=(p1.y+p2.y)/2 - 10;
-        const len=(dist(p1.x,p1.y,p2.x,p2.y)/25).toFixed(1);
-        labels.push(new TextLabel(midX,midY,`${names[i]}: ${len}`,'blue'));
-    }
-    return labels;
-}
 
 function trianglesCoincide(t1,t2){
     for(let i=0;i<3;i++){
