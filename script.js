@@ -429,9 +429,20 @@ function setup() {
     });
     document.getElementById('skip-activity').addEventListener('click', () => {
         if(mode === 'kids'){
-            if(currentActivity < kidsActivities.length - 1){
+            const currCat = kidsActivities[currentActivity].category;
+            let nextIdx = -1;
+            for(let j = currentActivity + 1; j < kidsActivities.length; j++){
+                if(kidsActivities[j].category === currCat){
+                    nextIdx = j;
+                    break;
+                }
+            }
+            if(nextIdx !== -1){
                 animatePageTurn('next');
-                loadKidsActivity(currentActivity + 1);
+                loadKidsActivity(nextIdx);
+            } else {
+                const skipBtn = document.getElementById('skip-activity');
+                if(skipBtn) skipBtn.disabled = true;
             }
         } else if(mode === 'advanced' && currentExample){
             const steps = advancedExamples[currentExample];
@@ -2719,7 +2730,17 @@ function loadKidsActivity(i){
     const skipBtn = document.getElementById('skip-activity');
     nextBtn.disabled = !act.autoNext;
     const last = i === kidsActivities.length - 1;
-    if(skipBtn) skipBtn.disabled = last;
+    let hasNextSame = false;
+    if(!last){
+        const cat = act.category;
+        for(let j = i + 1; j < kidsActivities.length; j++){
+            if(kidsActivities[j].category === cat){
+                hasNextSame = true;
+                break;
+            }
+        }
+    }
+    if(skipBtn) skipBtn.disabled = last || !hasNextSame;
     if(last) nextBtn.disabled = true;
     saveState();
     updateBrainButton();
