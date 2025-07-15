@@ -1362,7 +1362,7 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(introGuide.point){
-                    shapes.push(new Circle(introGuide.point.x, introGuide.point.y, 6, 'magenta'));
+                    shapes.push(new Point(introGuide.point.x, introGuide.point.y, 'magenta'));
                 }
             },
             check: function(){
@@ -1388,8 +1388,8 @@ function setupKidsActivities(){
                 const x1 = width/2 - 60;
                 const x2 = width/2 + 60;
                 const y = height/2;
-                shapes.push(new Circle(x1, y, 6, 'magenta'));
-                shapes.push(new Circle(x2, y, 6, 'magenta'));
+                shapes.push(new Point(x1, y, 'magenta'));
+                shapes.push(new Point(x2, y, 'magenta'));
             },
             check: function(){
                 const x1 = width/2 - 60;
@@ -1668,7 +1668,7 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(triangleGuide.A){
-                    shapes.push(new Circle(triangleGuide.A.x, triangleGuide.A.y, 6, 'magenta'));
+                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
                 }
             },
             check: function(){
@@ -1692,7 +1692,7 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(triangleGuide.A){
-                    shapes.push(new Circle(triangleGuide.A.x, triangleGuide.A.y, 6, 'magenta'));
+                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
                 }
             },
             check: function(){
@@ -1718,7 +1718,7 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(triangleGuide.B){
-                    shapes.push(new Circle(triangleGuide.B.x, triangleGuide.B.y, 6, 'magenta'));
+                    shapes.push(new Point(triangleGuide.B.x, triangleGuide.B.y, 'magenta'));
                 }
             },
             check: function(){
@@ -1741,14 +1741,14 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(triangleGuide.A && triangleGuide.B && triangleGuide.radius){
-                    shapes.push(new Circle(triangleGuide.A.x, triangleGuide.A.y, 6, 'magenta'));
-                    shapes.push(new Circle(triangleGuide.B.x, triangleGuide.B.y, 6, 'magenta'));
+                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
+                    shapes.push(new Point(triangleGuide.B.x, triangleGuide.B.y, 'magenta'));
                     const c1 = new Circle(triangleGuide.A.x, triangleGuide.A.y, triangleGuide.radius);
                     const c2 = new Circle(triangleGuide.B.x, triangleGuide.B.y, triangleGuide.radius);
                     const inter = circleCircleIntersection(c1,c2);
                     if(inter && inter.length){
                         triangleGuide.C = inter[0];
-                        shapes.push(new Circle(triangleGuide.C.x, triangleGuide.C.y, 6, 'magenta'));
+                        shapes.push(new Point(triangleGuide.C.x, triangleGuide.C.y, 'magenta'));
                     }
                 }
             },
@@ -1795,9 +1795,9 @@ function setupKidsActivities(){
                 rightTriangleGuide.A = {x:x, y:y};
                 rightTriangleGuide.B = {x:x+base, y:y};
                 rightTriangleGuide.C = {x:x+base, y:y-base};
-                shapes.push(new Circle(rightTriangleGuide.A.x, rightTriangleGuide.A.y, 6, 'magenta'));
-                shapes.push(new Circle(rightTriangleGuide.B.x, rightTriangleGuide.B.y, 6, 'magenta'));
-                shapes.push(new Circle(rightTriangleGuide.C.x, rightTriangleGuide.C.y, 6, 'magenta'));
+                shapes.push(new Point(rightTriangleGuide.A.x, rightTriangleGuide.A.y, 'magenta'));
+                shapes.push(new Point(rightTriangleGuide.B.x, rightTriangleGuide.B.y, 'magenta'));
+                shapes.push(new Point(rightTriangleGuide.C.x, rightTriangleGuide.C.y, 'magenta'));
                 const s = 20;
                 shapes.push(new LineSeg(rightTriangleGuide.B.x, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y));
                 shapes.push(new LineSeg(rightTriangleGuide.B.x + s, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y - s));
@@ -1828,9 +1828,9 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(rightTriangleGuide.A){
-                    shapes.push(new Circle(rightTriangleGuide.A.x, rightTriangleGuide.A.y, 6, 'magenta'));
-                    shapes.push(new Circle(rightTriangleGuide.B.x, rightTriangleGuide.B.y, 6, 'magenta'));
-                    shapes.push(new Circle(rightTriangleGuide.C.x, rightTriangleGuide.C.y, 6, 'magenta'));
+                    shapes.push(new Point(rightTriangleGuide.A.x, rightTriangleGuide.A.y, 'magenta'));
+                    shapes.push(new Point(rightTriangleGuide.B.x, rightTriangleGuide.B.y, 'magenta'));
+                    shapes.push(new Point(rightTriangleGuide.C.x, rightTriangleGuide.C.y, 'magenta'));
                     const s = 20;
                     shapes.push(new LineSeg(rightTriangleGuide.B.x, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y));
                     shapes.push(new LineSeg(rightTriangleGuide.B.x + s, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y - s));
@@ -1911,10 +1911,10 @@ function setupKidsActivities(){
                 const cx = width/2;
                 const cy = height/2;
                 const h = 60;
-                shapes.push(new Circle(cx - h, cy - h, 6, 'magenta'));
-                shapes.push(new Circle(cx + h, cy - h, 6, 'magenta'));
-                shapes.push(new Circle(cx + h, cy + h, 6, 'magenta'));
-                shapes.push(new Circle(cx - h, cy + h, 6, 'magenta'));
+                shapes.push(new Point(cx - h, cy - h, 'magenta'));
+                shapes.push(new Point(cx + h, cy - h, 'magenta'));
+                shapes.push(new Point(cx + h, cy + h, 'magenta'));
+                shapes.push(new Point(cx - h, cy + h, 'magenta'));
             },
             check: function(){
                 const pts = [
@@ -1977,8 +1977,8 @@ function setupKidsActivities(){
                 const cx = width/2;
                 const cy = height/2;
                 shapes.push(new Circle(cx, cy, r));
-                shapes.push(new Circle(cx - r, cy, 6, 'magenta'));
-                shapes.push(new Circle(cx + r, cy, 6, 'magenta'));
+                shapes.push(new Point(cx - r, cy, 'magenta'));
+                shapes.push(new Point(cx + r, cy, 'magenta'));
             },
             check: function(){
                 const p1 = {x: width/2 - 80, y: height/2};
@@ -2161,7 +2161,7 @@ function setupKidsActivities(){
                     roof: {x: cx, y: cy - size/2 - roof}
                 };
                 for(const p of Object.values(this.points)){
-                    shapes.push(new Circle(p.x, p.y, 6, 'magenta'));
+                    shapes.push(new Point(p.x, p.y, 'magenta'));
                 }
             },
             check: function(){
@@ -2773,9 +2773,9 @@ function placeTriangleDots(){
     const y1 = height/2 + 80;
     const x3 = width/2;
     const y3 = height/2 - 80;
-    shapes.push(new Circle(x1, y1, 6, 'magenta'));
-    shapes.push(new Circle(x2, y1, 6, 'magenta'));
-    shapes.push(new Circle(x3, y3, 6, 'magenta'));
+    shapes.push(new Point(x1, y1, 'magenta'));
+    shapes.push(new Point(x2, y1, 'magenta'));
+    shapes.push(new Point(x3, y3, 'magenta'));
     feedbackElem.textContent = 'Connect the dots to form a triangle!';
 }
 
@@ -2790,7 +2790,7 @@ function placeSquareDots(){
         {x: cx - half, y: cy + half}
     ];
     for(const p of pts){
-        shapes.push(new Circle(p.x, p.y, 6, 'magenta'));
+        shapes.push(new Point(p.x, p.y, 'magenta'));
     }
     feedbackElem.textContent = 'Connect the dots to form a square!';
 }
