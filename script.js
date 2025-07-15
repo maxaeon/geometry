@@ -50,8 +50,8 @@ let advancedInfo = {
         explanation: 'Cutting the circle in half highlights diameter and radius. The 3‑D analogue is a sphere where volume depends on r³.'
     },
     'fraction-square-quarters': {
-        formula: 'Square area = side² → cube volume = side³',
-        explanation: 'Dividing the square helps see equal areas. Extending the sides into 3‑D makes a cube whose volume uses side cubed.'
+        formula: 'Each quarter area = (side/2)²',
+        explanation: 'Splitting a square into four pieces shows how fractions work. Each part is one quarter of the whole area.'
     },
     'connect-red-points': {
         formula: "Euclid's First Postulate",
@@ -1483,7 +1483,7 @@ function setupKidsActivities(){
         },
         {
             id: 'cube-dotted',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Sketch a Cube',
             prompt: 'Use dotted line segments from each corner so the square looks like a 3-D cube.',
             keepShapes: true,
@@ -1652,7 +1652,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-point-a',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equilateral: Point A',
             prompt: 'Place the first point (point A) anywhere on the canvas.',
             keepShapes: false,
@@ -1672,7 +1672,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-circle-a',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equilateral: Circle A',
             prompt: 'Draw a circle centered at point A.',
             keepShapes: true,
@@ -1696,7 +1696,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-point-b',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equilateral: Point B',
             prompt: 'Place a second point (point B) on the circle\u2019s circumference.',
             keepShapes: true,
@@ -1722,7 +1722,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-circle-b',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equilateral: Circle B',
             prompt: 'Draw a second circle centered at B with the same radius as the first.',
             keepShapes: true,
@@ -1745,7 +1745,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-connect',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equilateral: Connect Points',
             prompt: 'Mark the intersection of both circles as point C and connect A-B-C with line segments.',
             keepShapes: true,
@@ -1755,23 +1755,23 @@ function setupKidsActivities(){
                     shapes.push(new Point(triangleGuide.B.x, triangleGuide.B.y, 'magenta'));
                     const c1 = new Circle(triangleGuide.A.x, triangleGuide.A.y, triangleGuide.radius);
                     const c2 = new Circle(triangleGuide.B.x, triangleGuide.B.y, triangleGuide.radius);
-                    const inter = circleCircleIntersection(c1,c2);
-                    if(inter && inter.length){
-                        triangleGuide.C = inter[0];
-                        shapes.push(new Point(triangleGuide.C.x, triangleGuide.C.y, 'magenta'));
-                    }
+                    triangleGuide.COptions = circleCircleIntersection(c1,c2) || [];
                 }
             },
             check: function(){
-                if(!triangleGuide.C) return false;
+                if(!triangleGuide.COptions || !triangleGuide.COptions.length) return false;
                 let cShape = null;
                 for(const s of shapes){
                     if(s instanceof Point){
-                        if(dist(s.x,s.y,triangleGuide.C.x,triangleGuide.C.y) < 5){
-                            cShape = s;
-                            break;
+                        for(const p of triangleGuide.COptions){
+                            if(dist(s.x,s.y,p.x,p.y) < 5){
+                                cShape = s;
+                                triangleGuide.C = {x:s.x, y:s.y};
+                                break;
+                            }
                         }
                     }
+                    if(cShape) break;
                 }
                 if(!cShape) return false;
                 cShape.label = 'C';
@@ -1914,7 +1914,7 @@ function setupKidsActivities(){
         },
         {
             id: 'rectangle-from-triangles',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Rectangle from Triangles',
             prompt: 'Combine two triangles to form a rectangle using the four dots.',
             setup: function(){
@@ -2047,7 +2047,7 @@ function setupKidsActivities(){
                 // obtuse angle on right
                 const rightX = width/2 + 120;
                 const obtuseAngle = 3 * Math.PI / 4;            // 135°
-                shapes.push(new LineSeg(rightX, y, rightX - len, y));
+                shapes.push(new LineSeg(rightX, y, rightX + len, y));
                 shapes.push(new LineSeg(
                     rightX,
                     y,
@@ -2117,7 +2117,7 @@ function setupKidsActivities(){
         },
         {
             id: 'compose-house',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Compose Shapes',
             prompt: 'Use the dots to build a house shape.',
             setup: function(){
@@ -2145,7 +2145,7 @@ function setupKidsActivities(){
         },
         {
             id: 'shape-attributes',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Shape Attributes',
             prompt: 'Click the shape with 3 sides.',
             setup: function(){
@@ -2947,11 +2947,19 @@ function showEqualSidesPrompt(){
 
 // ----- Utility buttons on start screen -----
 function hasLineBetween(p1,p2){
+    const tol = 12;
     for(const s of shapes){
         if(s instanceof LineSeg){
-            const c1 = dist(s.x1,s.y1,p1.x,p1.y) < 10 && dist(s.x2,s.y2,p2.x,p2.y) < 10;
-            const c2 = dist(s.x1,s.y1,p2.x,p2.y) < 10 && dist(s.x2,s.y2,p1.x,p1.y) < 10;
+            const c1 = dist(s.x1,s.y1,p1.x,p1.y) < tol && dist(s.x2,s.y2,p2.x,p2.y) < tol;
+            const c2 = dist(s.x1,s.y1,p2.x,p2.y) < tol && dist(s.x2,s.y2,p1.x,p1.y) < tol;
             if(c1 || c2) return true;
+        } else if(s instanceof TriangleGroup){
+            for(let i=0;i<3;i++){
+                const a=s.pts[i], b=s.pts[(i+1)%3];
+                const c1 = dist(a.x,a.y,p1.x,p1.y) < tol && dist(b.x,b.y,p2.x,p2.y) < tol;
+                const c2 = dist(a.x,a.y,p2.x,p2.y) < tol && dist(b.x,b.y,p1.x,p1.y) < tol;
+                if(c1 || c2) return true;
+            }
         }
     }
     return false;
