@@ -19,6 +19,7 @@ let lineDashed = false;
 let dimensionInterval = null;
 let fillLayer;
 let showGrid = true;
+let currentDictPage = 0;
 let triangleGuide = {};
 let introGuide = {};
 let rightTriangleGuide = {};
@@ -115,8 +116,13 @@ let flashcardDefinitions = {
     'triangle': 'A shape made of three straight sides.',
     'tangent': 'A line that touches a circle at one point.',
     'hexagon': 'A polygon with six sides and six angles.',
+    'pentagon': 'A polygon with five sides and five angles.',
+    'polygon': 'A closed shape made from straight line segments.',
     'similarity': 'When two shapes have the same angles and matching side ratios.',
     'circumference': 'The distance all the way around a circle.',
+    'diameter': 'A line passing through the center of a circle from side to side.',
+    'perimeter': 'The distance around a two-dimensional shape.',
+    'area': 'The amount of space inside a shape.',
     'hypotenuse': 'The longest side of a right triangle.',
     'square': 'A shape with four equal sides and four right angles.',
     'cube': 'A solid figure with six equal square faces.',
@@ -408,6 +414,14 @@ function setup() {
     const backBtn = document.getElementById('back-to-dictionary');
     if(backBtn){
         backBtn.addEventListener('click', showCategories);
+    }
+    const prevPage = document.getElementById('dict-prev');
+    if(prevPage){
+        prevPage.addEventListener('click', () => showBookPage(currentDictPage-1));
+    }
+    const nextPage = document.getElementById('dict-next');
+    if(nextPage){
+        nextPage.addEventListener('click', () => showBookPage(currentDictPage+1));
     }
     document.querySelectorAll('.flash-btn').forEach(btn => {
         btn.addEventListener('click', () => showFlashcard(btn.dataset.term));
@@ -2547,6 +2561,7 @@ function openDictionary(){
     const overlay = document.getElementById('dictionary-overlay');
     if(overlay){
         overlay.style.display = 'flex';
+        currentDictPage = 0;
         showCategories();
     }
 }
@@ -2580,8 +2595,22 @@ function closeActivities(){
     }
 }
 
+function showBookPage(idx){
+    const pages = document.querySelectorAll('#dictionary-book .dict-page');
+    if(!pages.length) return;
+    if(idx < 0 || idx >= pages.length) return;
+    pages.forEach((p,i)=>{p.style.display = i===idx ? 'block' : 'none';});
+    currentDictPage = idx;
+    const prev = document.getElementById('dict-prev');
+    const next = document.getElementById('dict-next');
+    if(prev) prev.style.display = idx===0 ? 'none' : 'inline-block';
+    if(next) next.style.display = idx===pages.length-1 ? 'none' : 'inline-block';
+}
+
 function showCategories(){
-    document.querySelectorAll('#dictionary-overlay .category').forEach(c => c.style.display = 'block');
+    const book = document.getElementById('dictionary-book');
+    if(book) book.style.display = 'block';
+    showBookPage(currentDictPage);
     const card = document.getElementById('flashcard');
     if(dimensionInterval){
         clearInterval(dimensionInterval);
@@ -2591,7 +2620,8 @@ function showCategories(){
 }
 
 function showFlashcard(term){
-    document.querySelectorAll('#dictionary-overlay .category').forEach(c => c.style.display = 'none');
+    const book = document.getElementById('dictionary-book');
+    if(book) book.style.display = 'none';
     const card = document.getElementById('flashcard');
     if(!card) return;
     if(dimensionInterval){
@@ -2675,6 +2705,19 @@ function showFlashcard(term){
         } else if(term === 'square'){
             const size = canvas.width-100;
             ctx.strokeRect(50, 50, size, size);
+        } else if(term === 'pentagon'){
+            const cx = canvas.width/2;
+            const cy = canvas.height/2;
+            const r = 60;
+            ctx.beginPath();
+            for(let i=0;i<5;i++){
+                const angle = Math.PI*2*i/5 - Math.PI/2;
+                const x = cx + r*Math.cos(angle);
+                const y = cy + r*Math.sin(angle);
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            }
+            ctx.closePath();
+            ctx.stroke();
         } else if(term === 'hexagon'){
             const cx = canvas.width/2;
             const cy = canvas.height/2;
@@ -2706,6 +2749,36 @@ function showFlashcard(term){
             ctx.lineTo(80 + size, 40 + size);
             ctx.stroke();
             ctx.setLineDash([]);
+        } else if(term === 'polygon'){
+            const cx = canvas.width/2;
+            const cy = canvas.height/2;
+            const r = 60;
+            ctx.beginPath();
+            for(let i=0;i<4;i++){
+                const angle = Math.PI*2*i/4 - Math.PI/4;
+                const x = cx + r*Math.cos(angle);
+                const y = cy + r*Math.sin(angle);
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        } else if(term === 'diameter'){
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2 - 60, canvas.height/2);
+            ctx.lineTo(canvas.width/2 + 60, canvas.height/2);
+            ctx.stroke();
+        } else if(term === 'perimeter'){
+            ctx.strokeRect(40, 40, canvas.width-80, canvas.height-80);
+            ctx.setLineDash([5,5]);
+            ctx.strokeRect(50, 50, canvas.width-100, canvas.height-100);
+            ctx.setLineDash([]);
+        } else if(term === 'area'){
+            ctx.strokeRect(40, 40, canvas.width-80, canvas.height-80);
+            ctx.fillStyle = 'rgba(0,0,255,0.2)';
+            ctx.fillRect(40, 40, canvas.width-80, canvas.height-80);
         } else if(term === 'dimension'){
             let step = 0;
             const drawSteps = [
