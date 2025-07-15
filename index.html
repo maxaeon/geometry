@@ -95,6 +95,7 @@
         <button id="prev-activity">Back</button>
         <button id="next-activity">Next</button>
         <button id="info-btn" title="Show Tutorial">&#9432;</button>
+        <button id="brain-btn" class="tool-btn" title="More Info">&#129504;</button>
     </div>
     <div id="instruction-panel"></div>
     <div id="canvas-container" style="display:none"></div>
@@ -129,6 +130,15 @@
                 <canvas id="flashcard-canvas" width="200" height="200"></canvas>
                 <div><button id="back-to-dictionary">Back</button></div>
             </div>
+        </div>
+    </div>
+    <div id="advanced-overlay">
+        <div class="advanced-content">
+            <button id="advanced-close" title="Close">&times;</button>
+            <h2>More Information</h2>
+            <div id="advanced-formula"></div>
+            <button id="explain-btn">Why?</button>
+            <div id="advanced-explanation" style="display:none"></div>
         </div>
     </div>
     <script src="script.js"></script>

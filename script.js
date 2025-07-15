@@ -19,6 +19,32 @@ let fillLayer;
 let showGrid = true;
 let triangleGuide = {};
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
+let advancedInfo = {
+    0: {
+        formula: '<strong>Dimensions:</strong> a line is 1D and our canvas is 2D.',
+        explanation: 'In 3D you add height to length and width. Time or another axis can create 4D and beyond.'
+    },
+    1: {
+        formula: 'Length = √((x₂−x₁)² + (y₂−y₁)²)',
+        explanation: 'This distance formula is derived from the Pythagorean theorem.'
+    },
+    2: {
+        formula: 'Triangle area = base × height ÷ 2',
+        explanation: 'A triangle occupies half the area of a rectangle with the same base and height.'
+    },
+    3: {
+        formula: 'Dotted lines show hidden or imaginary edges.',
+        explanation: 'They are used when a side is not physically present but helpful for reasoning.'
+    },
+    4: {
+        formula: 'Right angle = 90°',
+        explanation: 'Two lines that meet to form a square corner are perpendicular.'
+    },
+    5: {
+        formula: 'Circle circumference = 2πr, area = πr²',
+        explanation: 'The constant π describes the ratio between a circle’s circumference and its diameter.'
+    }
+};
 
 function positionInstructionPanel(){
     const panel = document.getElementById('instruction-panel');
@@ -210,6 +236,27 @@ function setup() {
     const advBtn = document.getElementById('advanced-info-btn');
     if(advBtn){
         advBtn.addEventListener('click', showAdvancedInfo);
+    }
+    const brainBtn = document.getElementById('brain-btn');
+    if(brainBtn){
+        brainBtn.addEventListener('click', showAdvancedInfo);
+    }
+    const advClose = document.getElementById('advanced-close');
+    if(advClose){
+        advClose.addEventListener('click', () => {
+            document.getElementById('advanced-overlay').style.display = 'none';
+        });
+    }
+    const explainBtn = document.getElementById('explain-btn');
+    if(explainBtn){
+        explainBtn.addEventListener('click', () => {
+            const expl = document.getElementById('advanced-explanation');
+            if(expl.style.display === 'block'){
+                expl.style.display = 'none';
+            } else {
+                expl.style.display = 'block';
+            }
+        });
     }
 
     createColorPalette();
@@ -762,7 +809,7 @@ function startAdvancedMode(){
 function setupKidsActivities(){
     kidsActivities = [
         {
-            prompt: 'Welcome! Our screen is a plane – a flat 2D space. A line is 1D, our world is 3D, and adding time makes 4D. A point is a tiny spot with no size. Place a point anywhere on the plane.',
+            prompt: 'Welcome! Our screen is a plane – a flat 2D space. A line is 1D. A point is a tiny spot with no size. Place a point anywhere on the plane.',
             setup: function(){
                 // nothing pre-drawn
             },
@@ -1150,5 +1197,17 @@ function showFlashcard(term){
 }
 
 function showAdvancedInfo(){
-    alert('Advanced info coming soon!');
+    const overlay = document.getElementById('advanced-overlay');
+    const formulaEl = document.getElementById('advanced-formula');
+    const explEl = document.getElementById('advanced-explanation');
+    if(!overlay || !formulaEl || !explEl) return;
+    explEl.style.display = 'none';
+    if(mode === 'kids' && advancedInfo[currentActivity]){
+        formulaEl.innerHTML = advancedInfo[currentActivity].formula;
+        explEl.textContent = advancedInfo[currentActivity].explanation;
+    } else {
+        formulaEl.textContent = 'No additional information for this step.';
+        explEl.textContent = '';
+    }
+    overlay.style.display = 'flex';
 }
