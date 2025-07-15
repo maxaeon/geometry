@@ -62,7 +62,10 @@ let flashcardDefinitions = {
     'centroid': 'The point where a triangle\'s three medians meet.',
     'similarity': 'When two shapes have the same angles and matching side ratios.',
     'circumference': 'The distance all the way around a circle.',
-    'hypotenuse': 'The longest side of a right triangle.'
+    'hypotenuse': 'The longest side of a right triangle.',
+    'square': 'A shape with four equal sides and four right angles.',
+    'cube': 'A 3D object made of six equal square faces.',
+    'dimension': 'A measurable extent such as length, width, or height.'
 };
 
 function updateBrainButton(){
@@ -1318,6 +1321,26 @@ function showFlashcard(term){
                 ctx.closePath();
                 ctx.stroke();
             }
+        } else if(term === 'square'){
+            const size = canvas.width-100;
+            ctx.strokeRect(50, 50, size, size);
+        } else if(term === 'cube'){
+            const size = 70;
+            // back square
+            ctx.strokeRect(80, 40, size, size);
+            // front square
+            ctx.strokeRect(50, 70, size, size);
+            // connecting lines
+            ctx.beginPath();
+            ctx.moveTo(50, 70);
+            ctx.lineTo(80, 40);
+            ctx.moveTo(50 + size, 70);
+            ctx.lineTo(80 + size, 40);
+            ctx.moveTo(50, 70 + size);
+            ctx.lineTo(80, 40 + size);
+            ctx.moveTo(50 + size, 70 + size);
+            ctx.lineTo(80 + size, 40 + size);
+            ctx.stroke();
         } else if(term === 'tangent'){
             ctx.beginPath();
             ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI*2);
