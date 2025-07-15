@@ -46,6 +46,14 @@ let advancedInfo = {
     5: {
         formula: 'Circle circumference = 2πr, area = πr²',
         explanation: 'The constant π describes the ratio between a circle’s circumference and its diameter.'
+    },
+    6: {
+        formula: 'Square area = side²',
+        explanation: 'A square lives in 2‑D with only length and width.'
+    },
+    7: {
+        formula: 'Cube volume = side³',
+        explanation: 'Cubes add height, giving a third dimension.'
     }
 };
 
@@ -944,6 +952,52 @@ function setupKidsActivities(){
             }
         },
         {
+            prompt: 'Connect the 4 red points to make a square.',
+            setup: function(){
+                placeSquareDots();
+            },
+            check: function(){
+                const pts = [
+                    {x: width/2 - 60, y: height/2 - 60},
+                    {x: width/2 + 60, y: height/2 - 60},
+                    {x: width/2 + 60, y: height/2 + 60},
+                    {x: width/2 - 60, y: height/2 + 60}
+                ];
+                let count = 0;
+                function connected(p1, p2, seg){
+                    const c1 = dist(seg.x1, seg.y1, p1.x, p1.y) < 10 && dist(seg.x2, seg.y2, p2.x, p2.y) < 10;
+                    const c2 = dist(seg.x1, seg.y1, p2.x, p2.y) < 10 && dist(seg.x2, seg.y2, p1.x, p1.y) < 10;
+                    return c1 || c2;
+                }
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        for(let i=0;i<4;i++){
+                            const j=(i+1)%4;
+                            if(connected(pts[i],pts[j],s)){
+                                count++;
+                                break;
+                            }
+                        }
+                    }
+                }
+                return count>=4;
+            }
+        },
+        {
+            prompt: 'Add lines or shading to turn your square into a cube.',
+            keepShapes: true,
+            setup: function(){
+                // square from previous step remains
+            },
+            check: function(){
+                let lines=0;
+                for(const s of shapes){
+                    if(s instanceof LineSeg) lines++;
+                }
+                return lines>=8;
+            }
+        },
+        {
             prompt: 'Use line segments to connect the 3 red points into a triangle. A triangle is a polygon, a closed shape made from line segments. Can you make two line segments equal?',
             setup: function(){
                 placeTriangleDots();
@@ -1232,6 +1286,41 @@ function placeTriangleDots(){
     shapes.push(new Circle(x2, y1, 6, 'magenta'));
     shapes.push(new Circle(x3, y3, 6, 'magenta'));
     feedbackElem.textContent = 'Connect the dots to form a triangle!';
+}
+
+function placeSquareDots(){
+    const cx = width/2;
+    const cy = height/2;
+    const half = 60;
+    const pts = [
+        {x: cx - half, y: cy - half},
+        {x: cx + half, y: cy - half},
+        {x: cx + half, y: cy + half},
+        {x: cx - half, y: cy + half}
+    ];
+    for(const p of pts){
+        shapes.push(new Circle(p.x, p.y, 6, 'magenta'));
+    }
+    feedbackElem.textContent = 'Connect the dots to form a square!';
+}
+
+function drawCube(x, y, size){
+    const o = size * 0.3;
+    // back square
+    shapes.push(new LineSeg(x + o, y - o, x + size + o, y - o));
+    shapes.push(new LineSeg(x + size + o, y - o, x + size + o, y + size - o));
+    shapes.push(new LineSeg(x + size + o, y + size - o, x + o, y + size - o));
+    shapes.push(new LineSeg(x + o, y + size - o, x + o, y - o));
+    // front square
+    shapes.push(new LineSeg(x, y, x + size, y));
+    shapes.push(new LineSeg(x + size, y, x + size, y + size));
+    shapes.push(new LineSeg(x + size, y + size, x, y + size));
+    shapes.push(new LineSeg(x, y + size, x, y));
+    // connectors
+    shapes.push(new LineSeg(x, y, x + o, y - o));
+    shapes.push(new LineSeg(x + size, y, x + size + o, y - o));
+    shapes.push(new LineSeg(x + size, y + size, x + size + o, y + size - o));
+    shapes.push(new LineSeg(x, y + size, x + o, y + size - o));
 }
 
 function demonstrateCircleSymmetry(){
