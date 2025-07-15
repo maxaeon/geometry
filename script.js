@@ -30,6 +30,8 @@ let identifyCenterStep = 0;
 let identifyCenterCircles = [];
 let shapeIdentify = {};
 let squareGuide = {};
+
+
 const CANVAS_PADDING_PCT = 0;
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 let currentExample = null;
@@ -65,7 +67,7 @@ let advancedInfo = {
     },
     'identify-right-angles': {
         formula: "Euclid's Fourth Postulate",
-        explanation: 'All right angles are congruent to one another.'
+        explanation: 'All right angles are congruent to one another. They build rectangles and lead to the Pythagorean theorem.'
     },
     'parallel-through-point': {
         formula: "Euclid's Fifth Postulate",
@@ -147,10 +149,6 @@ let advancedInfo = {
         formula: 'Obtuse angle > 90° and < 180°',
         explanation: 'Angles bigger than a right angle but less than a straight line are obtuse.'
     },
-    'shape-name-clicks': {
-        formula: 'Circle=0 sides, triangle=3, square=4',
-        explanation: 'Shapes are named by how many sides or curves they have.'
-    },
     'shape-identify-sequence': {
         formula: 'Circle=0 sides, triangle=3, square=4',
         explanation: 'Shapes are named by how many sides or curves they have.'
@@ -170,7 +168,7 @@ let flashcardDefinitions = {
     'line': 'A straight path that goes on forever in both directions.',
     'plane': 'A flat surface that extends forever.',
     'angle': 'Two rays sharing the same starting point.',
-    'right angle': 'An angle that forms a perfect square corner.',
+    'right angle': 'An angle that forms a perfect square corner. Right angles make rectangles possible and are key to the Pythagorean theorem.',
     'radius': 'The distance from the center of a circle to its edge.',
     'circle': 'A round shape where every point is the same distance from the center.',
     'triangle': 'A shape made of three straight sides.',
@@ -430,9 +428,20 @@ function setup() {
     });
     document.getElementById('skip-activity').addEventListener('click', () => {
         if(mode === 'kids'){
-            if(currentActivity < kidsActivities.length - 1){
+            const currCat = kidsActivities[currentActivity].category;
+            let nextIdx = -1;
+            for(let j = currentActivity + 1; j < kidsActivities.length; j++){
+                if(kidsActivities[j].category === currCat){
+                    nextIdx = j;
+                    break;
+                }
+            }
+            if(nextIdx !== -1){
                 animatePageTurn('next');
-                loadKidsActivity(currentActivity + 1);
+                loadKidsActivity(nextIdx);
+            } else {
+                const skipBtn = document.getElementById('skip-activity');
+                if(skipBtn) skipBtn.disabled = true;
             }
         } else if(mode === 'advanced' && currentExample){
             const steps = advancedExamples[currentExample];
@@ -1363,7 +1372,7 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(introGuide.point){
-                    shapes.push(new Circle(introGuide.point.x, introGuide.point.y, 6, 'magenta'));
+                    shapes.push(new Point(introGuide.point.x, introGuide.point.y, 'magenta'));
                 }
             },
             check: function(){
@@ -1389,8 +1398,8 @@ function setupKidsActivities(){
                 const x1 = width/2 - 60;
                 const x2 = width/2 + 60;
                 const y = height/2;
-                shapes.push(new Circle(x1, y, 6, 'magenta'));
-                shapes.push(new Circle(x2, y, 6, 'magenta'));
+                shapes.push(new Point(x1, y, 'magenta'));
+                shapes.push(new Point(x2, y, 'magenta'));
             },
             check: function(){
                 const x1 = width/2 - 60;
@@ -1439,7 +1448,7 @@ function setupKidsActivities(){
         },
         {
             id: 'draw-square',
-            category: 'Shapes',
+            category: 'Basics',
             title: 'Construct a Square',
             prompt: 'Connect the 4 red points to make a square.',
             setup: function(){
@@ -1515,7 +1524,7 @@ function setupKidsActivities(){
         },
         {
             id: 'triangle-equal',
-            category: 'Shapes',
+            category: 'Basics',
             title: 'Equal Sides Triangle',
             prompt: 'Use line segments to connect the 3 red points into a triangle. A triangle is a polygon, a closed shape made from line segments. Can you make two line segments equal?',
             setup: function(){
@@ -1557,7 +1566,7 @@ function setupKidsActivities(){
         },
         {
             id: 'triangle-dotted-base',
-            category: 'Shapes',
+            category: 'Basics',
             title: 'Dotted Triangle Base',
             prompt: 'Use a dotted line segment to complete the base of the triangle.',
             setup: function(){
@@ -1669,7 +1678,7 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(triangleGuide.A){
-                    shapes.push(new Circle(triangleGuide.A.x, triangleGuide.A.y, 6, 'magenta'));
+                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
                 }
             },
             check: function(){
@@ -1693,7 +1702,7 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(triangleGuide.A){
-                    shapes.push(new Circle(triangleGuide.A.x, triangleGuide.A.y, 6, 'magenta'));
+                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
                 }
             },
             check: function(){
@@ -1719,7 +1728,7 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(triangleGuide.B){
-                    shapes.push(new Circle(triangleGuide.B.x, triangleGuide.B.y, 6, 'magenta'));
+                    shapes.push(new Point(triangleGuide.B.x, triangleGuide.B.y, 'magenta'));
                 }
             },
             check: function(){
@@ -1742,14 +1751,14 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(triangleGuide.A && triangleGuide.B && triangleGuide.radius){
-                    shapes.push(new Circle(triangleGuide.A.x, triangleGuide.A.y, 6, 'magenta'));
-                    shapes.push(new Circle(triangleGuide.B.x, triangleGuide.B.y, 6, 'magenta'));
+                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
+                    shapes.push(new Point(triangleGuide.B.x, triangleGuide.B.y, 'magenta'));
                     const c1 = new Circle(triangleGuide.A.x, triangleGuide.A.y, triangleGuide.radius);
                     const c2 = new Circle(triangleGuide.B.x, triangleGuide.B.y, triangleGuide.radius);
                     const inter = circleCircleIntersection(c1,c2);
                     if(inter && inter.length){
                         triangleGuide.C = inter[0];
-                        shapes.push(new Circle(triangleGuide.C.x, triangleGuide.C.y, 6, 'magenta'));
+                        shapes.push(new Point(triangleGuide.C.x, triangleGuide.C.y, 'magenta'));
                     }
                 }
             },
@@ -1796,9 +1805,9 @@ function setupKidsActivities(){
                 rightTriangleGuide.A = {x:x, y:y};
                 rightTriangleGuide.B = {x:x+base, y:y};
                 rightTriangleGuide.C = {x:x+base, y:y-base};
-                shapes.push(new Circle(rightTriangleGuide.A.x, rightTriangleGuide.A.y, 6, 'magenta'));
-                shapes.push(new Circle(rightTriangleGuide.B.x, rightTriangleGuide.B.y, 6, 'magenta'));
-                shapes.push(new Circle(rightTriangleGuide.C.x, rightTriangleGuide.C.y, 6, 'magenta'));
+                shapes.push(new Point(rightTriangleGuide.A.x, rightTriangleGuide.A.y, 'magenta'));
+                shapes.push(new Point(rightTriangleGuide.B.x, rightTriangleGuide.B.y, 'magenta'));
+                shapes.push(new Point(rightTriangleGuide.C.x, rightTriangleGuide.C.y, 'magenta'));
                 const s = 20;
                 shapes.push(new LineSeg(rightTriangleGuide.B.x, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y));
                 shapes.push(new LineSeg(rightTriangleGuide.B.x + s, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y - s));
@@ -1829,9 +1838,9 @@ function setupKidsActivities(){
             keepShapes: true,
             setup: function(){
                 if(rightTriangleGuide.A){
-                    shapes.push(new Circle(rightTriangleGuide.A.x, rightTriangleGuide.A.y, 6, 'magenta'));
-                    shapes.push(new Circle(rightTriangleGuide.B.x, rightTriangleGuide.B.y, 6, 'magenta'));
-                    shapes.push(new Circle(rightTriangleGuide.C.x, rightTriangleGuide.C.y, 6, 'magenta'));
+                    shapes.push(new Point(rightTriangleGuide.A.x, rightTriangleGuide.A.y, 'magenta'));
+                    shapes.push(new Point(rightTriangleGuide.B.x, rightTriangleGuide.B.y, 'magenta'));
+                    shapes.push(new Point(rightTriangleGuide.C.x, rightTriangleGuide.C.y, 'magenta'));
                     const s = 20;
                     shapes.push(new LineSeg(rightTriangleGuide.B.x, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y));
                     shapes.push(new LineSeg(rightTriangleGuide.B.x + s, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y - s));
@@ -1912,10 +1921,10 @@ function setupKidsActivities(){
                 const cx = width/2;
                 const cy = height/2;
                 const h = 60;
-                shapes.push(new Circle(cx - h, cy - h, 6, 'magenta'));
-                shapes.push(new Circle(cx + h, cy - h, 6, 'magenta'));
-                shapes.push(new Circle(cx + h, cy + h, 6, 'magenta'));
-                shapes.push(new Circle(cx - h, cy + h, 6, 'magenta'));
+                shapes.push(new Point(cx - h, cy - h, 'magenta'));
+                shapes.push(new Point(cx + h, cy - h, 'magenta'));
+                shapes.push(new Point(cx + h, cy + h, 'magenta'));
+                shapes.push(new Point(cx - h, cy + h, 'magenta'));
             },
             check: function(){
                 const pts = [
@@ -1978,8 +1987,8 @@ function setupKidsActivities(){
                 const cx = width/2;
                 const cy = height/2;
                 shapes.push(new Circle(cx, cy, r));
-                shapes.push(new Circle(cx - r, cy, 6, 'magenta'));
-                shapes.push(new Circle(cx + r, cy, 6, 'magenta'));
+                shapes.push(new Point(cx - r, cy, 'magenta'));
+                shapes.push(new Point(cx + r, cy, 'magenta'));
             },
             check: function(){
                 const p1 = {x: width/2 - 80, y: height/2};
@@ -2057,46 +2066,8 @@ function setupKidsActivities(){
             }
         },
         {
-            id: 'shape-name-clicks',
-            category: 'Shapes',
-            title: 'Name That Shape',
-            prompt: 'Click the circle, square, and triangle to name each shape.',
-            setup: function(){
-                shapeIdentify = {};
-                const cx = width/2;
-                const cy = height/2;
-                const gap = 150;
-                const circ = new Circle(cx - gap, cy, 40, 'gray', true);
-                shapes.push(circ);
-                shapeIdentify.circle = circ;
-                const s = 80;
-                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2));
-                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2));
-                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2));
-                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2));
-                const sq = new Circle(cx, cy, 8, 'gray', true);
-                shapes.push(sq);
-                shapeIdentify.square = sq;
-                const tx = cx + gap;
-                const pts = [
-                    {x: tx - 40, y: cy + 40},
-                    {x: tx + 40, y: cy + 40},
-                    {x: tx, y: cy - 40}
-                ];
-                shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y));
-                shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y));
-                shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y));
-                const tri = new Circle(tx, cy, 8, 'gray', true);
-                shapes.push(tri);
-                shapeIdentify.triangle = tri;
-            },
-            check: function(){
-                return shapeIdentify.circle.clicked && shapeIdentify.square.clicked && shapeIdentify.triangle.clicked;
-            }
-        },
-        {
             id: 'shape-identify-sequence',
-            category: 'Shapes',
+            category: 'Basics',
             title: 'Shape Identification',
             prompt: 'Click the circle.',
             setup: function(){
@@ -2162,7 +2133,7 @@ function setupKidsActivities(){
                     roof: {x: cx, y: cy - size/2 - roof}
                 };
                 for(const p of Object.values(this.points)){
-                    shapes.push(new Circle(p.x, p.y, 6, 'magenta'));
+                    shapes.push(new Point(p.x, p.y, 'magenta'));
                 }
             },
             check: function(){
@@ -2824,7 +2795,17 @@ function loadKidsActivity(i){
     const skipBtn = document.getElementById('skip-activity');
     nextBtn.disabled = !act.autoNext;
     const last = i === kidsActivities.length - 1;
-    if(skipBtn) skipBtn.disabled = last;
+    let hasNextSame = false;
+    if(!last){
+        const cat = act.category;
+        for(let j = i + 1; j < kidsActivities.length; j++){
+            if(kidsActivities[j].category === cat){
+                hasNextSame = true;
+                break;
+            }
+        }
+    }
+    if(skipBtn) skipBtn.disabled = last || !hasNextSame;
     if(last) nextBtn.disabled = true;
     saveState();
     updateBrainButton();
@@ -2878,9 +2859,9 @@ function placeTriangleDots(){
     const y1 = height/2 + 80;
     const x3 = width/2;
     const y3 = height/2 - 80;
-    shapes.push(new Circle(x1, y1, 6, 'magenta'));
-    shapes.push(new Circle(x2, y1, 6, 'magenta'));
-    shapes.push(new Circle(x3, y3, 6, 'magenta'));
+    shapes.push(new Point(x1, y1, 'magenta'));
+    shapes.push(new Point(x2, y1, 'magenta'));
+    shapes.push(new Point(x3, y3, 'magenta'));
     feedbackElem.textContent = 'Connect the dots to form a triangle!';
 }
 
@@ -2895,7 +2876,7 @@ function placeSquareDots(){
         {x: cx - half, y: cy + half}
     ];
     for(const p of pts){
-        shapes.push(new Circle(p.x, p.y, 6, 'magenta'));
+        shapes.push(new Point(p.x, p.y, 'magenta'));
     }
     feedbackElem.textContent = 'Connect the dots to form a square!';
 }
