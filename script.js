@@ -48,6 +48,23 @@ let advancedInfo = {
     }
 };
 
+let flashcardDefinitions = {
+    'point': 'A single spot showing a location.',
+    'line': 'A straight path that goes on forever in both directions.',
+    'plane': 'A flat surface that extends forever.',
+    'angle': 'Two rays sharing the same starting point.',
+    'right angle': 'An angle that forms a perfect square corner.',
+    'radius': 'The distance from the center of a circle to its edge.',
+    'circle': 'A round shape where every point is the same distance from the center.',
+    'triangle': 'A shape made of three straight sides.',
+    'tangent': 'A line that touches a circle at one point.',
+    'secant': 'A line that cuts through a circle at two points.',
+    'centroid': 'The point where a triangle\'s three medians meet.',
+    'similarity': 'When two shapes have the same angles and matching side ratios.',
+    'circumference': 'The distance all the way around a circle.',
+    'hypotenuse': 'The longest side of a right triangle.'
+};
+
 function updateBrainButton(){
     const brainBtn = document.getElementById('brain-btn');
     if(!brainBtn) return;
@@ -1194,18 +1211,49 @@ function showFlashcard(term){
     if(!card) return;
     card.style.display = 'block';
     document.getElementById('flashcard-title').textContent = term.charAt(0).toUpperCase() + term.slice(1);
+    const defEl = document.getElementById('flashcard-definition');
+    if(defEl){
+        defEl.textContent = flashcardDefinitions[term] || '';
+    }
     const canvas = document.getElementById('flashcard-canvas');
     if(canvas){
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 2;
-        if(term === 'circle' || term === 'circumference'){
+        if(term === 'point'){
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2, 5, 0, Math.PI*2);
+            ctx.fill();
+        } else if(term === 'line'){
+            ctx.beginPath();
+            ctx.moveTo(20, canvas.height/2);
+            ctx.lineTo(canvas.width-20, canvas.height/2);
+            ctx.stroke();
+        } else if(term === 'plane'){
+            ctx.strokeRect(40, 40, canvas.width-80, canvas.height-80);
+        } else if(term === 'angle' || term === 'right angle'){
+            ctx.beginPath();
+            ctx.moveTo(40, canvas.height-40);
+            ctx.lineTo(canvas.width/2, canvas.height-80);
+            ctx.lineTo(canvas.width-40, canvas.height-40);
+            ctx.stroke();
+            if(term === 'right angle'){
+                ctx.strokeRect(canvas.width/2-10, canvas.height-50, 10, 10);
+            }
+        } else if(term === 'radius'){
             ctx.beginPath();
             ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
             ctx.stroke();
-        }
-        if(term === 'triangle' || term === 'hypotenuse'){
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2, canvas.height/2);
+            ctx.lineTo(canvas.width/2 + 60, canvas.height/2);
+            ctx.stroke();
+        } else if(term === 'circle' || term === 'circumference'){
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
+            ctx.stroke();
+        } else if(term === 'triangle' || term === 'hypotenuse' || term === 'centroid' || term === 'similarity'){
             ctx.beginPath();
             ctx.moveTo(canvas.width/2, 40);
             ctx.lineTo(canvas.width-40, canvas.height-40);
@@ -1219,6 +1267,42 @@ function showFlashcard(term){
                 ctx.lineTo(40, canvas.height-40);
                 ctx.stroke();
             }
+            if(term === 'centroid'){
+                ctx.strokeStyle = 'blue';
+                ctx.beginPath();
+                ctx.moveTo(canvas.width/2, 40);
+                ctx.lineTo((canvas.width-40+40)/2, canvas.height-40);
+                ctx.moveTo(canvas.width-40, canvas.height-40);
+                ctx.lineTo(canvas.width/2, (40+canvas.height-40)/2);
+                ctx.moveTo(40, canvas.height-40);
+                ctx.lineTo(canvas.width/2, (40+canvas.height-40)/2);
+                ctx.stroke();
+            }
+            if(term === 'similarity'){
+                ctx.strokeStyle = 'blue';
+                ctx.beginPath();
+                ctx.moveTo(canvas.width/2 - 40, 80);
+                ctx.lineTo(canvas.width-80, canvas.height-80);
+                ctx.lineTo(80, canvas.height-80);
+                ctx.closePath();
+                ctx.stroke();
+            }
+        } else if(term === 'tangent'){
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2-60, canvas.height/2+50);
+            ctx.lineTo(canvas.width/2+60, canvas.height/2+50);
+            ctx.stroke();
+        } else if(term === 'secant'){
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2-60, canvas.height/2-30);
+            ctx.lineTo(canvas.width/2+60, canvas.height/2+30);
+            ctx.stroke();
         }
     }
 }
