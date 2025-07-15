@@ -124,8 +124,15 @@ canvas {
     border: 1px solid #ccc;
 }
 
-#feedback {
-    margin-left: auto;
+#instruction-panel {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 12px;
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 body.kids #example-select {
@@ -137,10 +144,6 @@ body.kids #thickness-input {
     display: none;
 }
 
-body.kids #feedback {
-    flex: 1;
-    text-align: center;
-}
 
 #prev-activity, #next-activity {
     display: none;
