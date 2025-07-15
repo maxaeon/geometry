@@ -20,6 +20,15 @@ let showGrid = true;
 let triangleGuide = {};
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 
+function positionInstructionPanel(){
+    const panel = document.getElementById('instruction-panel');
+    const toolbar = document.getElementById('toolbar');
+    if(panel && toolbar){
+        const offset = toolbar.offsetHeight + 10;
+        panel.style.top = offset + 'px';
+    }
+}
+
 function showTutorial(){
     const box = document.getElementById('info-box');
     if(!box) return;
@@ -188,6 +197,7 @@ function setup() {
     createColorPalette();
     setTool('select');
     saveState();
+    positionInstructionPanel();
 }
 
 function windowResized() {
@@ -195,6 +205,7 @@ function windowResized() {
     if(fillLayer){
         fillLayer.resizeCanvas(window.innerWidth, window.innerHeight);
     }
+    positionInstructionPanel();
 }
 
 function mousePressed() {
@@ -714,6 +725,7 @@ function startKidsMode(){
     triangleGuide = {};
     setupKidsActivities();
     loadKidsActivity(0);
+    positionInstructionPanel();
 }
 
 function startAdvancedMode(){
@@ -726,6 +738,7 @@ function startAdvancedMode(){
     document.getElementById('next-activity').style.display = 'none';
     resizeCanvas(window.innerWidth, window.innerHeight);
     feedbackElem.textContent = '';
+    positionInstructionPanel();
 }
 
 function setupKidsActivities(){
