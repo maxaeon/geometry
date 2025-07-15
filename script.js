@@ -30,6 +30,7 @@ let identifyCenterStep = 0;
 let identifyCenterCircles = [];
 let shapeIdentify = {};
 let squareGuide = {};
+let compassPoints = [];
 
 
 const CANVAS_PADDING_PCT = 0;
@@ -232,6 +233,7 @@ function setTool(tool){
     currentTool = tool;
     lineDashed = tool === 'dotted';
     selectedShape = null;
+    if(tool !== 'compass') compassPoints = [];
     document.getElementById('tool-select').value = tool;
     document.querySelectorAll('.tool-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tool === tool);
@@ -250,6 +252,14 @@ function cloneShapeList(list){
         }
         if(s instanceof LineSeg){
             return new LineSeg(s.x1, s.y1, s.x2, s.y2, s.dotted, s.color, s.weight, s.label);
+        }
+        if(s instanceof AngleSnapshot){
+            const v = {x: s.x, y: s.y};
+            const p1 = s.getP1();
+            const p2 = s.getP2();
+            const a = new AngleSnapshot(v, p1, p2, s.color, s.weight);
+            a.rotation = s.rotation;
+            return a;
         }
         return null;
     });
@@ -575,7 +585,17 @@ function mousePressed() {
             }
         }
     }
-    if (currentTool === 'point') {
+    if(currentTool === 'compass') {
+        const snap = snapToPoint(mouseX, mouseY);
+        compassPoints.push({x:snap.x, y:snap.y});
+        if(compassPoints.length === 3){
+            saveState();
+            const ang = new AngleSnapshot(compassPoints[0], compassPoints[1], compassPoints[2], currentColor, currentWeight);
+            shapes.push(ang);
+            compassPoints = [];
+            actionChanged = true;
+        }
+    } else if (currentTool === 'point') {
         saveState();
         shapes.push(new Point(mouseX, mouseY));
         actionChanged = true;
@@ -921,6 +941,95 @@ class TriangleGroup {
         this.pts.forEach(p=>{p.x += dx; p.y += dy;});
     }
     resize(){}
+}
+
+class AngleSnapshot {
+    constructor(vertex, p1, p2, color = 'black', weight = 1){
+        this.x = vertex.x;
+        this.y = vertex.y;
+        this.a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+        this.a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+        this.len1 = dist(vertex.x, vertex.y, p1.x, p1.y);
+        this.len2 = dist(vertex.x, vertex.y, p2.x, p2.y);
+        this.color = color;
+        this.weight = weight;
+        this.rotation = 0;
+        const maxLen = Math.max(this.len1, this.len2) + 10;
+        this.pg = createGraphics(maxLen*2, maxLen*2);
+        this.pg.stroke(color);
+        this.pg.strokeWeight(weight);
+        this.pg.noFill();
+        const ox = maxLen;
+        const oy = maxLen;
+        this.pg.line(ox, oy, ox + this.len1 * Math.cos(this.a1), oy + this.len1 * Math.sin(this.a1));
+        this.pg.line(ox, oy, ox + this.len2 * Math.cos(this.a2), oy + this.len2 * Math.sin(this.a2));
+        this.offset = {x: maxLen, y: maxLen};
+    }
+    getP1(){
+        const ang = this.a1 + this.rotation;
+        return {
+            x: this.x + this.len1 * Math.cos(ang),
+            y: this.y + this.len1 * Math.sin(ang)
+        };
+    }
+    getP2(){
+        const ang = this.a2 + this.rotation;
+        return {
+            x: this.x + this.len2 * Math.cos(ang),
+            y: this.y + this.len2 * Math.sin(ang)
+        };
+    }
+    draw(pg){
+        const g = pg || window;
+        g.push();
+        g.translate(this.x, this.y);
+        g.rotate(this.rotation);
+        g.imageMode(CENTER);
+        g.image(this.pg, 0, 0);
+        g.pop();
+        if(!pg && selectedShape === this){
+            const p1 = this.getP1();
+            const p2 = this.getP2();
+            push();
+            stroke('orange');
+            strokeWeight(2);
+            line(this.x, this.y, p1.x, p1.y);
+            line(this.x, this.y, p2.x, p2.y);
+            fill('yellow');
+            noStroke();
+            rectMode(CENTER);
+            rect(this.x, this.y, 6, 6);
+            rect(p1.x, p1.y, 6, 6);
+            rect(p2.x, p2.y, 6, 6);
+            pop();
+        }
+    }
+    hitTest(px,py){
+        const p1 = this.getP1();
+        const p2 = this.getP2();
+        if(dist(px,py,this.x,this.y) < 6) return 'center';
+        if(dist(px,py,p1.x,p1.y) < 6) return 'start';
+        if(dist(px,py,p2.x,p2.y) < 6) return 'end';
+        const d1 = pointSegDist(px,py,{x:this.x,y:this.y},p1);
+        const d2 = pointSegDist(px,py,{x:this.x,y:this.y},p2);
+        if(Math.min(d1,d2) < 3) return 'center';
+        return null;
+    }
+    move(nx,ny){
+        this.x = nx;
+        this.y = ny;
+    }
+    resize(mode,px,py){
+        if(mode==='center') this.move(px,py);
+        if(mode==='start'){
+            const ang = Math.atan2(py - this.y, px - this.x);
+            this.rotation = ang - this.a1;
+        }
+        if(mode==='end'){
+            const ang = Math.atan2(py - this.y, px - this.x);
+            this.rotation = ang - this.a2;
+        }
+    }
 }
 
 function findShape(px,py){
