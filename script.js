@@ -1279,7 +1279,8 @@ function setupKidsActivities(){
             id: 'intro-plane',
             category: 'Basics',
             title: 'Welcome to the Plane',
-            prompt: 'This grid is our plane—a flat surface that goes on forever.',
+            prompt: 'This grid is our plane—a flat surface that goes on forever in every direction.',
+            autoNext: true,
             setup: function(){
                 showGrid = true;
             },
@@ -1291,7 +1292,7 @@ function setupKidsActivities(){
             id: 'place-point',
             category: 'Basics',
             title: 'Placing a Point',
-            prompt: 'Place a point anywhere on the plane.',
+            prompt: 'Place a point anywhere on the plane. A point marks an exact location with no size.',
             setup: function(){
                 // nothing pre-drawn
             },
@@ -1309,7 +1310,7 @@ function setupKidsActivities(){
             id: 'stretch-to-segment',
             category: 'Basics',
             title: 'Make a Line Segment',
-            prompt: 'Stretch your point into a line segment.',
+            prompt: 'Draw a line segment starting from your point and extending away. A line segment is a straight path with two endpoints.',
             keepShapes: true,
             setup: function(){
                 if(introGuide.point){
@@ -1360,14 +1361,14 @@ function setupKidsActivities(){
             id: 'extend-line',
             category: 'Basics',
             title: 'Extend the Line',
-            prompt: 'Extend your line segment past both red points so it keeps going in a straight path.',
+            prompt: 'Extend your line segment so it goes beyond the magenta points. Only drag the line itself.',
             keepShapes: true,
             setup: function(){
                 const x1 = width/2 - 60;
                 const x2 = width/2 + 60;
                 const y = height/2;
-                shapes.push(new Circle(x1, y, 6, 'magenta'));
-                shapes.push(new Circle(x2, y, 6, 'magenta'));
+                shapes.push(new Circle(x1, y, 6, 'magenta', true));
+                shapes.push(new Circle(x2, y, 6, 'magenta', true));
             },
             check: function(){
                 const x1 = width/2 - 60;
@@ -1378,7 +1379,8 @@ function setupKidsActivities(){
                     if(s instanceof LineSeg){
                         const match1 = dist(s.x1,s.y1,x1,y) < 10 && dist(s.x2,s.y2,x2,y) < 10;
                         const match2 = dist(s.x1,s.y1,x2,y) < 10 && dist(s.x2,s.y2,x1,y) < 10;
-                        if((match1 || match2) && dist(s.x1,s.y1,s.x2,s.y2) > baseLen + 40){
+                        const len = dist(s.x1,s.y1,s.x2,s.y2);
+                        if((match1 || match2) && len > baseLen + 10){
                             return true;
                         }
                     }
@@ -2667,20 +2669,20 @@ function loadKidsActivity(i){
     document.getElementById('prev-activity').disabled = i === 0;
     const nextBtn = document.getElementById('next-activity');
     const skipBtn = document.getElementById('skip-activity');
-    nextBtn.disabled = true;
+    nextBtn.disabled = !act.autoNext;
     const last = i === kidsActivities.length - 1;
     if(skipBtn) skipBtn.disabled = last;
     if(last) nextBtn.disabled = true;
     saveState();
     updateBrainButton();
-    checkKidsActivity();
+    if(!act.autoNext) checkKidsActivity();
 }
 
 function checkKidsActivity(){
     if(mode !== 'kids') return;
     const act = kidsActivities[currentActivity];
     if(act.check && act.check()){
-        feedbackElem.textContent = 'Great job!';
+        feedbackElem.textContent = '\u2713';
         const nextBtn = document.getElementById('next-activity');
         if(nextBtn && currentActivity < kidsActivities.length - 1){
             nextBtn.disabled = false;
@@ -2708,7 +2710,7 @@ function checkAdvancedStep(){
     const steps = advancedExamples[currentExample];
     const step = steps[currentExampleStep];
     if(step.check && step.check()){
-        feedbackElem.textContent = 'Great job!';
+        feedbackElem.textContent = '\u2713';
         const nextBtn = document.getElementById('next-activity');
         if(nextBtn && currentExampleStep < steps.length - 1){
             nextBtn.disabled = false;
@@ -2981,13 +2983,16 @@ function showFlashcard(term){
         } else if(term === 'plane'){
             ctx.strokeRect(40, 40, canvas.width-80, canvas.height-80);
         } else if(term === 'angle' || term === 'right angle'){
+            const vx = 60;
+            const vy = canvas.height - 60;
             ctx.beginPath();
-            ctx.moveTo(40, canvas.height-40);
-            ctx.lineTo(canvas.width/2, canvas.height-80);
-            ctx.lineTo(canvas.width-40, canvas.height-40);
+            ctx.moveTo(vx, vy);
+            ctx.lineTo(vx, vy - 80);
+            ctx.moveTo(vx, vy);
+            ctx.lineTo(vx + 80, vy);
             ctx.stroke();
             if(term === 'right angle'){
-                ctx.strokeRect(canvas.width/2-10, canvas.height-50, 10, 10);
+                ctx.strokeRect(vx, vy - 20, 20, 20);
             }
         } else if(term === 'radius'){
             ctx.beginPath();
@@ -3089,6 +3094,19 @@ function showFlashcard(term){
                 const y = cy + r*Math.sin(angle);
                 if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
             }
+            ctx.closePath();
+            ctx.stroke();
+        } else if(term === 'congruent triangles' || term === 'SSS criterion' || term === 'corresponding sides'){
+            ctx.beginPath();
+            ctx.moveTo(40, canvas.height-40);
+            ctx.lineTo(80, 40);
+            ctx.lineTo(120, canvas.height-40);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(130, canvas.height-40);
+            ctx.lineTo(170, 40);
+            ctx.lineTo(canvas.width-40, canvas.height-40);
             ctx.closePath();
             ctx.stroke();
         } else if(term === 'diameter'){
