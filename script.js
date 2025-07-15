@@ -1114,6 +1114,11 @@ function startAdvancedMode(){
     mode = 'advanced';
     currentExample = null;
     exampleShapes = [];
+    // Ensure kids activities are loaded so they appear in the activity lists
+    // even before entering kids mode
+    if(!kidsActivities.length){
+        setupKidsActivities();
+    }
     document.body.classList.remove('kids');
     document.getElementById('mode-selector').style.display = 'none';
     const tb = document.getElementById('toolbar');
