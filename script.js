@@ -731,7 +731,7 @@ function startAdvancedMode(){
 function setupKidsActivities(){
     kidsActivities = [
         {
-            prompt: 'Place a point anywhere on the canvas. A point is an exact position with no size.',
+            prompt: 'Welcome! Our screen is a plane – a flat 2D space. A line is 1D, our world is 3D, and adding time makes 4D. A point is a tiny spot with no size. Place a point anywhere on the plane.',
             setup: function(){
                 // nothing pre-drawn
             },
@@ -745,7 +745,7 @@ function setupKidsActivities(){
             }
         },
         {
-            prompt: 'Draw a line segment connecting the two red points. A line segment is the straight path between points.',
+            prompt: 'Draw a line segment connecting the two red points. A line segment is a straight 1D path between points.',
             setup: function(){
                 const x1 = width/2 - 60;
                 const x2 = width/2 + 60;
@@ -768,7 +768,7 @@ function setupKidsActivities(){
             }
         },
         {
-            prompt: 'Use line segments to connect the 3 red points into a triangle. Can you make two line segments equal?',
+            prompt: 'Use line segments to connect the 3 red points into a triangle. A triangle is a polygon, a closed shape made from line segments. Can you make two line segments equal?',
             setup: function(){
                 placeTriangleDots();
             },
@@ -832,7 +832,7 @@ function setupKidsActivities(){
             }
         },
         {
-            prompt: 'Click each corner point of the square to find the right angles.',
+            prompt: 'Click each corner point of the square to find the right angles. An angle is the space between two lines that meet.',
             setup: function(){
                 const size=120;
                 const cx=width/2;
@@ -860,7 +860,7 @@ function setupKidsActivities(){
         }
         },
         {
-            prompt: 'Step 1: Place a point anywhere on the canvas. Step 2: Draw a circle centered on that point. Step 3: The radius is the distance from the center to the edge and the circumference is the distance all the way around.',
+            prompt: 'Step 1: Place a point anywhere on the canvas. Step 2: Draw a circle centered on that point. The radius is the distance from the center to the edge. The circumference is the distance all the way around the circle.',
             setup: function(){
                 // nothing pre-drawn
             },
