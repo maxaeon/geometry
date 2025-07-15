@@ -306,21 +306,44 @@ function setup() {
     });
 
     document.getElementById('next-activity').addEventListener('click', () => {
-        if(currentActivity < kidsActivities.length - 1){
-            animatePageTurn('next');
-            loadKidsActivity(currentActivity + 1);
+        if(mode === 'kids'){
+            if(currentActivity < kidsActivities.length - 1){
+                animatePageTurn('next');
+                loadKidsActivity(currentActivity + 1);
+            }
+        } else if(mode === 'advanced' && currentExample){
+            const steps = advancedExamples[currentExample];
+            if(currentExampleStep < steps.length - 1){
+                animatePageTurn('next');
+                loadAdvancedStep(currentExampleStep + 1);
+            }
         }
     });
     document.getElementById('skip-activity').addEventListener('click', () => {
-        if(currentActivity < kidsActivities.length - 1){
-            animatePageTurn('next');
-            loadKidsActivity(currentActivity + 1);
+        if(mode === 'kids'){
+            if(currentActivity < kidsActivities.length - 1){
+                animatePageTurn('next');
+                loadKidsActivity(currentActivity + 1);
+            }
+        } else if(mode === 'advanced' && currentExample){
+            const steps = advancedExamples[currentExample];
+            if(currentExampleStep < steps.length - 1){
+                animatePageTurn('next');
+                loadAdvancedStep(currentExampleStep + 1);
+            }
         }
     });
     document.getElementById('prev-activity').addEventListener('click', () => {
-        if(currentActivity > 0){
-            animatePageTurn('prev');
-            loadKidsActivity(currentActivity - 1);
+        if(mode === 'kids'){
+            if(currentActivity > 0){
+                animatePageTurn('prev');
+                loadKidsActivity(currentActivity - 1);
+            }
+        } else if(mode === 'advanced' && currentExample){
+            if(currentExampleStep > 0){
+                animatePageTurn('prev');
+                loadAdvancedStep(currentExampleStep - 1);
+            }
         }
     });
 
@@ -417,6 +440,7 @@ function mousePressed() {
                         if(s === expected){
                             s.clicked = true;
                             checkKidsActivity();
+                            checkAdvancedStep();
                         }
                         return;
                     }
@@ -428,6 +452,7 @@ function mousePressed() {
                     if(dist(mouseX,mouseY,s.x,s.y) <= s.r + 5){
                         s.clicked = true;
                         checkKidsActivity();
+                        checkAdvancedStep();
                         return;
                     }
                 }
@@ -499,6 +524,7 @@ function mouseReleased() {
     drawingShape = null;
     resizeMode = null;
     checkKidsActivity();
+    checkAdvancedStep();
 }
 
 function keyPressed() {
@@ -878,63 +904,15 @@ function loadExample(name){
     shapes = [];
     currentExample = null;
     exampleShapes = [];
-    if(name==='triangle-congruency'){
-        const left=[{x:200,y:300},{x:300,y:150},{x:400,y:300}];
-        shapes.push(new LineSeg(left[0].x,left[0].y,left[1].x,left[1].y,false));
-        shapes.push(new LineSeg(left[1].x,left[1].y,left[2].x,left[2].y,false));
-        shapes.push(new LineSeg(left[2].x,left[2].y,left[0].x,left[0].y,false));
-        const dx=250;
-        for(let i=0;i<3;i++){
-            const j=(i+1)%3;
-            shapes.push(new LineSeg(left[i].x+dx,left[i].y,left[j].x+dx,left[j].y,false));
-        }
-        feedbackElem.textContent='Two triangles with equal sides - congruent (SSS)';
+    if(advancedExamples[name]){
         currentExample = name;
-        exampleShapes = [...shapes];
-    } else if(name==='circle-theorem'){
-        const c=new Circle(width/2, height/2, 120);
-        const aAngle=PI/6, bAngle=-PI/6, cAngle=PI/2;
-        const ax=c.x+cos(aAngle)*c.r, ay=c.y+sin(aAngle)*c.r;
-        const bx=c.x+cos(bAngle)*c.r, by=c.y+sin(bAngle)*c.r;
-        const cxp=c.x+cos(cAngle)*c.r, cyp=c.y+sin(cAngle)*c.r;
-        shapes.push(c);
-        shapes.push(new LineSeg(ax,ay,bx,by,false));
-        shapes.push(new LineSeg(ax,ay,cxp,cyp,false));
-        shapes.push(new LineSeg(bx,by,cxp,cyp,false));
-        feedbackElem.textContent='Angles subtended by the same arc are equal';
-        currentExample = name;
-        exampleShapes = [...shapes];
-    } else if(name==='pythagorean'){
-        const base=160;
-        const x=width/2-base/2, y=height/2+base/2;
-        shapes.push(new LineSeg(x,y,x+base,y,false));
-        shapes.push(new LineSeg(x+base,y,x+base,y-base,false));
-        shapes.push(new LineSeg(x+base,y-base,x,y,false));
-        // squares
-        shapes.push(new LineSeg(x,y,x,y-base,false));
-        shapes.push(new LineSeg(x,y-base,x+base,y-base,false));
-        shapes.push(new LineSeg(x+base,y-base,x+base,y-base-base,false));
-        shapes.push(new LineSeg(x+base,y-base-base,x,y-base-base,false));
-        shapes.push(new LineSeg(x,y-base-base,x,y-base,false));
-        shapes.push(new LineSeg(x+base,y,x+base+base,y,false));
-        shapes.push(new LineSeg(x+base+base,y,x+base+base,y-base,false));
-        shapes.push(new LineSeg(x+base+base,y-base,x+base,y-base,false));
-        feedbackElem.textContent='Right triangle with squares demonstrates a^2+b^2=c^2';
-        currentExample = name;
-        exampleShapes = [...shapes];
-    } else if(name==='parallel-lines'){
-        const y1=height/2-60, y2=height/2+60;
-        const x1=width/2-120, x2=width/2+120;
-        shapes.push(new LineSeg(x1,y1,x2,y1,false));
-        shapes.push(new LineSeg(x1,y2,x2,y2,false));
-        const tx=width/2, ty1=height/2-100, ty2=height/2+100;
-        shapes.push(new LineSeg(tx,ty1,tx,ty2,false));
-        feedbackElem.textContent='Parallel lines with a transversal';
-        currentExample = name;
-        exampleShapes = [...shapes];
-    } else {
-        feedbackElem.textContent='';
+        document.getElementById('prev-activity').style.display = 'inline-block';
+        document.getElementById('next-activity').style.display = 'inline-block';
+        document.getElementById('skip-activity').style.display = 'inline-block';
+        loadAdvancedStep(0);
+        return;
     }
+    feedbackElem.textContent='';
     saveState();
 }
 
@@ -1002,6 +980,7 @@ function startAdvancedMode(){
     }
     feedbackElem.textContent = '';
     updateBrainButton();
+    setupAdvancedExamples();
     positionInstructionPanel();
 }
 
@@ -1677,6 +1656,177 @@ function setupKidsActivities(){
     ];
 }
 
+function setupAdvancedExamples(){
+    advancedExamples = {
+        'triangle-congruency': [
+            {
+                prompt: 'Connect the three magenta points to make a triangle.',
+                setup: function(){
+                    const cx = width/2 - 150;
+                    const cy = height/2 + 80;
+                    const base = 200;
+                    this.pts = [
+                        {x: cx, y: cy},
+                        {x: cx + base/2, y: cy - 150},
+                        {x: cx + base, y: cy}
+                    ];
+                    for(const p of this.pts){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                },
+                check: function(){
+                    return triangleLinesDrawn(this.pts);
+                }
+            },
+            {
+                prompt: 'Copy the triangle on the right using the new points.',
+                keepShapes: true,
+                setup: function(){
+                    const cx = width/2 - 150 + 250;
+                    const cy = height/2 + 80;
+                    const base = 200;
+                    this.pts = [
+                        {x: cx, y: cy},
+                        {x: cx + base/2, y: cy - 150},
+                        {x: cx + base, y: cy}
+                    ];
+                    for(const p of this.pts){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                },
+                check: function(){
+                    return triangleLinesDrawn(this.pts);
+                }
+            },
+            {
+                prompt: 'Great! The two triangles are congruent by SSS.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){return true;}
+            }
+        ],
+        'circle-theorem': [
+            {
+                prompt: 'Connect the three points on the circle.',
+                setup: function(){
+                    const c = new Circle(width/2,height/2,120);
+                    shapes.push(c);
+                    this.center = c;
+                    this.pts = [];
+                    const angles=[Math.PI/6,-Math.PI/6,Math.PI/2];
+                    for(const a of angles){
+                        const x=c.x+Math.cos(a)*c.r;
+                        const y=c.y+Math.sin(a)*c.r;
+                        const pt={x,y};
+                        this.pts.push(pt);
+                        shapes.push(new Circle(x,y,6,'magenta'));
+                    }
+                },
+                check: function(){
+                    return triangleLinesDrawn(this.pts);
+                }
+            },
+            {
+                prompt: 'Add the angle on the same arc using the new point.',
+                keepShapes: true,
+                setup: function(){
+                    const a=-Math.PI/2;
+                    const c=this.center;
+                    const x=c.x+Math.cos(a)*c.r;
+                    const y=c.y+Math.sin(a)*c.r;
+                    this.extra={x,y};
+                    shapes.push(new Circle(x,y,6,'magenta'));
+                },
+                check: function(){
+                    return hasLineBetween(this.pts[0],this.extra) && hasLineBetween(this.pts[1],this.extra);
+                }
+            },
+            {
+                prompt: 'Angles subtended by the same arc are equal.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){return true;}
+            }
+        ],
+        'pythagorean': [
+            {
+                prompt: 'Connect the three points to form a right triangle.',
+                setup: function(){
+                    const base=160;
+                    const x=width/2-base/2;
+                    const y=height/2+base/2;
+                    this.pts=[{x:x,y:y},{x:x+base,y:y},{x:x+base,y:y-base}];
+                    for(const p of this.pts){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                },
+                check: function(){return triangleLinesDrawn(this.pts);}
+            },
+            {
+                prompt: 'Squares on each side illustrate a^2 + b^2 = c^2.',
+                keepShapes: true,
+                setup: function(){
+                    const base=160;
+                    const x=width/2-base/2;
+                    const y=height/2+base/2;
+                    shapes.push(new LineSeg(x,y,x,y-base));
+                    shapes.push(new LineSeg(x,y-base,x+base,y-base));
+                    shapes.push(new LineSeg(x+base,y-base,x+base,y-base-base));
+                    shapes.push(new LineSeg(x+base,y-base-base,x,y-base-base));
+                    shapes.push(new LineSeg(x,y-base-base,x,y-base));
+                    shapes.push(new LineSeg(x+base,y,x+base+base,y));
+                    shapes.push(new LineSeg(x+base+base,y,x+base+base,y-base));
+                    shapes.push(new LineSeg(x+base+base,y-base,x+base,y-base));
+                },
+                check: function(){return true;}
+            },
+            {
+                prompt: 'The areas of the small squares add up to the large one.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){return true;}
+            }
+        ],
+        'parallel-lines': [
+            {
+                prompt: 'Draw two parallel lines through the points.',
+                setup: function(){
+                    const y1=height/2-60, y2=height/2+60;
+                    const x1=width/2-120, x2=width/2+120;
+                    this.pairs=[[{x:x1,y:y1},{x:x2,y:y1}],[{x:x1,y:y2},{x:x2,y:y2}]];
+                    for(const pair of this.pairs){
+                        for(const p of pair){
+                            shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                        }
+                    }
+                },
+                check: function(){
+                    return hasLineBetween(this.pairs[0][0],this.pairs[0][1]) && hasLineBetween(this.pairs[1][0],this.pairs[1][1]);
+                }
+            },
+            {
+                prompt: 'Add a transversal connecting the new points.',
+                keepShapes: true,
+                setup: function(){
+                    const tx=width/2, ty1=height/2-100, ty2=height/2+100;
+                    this.p1={x:tx,y:ty1};
+                    this.p2={x:tx,y:ty2};
+                    shapes.push(new Circle(tx,ty1,6,'magenta'));
+                    shapes.push(new Circle(tx,ty2,6,'magenta'));
+                },
+                check: function(){
+                    return hasLineBetween(this.p1,this.p2);
+                }
+            },
+            {
+                prompt: 'Parallel lines with a transversal create equal angles.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){return true;}
+            }
+        ]
+    };
+}
 function loadKidsActivity(i){
     currentActivity = i;
     const act = kidsActivities[i];
@@ -1707,6 +1857,34 @@ function checkKidsActivity(){
         feedbackElem.textContent = 'Great job!';
         const nextBtn = document.getElementById('next-activity');
         if(nextBtn && currentActivity < kidsActivities.length - 1){
+            nextBtn.disabled = false;
+        }
+    }
+}
+function loadAdvancedStep(i){
+    const steps = advancedExamples[currentExample];
+    const step = steps[i];
+    currentExampleStep = i;
+    if(!step.keepShapes){
+        shapes = [];
+    }
+    step.setup();
+    feedbackElem.textContent = step.prompt;
+    document.getElementById('prev-activity').disabled = i === 0;
+    const nextBtn = document.getElementById('next-activity');
+    nextBtn.disabled = true;
+    saveState();
+    checkAdvancedStep();
+}
+
+function checkAdvancedStep(){
+    if(mode !== 'advanced' || !currentExample) return;
+    const steps = advancedExamples[currentExample];
+    const step = steps[currentExampleStep];
+    if(step.check && step.check()){
+        feedbackElem.textContent = 'Great job!';
+        const nextBtn = document.getElementById('next-activity');
+        if(nextBtn && currentExampleStep < steps.length - 1){
             nextBtn.disabled = false;
         }
     }
@@ -1779,6 +1957,20 @@ function showEqualSidesPrompt(){
 }
 
 // ----- Utility buttons on start screen -----
+function hasLineBetween(p1,p2){
+    for(const s of shapes){
+        if(s instanceof LineSeg){
+            const c1 = dist(s.x1,s.y1,p1.x,p1.y) < 10 && dist(s.x2,s.y2,p2.x,p2.y) < 10;
+            const c2 = dist(s.x1,s.y1,p2.x,p2.y) < 10 && dist(s.x2,s.y2,p1.x,p1.y) < 10;
+            if(c1 || c2) return true;
+        }
+    }
+    return false;
+}
+
+function triangleLinesDrawn(pts){
+    return hasLineBetween(pts[0],pts[1]) && hasLineBetween(pts[1],pts[2]) && hasLineBetween(pts[2],pts[0]);
+}
 function openDictionary(){
     const overlay = document.getElementById('dictionary-overlay');
     if(overlay){
