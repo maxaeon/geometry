@@ -16,6 +16,7 @@ let actionChanged = false;
 let currentColor = '#000000';
 let currentWeight = 1;
 let lineDashed = false;
+let dimensionInterval = null;
 let fillLayer;
 let showGrid = true;
 let triangleGuide = {};
@@ -1356,11 +1357,19 @@ function closeDictionary(){
     if(overlay){
         overlay.style.display = 'none';
     }
+    if(dimensionInterval){
+        clearInterval(dimensionInterval);
+        dimensionInterval = null;
+    }
 }
 
 function showCategories(){
     document.querySelectorAll('#dictionary-overlay .category').forEach(c => c.style.display = 'block');
     const card = document.getElementById('flashcard');
+    if(dimensionInterval){
+        clearInterval(dimensionInterval);
+        dimensionInterval = null;
+    }
     if(card) card.style.display = 'none';
 }
 
@@ -1368,6 +1377,10 @@ function showFlashcard(term){
     document.querySelectorAll('#dictionary-overlay .category').forEach(c => c.style.display = 'none');
     const card = document.getElementById('flashcard');
     if(!card) return;
+    if(dimensionInterval){
+        clearInterval(dimensionInterval);
+        dimensionInterval = null;
+    }
     card.style.display = 'block';
     document.getElementById('flashcard-title').textContent = term.charAt(0).toUpperCase() + term.slice(1);
     const defEl = document.getElementById('flashcard-definition');
@@ -1475,6 +1488,21 @@ function showFlashcard(term){
             ctx.moveTo(50 + size, 70 + size);
             ctx.lineTo(80 + size, 40 + size);
             ctx.stroke();
+        } else if(term === 'dimension'){
+            let step = 0;
+            const drawSteps = [
+                () => drawDimension1(ctx, canvas),
+                () => drawDimension2(ctx, canvas),
+                () => drawDimension3(ctx, canvas)
+            ];
+            drawSteps[step]();
+            dimensionInterval = setInterval(() => {
+                step = (step + 1) % drawSteps.length;
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                drawSteps[step]();
+            }, 1000);
         } else if(term === 'tangent'){
             ctx.beginPath();
             ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI*2);
@@ -1502,3 +1530,48 @@ function showAdvancedInfo(){
     }
     overlay.style.display = 'flex';
 }
+
+function drawArrowhead(ctx, x, y, x0, y0){
+    const headlen = 8;
+    const angle = Math.atan2(y - y0, x - x0);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - headlen * Math.cos(angle - Math.PI / 6),
+               y - headlen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(x - headlen * Math.cos(angle + Math.PI / 6),
+               y - headlen * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawArrowLine(ctx, x1, y1, x2, y2){
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    drawArrowhead(ctx, x2, y2, x1, y1);
+    drawArrowhead(ctx, x1, y1, x2, y2);
+}
+
+
+
+function drawDimension1(ctx, canvas){
+    const y = canvas.height / 2;
+    drawArrowLine(ctx, 20, y, canvas.width - 20, y);
+}
+
+function drawDimension2(ctx, canvas){
+    const midX = canvas.width / 2;
+    const midY = canvas.height / 2;
+    drawArrowLine(ctx, 20, midY, canvas.width - 20, midY);
+    drawArrowLine(ctx, midX, canvas.height - 20, midX, 20);
+}
+
+function drawDimension3(ctx, canvas){
+    const midX = canvas.width / 2;
+    const midY = canvas.height / 2;
+    drawArrowLine(ctx, 20, midY, canvas.width - 20, midY);
+    drawArrowLine(ctx, midX, canvas.height - 20, midX, 20);
+    drawArrowLine(ctx, midX - 40, midY + 40, midX + 40, midY - 40);
+}
+
