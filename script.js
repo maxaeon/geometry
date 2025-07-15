@@ -856,7 +856,31 @@ function setupKidsActivities(){
                         }
                     }
                 }
-                return allClicked;
+        return allClicked;
+        }
+        },
+        {
+            prompt: 'Step 1: Place a point anywhere on the canvas. Step 2: Draw a circle centered on that point. Step 3: The radius is the distance from the center to the edge and the circumference is the distance all the way around.',
+            setup: function(){
+                // nothing pre-drawn
+            },
+            check: function(){
+                let pt=null;
+                for(const s of shapes){
+                    if(s instanceof Point){
+                        pt = s;
+                        break;
+                    }
+                }
+                if(!pt) return false;
+                for(const s of shapes){
+                    if(s instanceof Circle){
+                        if(dist(s.x,s.y,pt.x,pt.y) < 5 && s.r > 10){
+                            return true;
+                        }
+                    }
+                }
+                return false;
             }
         },
         {
