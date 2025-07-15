@@ -3157,8 +3157,8 @@ function showAdvancedInfo(){
     const overlay = document.getElementById('advanced-overlay');
     const formulaEl = document.getElementById('advanced-formula');
     const explEl = document.getElementById('advanced-explanation');
-    const imgEl = document.getElementById('advanced-image');
-    if(!overlay || !formulaEl || !explEl || !imgEl) return;
+    const canvas = document.getElementById('advanced-canvas');
+    if(!overlay || !formulaEl || !explEl || !canvas) return;
     explEl.style.display = 'none';
     const act = kidsActivities[currentActivity];
     const info = act ? advancedInfo[act.id] : null;
@@ -3166,19 +3166,37 @@ function showAdvancedInfo(){
         formulaEl.innerHTML = info.formula;
         explEl.textContent = info.explanation;
         if(act.id === 'intro-plane'){
-            imgEl.src = '4d.png';
-            imgEl.style.display = 'block';
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            drawCubeImage(ctx);
+            canvas.style.display = 'block';
         } else {
-            imgEl.src = '';
-            imgEl.style.display = 'none';
+            canvas.style.display = 'none';
         }
     } else {
         formulaEl.textContent = 'No additional information for this step.';
         explEl.textContent = '';
-        imgEl.src = '';
-        imgEl.style.display = 'none';
+        canvas.style.display = 'none';
     }
     overlay.style.display = 'flex';
+}
+
+function drawCubeImage(ctx){
+    const size = 70;
+    ctx.strokeRect(50, 70, size, size);
+    ctx.setLineDash([5,5]);
+    ctx.strokeRect(80, 40, size, size);
+    ctx.beginPath();
+    ctx.moveTo(50, 70);
+    ctx.lineTo(80, 40);
+    ctx.moveTo(50 + size, 70);
+    ctx.lineTo(80 + size, 40);
+    ctx.moveTo(50, 70 + size);
+    ctx.lineTo(80, 40 + size);
+    ctx.moveTo(50 + size, 70 + size);
+    ctx.lineTo(80 + size, 40 + size);
+    ctx.stroke();
+    ctx.setLineDash([]);
 }
 
 function drawArrowhead(ctx, x, y, x0, y0){
