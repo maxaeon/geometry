@@ -24,6 +24,8 @@ let triangleGuide = {};
 let introGuide = {};
 let rightTriangleGuide = {};
 let pythGuide = {};
+let similarityGuide = {};
+let similarityDemo = null;
 let identifyCenterStep = 0;
 let identifyCenterCircles = [];
 let shapeIdentify = {};
@@ -569,6 +571,17 @@ function mouseDragged() {
                 const dx = selectedShape.x - symmetryDemo.centerX;
                 symmetryDemo.mirrorDot.move(symmetryDemo.centerX - dx, selectedShape.y);
             }
+            if(similarityDemo && selectedShape === similarityDemo.scaleDot){
+                const dx = similarityDemo.scaleDot.x - similarityDemo.anchor.x;
+                const dy = similarityDemo.scaleDot.y - similarityDemo.anchor.y;
+                const baseLen = Math.hypot(similarityDemo.baseVec1.x, similarityDemo.baseVec1.y);
+                const scale = Math.hypot(dx, dy) / baseLen;
+                similarityDemo.group.pts[1].x = similarityDemo.anchor.x + similarityDemo.baseVec1.x * scale;
+                similarityDemo.group.pts[1].y = similarityDemo.anchor.y + similarityDemo.baseVec1.y * scale;
+                similarityDemo.group.pts[2].x = similarityDemo.anchor.x + similarityDemo.baseVec2.x * scale;
+                similarityDemo.group.pts[2].y = similarityDemo.anchor.y + similarityDemo.baseVec2.y * scale;
+                similarityDemo.scaleDot.move(similarityDemo.group.pts[1].x, similarityDemo.group.pts[1].y);
+            }
         }
     }
 }
@@ -1000,7 +1013,7 @@ function populateActivitySelect(){
     if(typeof advancedExamples === 'object'){
         const og = document.createElement('optgroup');
         og.label = 'Advanced';
-        Object.keys(advancedExamples).forEach(key => {
+        Object.keys(advancedExamples).sort().forEach(key => {
             const opt = document.createElement('option');
             opt.value = key;
             opt.textContent = key.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -1043,7 +1056,7 @@ function populateActivitiesOverlay(){
         container.appendChild(h);
         const ul = document.createElement('ul');
         container.appendChild(ul);
-        Object.keys(advancedExamples).forEach(key => {
+        Object.keys(advancedExamples).sort().forEach(key => {
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.href = '#';
@@ -2456,6 +2469,95 @@ function setupAdvancedExamples(){
                 check: function(){return true;}
             }
         ],
+        'triangle-similarity': [
+            {
+                prompt: 'Construct triangle XYZ using the magenta points.',
+                setup: function(){
+                    showGrid = true;
+                    const cx = width/2 - 160;
+                    const cy = height/2 + 80;
+                    const base = 180;
+                    similarityGuide.src = [
+                        {x: cx, y: cy},
+                        {x: cx + base, y: cy},
+                        {x: cx + base/2, y: cy - 130}
+                    ];
+                    for(const p of similarityGuide.src){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                },
+                check: function(){
+                    if(triangleLinesDrawn(similarityGuide.src)){
+                        similarityGuide.angles = triangleAngles(similarityGuide.src);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                prompt: 'Copy two angles for X\'Y\'Z\' with the new points.',
+                keepShapes: true,
+                setup: function(){
+                    showGrid = true;
+                    const cx = width/2 + 160;
+                    const cy = height/2 + 80;
+                    const base = 120;
+                    similarityGuide.dst = [
+                        {x: cx, y: cy},
+                        {x: cx + base, y: cy},
+                        {x: cx + base/2, y: cy - 90}
+                    ];
+                    for(const p of similarityGuide.dst){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                },
+                check: function(){
+                    if(triangleLinesDrawn(similarityGuide.dst)){
+                        const ang = triangleAngles(similarityGuide.dst);
+                        const match = Math.abs(ang[0]-similarityGuide.angles[0])<0.1 &&
+                                     Math.abs(ang[1]-similarityGuide.angles[1])<0.1;
+                        if(match && !similarityGuide.tri){
+                            similarityGuide.tri = new TriangleGroup(similarityGuide.dst[0], similarityGuide.dst[1], similarityGuide.dst[2]);
+                            similarityGuide.base1 = {x: similarityGuide.dst[1].x - similarityGuide.dst[0].x,
+                                                     y: similarityGuide.dst[1].y - similarityGuide.dst[0].y};
+                            similarityGuide.base2 = {x: similarityGuide.dst[2].x - similarityGuide.dst[0].x,
+                                                     y: similarityGuide.dst[2].y - similarityGuide.dst[0].y};
+                            removeLineBetween(similarityGuide.dst[0], similarityGuide.dst[1]);
+                            removeLineBetween(similarityGuide.dst[1], similarityGuide.dst[2]);
+                            removeLineBetween(similarityGuide.dst[2], similarityGuide.dst[0]);
+                            shapes.push(similarityGuide.tri);
+                        }
+                        return match;
+                    }
+                    return false;
+                }
+            },
+            {
+                prompt: 'Drag the blue point to scale X\'Y\'Z\'.',
+                keepShapes: true,
+                setup: function(){
+                    showGrid = true;
+                    currentTool = 'select';
+                    const p = similarityGuide.tri.pts[1];
+                    const dot = new Circle(p.x, p.y, 6, 'blue');
+                    shapes.push(dot);
+                    similarityDemo = {
+                        anchor: similarityGuide.tri.pts[0],
+                        scaleDot: dot,
+                        baseVec1: similarityGuide.base1,
+                        baseVec2: similarityGuide.base2,
+                        group: similarityGuide.tri
+                    };
+                },
+                check: function(){return true;}
+            },
+            {
+                prompt: 'These triangles are similar with two matching angles.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){return true;}
+            }
+        ],
         'parallel-lines': [
             {
                 prompt: 'Draw two parallel lines through the points.',
@@ -2686,6 +2788,22 @@ function hasLineBetween(p1,p2){
 
 function triangleLinesDrawn(pts){
     return hasLineBetween(pts[0],pts[1]) && hasLineBetween(pts[1],pts[2]) && hasLineBetween(pts[2],pts[0]);
+}
+
+function angleAt(a, b, c){
+    const ab = Math.atan2(a.y - b.y, a.x - b.x);
+    const cb = Math.atan2(c.y - b.y, c.x - b.x);
+    let diff = Math.abs(ab - cb);
+    if(diff > Math.PI) diff = Math.PI * 2 - diff;
+    return diff;
+}
+
+function triangleAngles(pts){
+    return [
+        angleAt(pts[1], pts[0], pts[2]),
+        angleAt(pts[0], pts[1], pts[2]),
+        angleAt(pts[0], pts[2], pts[1])
+    ];
 }
 
 function removeLineBetween(p1,p2){
