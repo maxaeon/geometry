@@ -401,3 +401,41 @@ body.kids #skip-activity {
     display: inline-block;
     margin: 4px 0;
 }
+
+/* left side activity panel for larger screens */
+#activity-panel {
+    display: none;
+}
+
+#activity-panel h2 {
+    margin-top: 0;
+}
+
+#activity-panel ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#activity-panel a {
+    color: #003399;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    #activity-panel {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 220px;
+        background: rgba(255,255,255,0.95);
+        padding: 10px;
+        overflow-y: auto;
+        z-index: 150;
+    }
+    body {
+        margin-left: 220px;
+    }
+}
