@@ -349,3 +349,8 @@ body.kids #skip-activity {
     font-size: 24px;
     cursor: pointer;
 }
+
+#advanced-image {
+    max-width: 100%;
+    margin: 10px 0;
+}

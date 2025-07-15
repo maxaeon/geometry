@@ -1491,14 +1491,24 @@ function showAdvancedInfo(){
     const overlay = document.getElementById('advanced-overlay');
     const formulaEl = document.getElementById('advanced-formula');
     const explEl = document.getElementById('advanced-explanation');
-    if(!overlay || !formulaEl || !explEl) return;
+    const imgEl = document.getElementById('advanced-image');
+    if(!overlay || !formulaEl || !explEl || !imgEl) return;
     explEl.style.display = 'none';
     if(mode === 'kids' && advancedInfo[currentActivity]){
         formulaEl.innerHTML = advancedInfo[currentActivity].formula;
         explEl.textContent = advancedInfo[currentActivity].explanation;
+        if(currentActivity === 0){
+            imgEl.src = '4d.png';
+            imgEl.style.display = 'block';
+        } else {
+            imgEl.src = '';
+            imgEl.style.display = 'none';
+        }
     } else {
         formulaEl.textContent = 'No additional information for this step.';
         explEl.textContent = '';
+        imgEl.src = '';
+        imgEl.style.display = 'none';
     }
     overlay.style.display = 'flex';
 }
