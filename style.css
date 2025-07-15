@@ -238,3 +238,58 @@ body.kids #next-activity {
     display: none;
     z-index: 200;
 }
+
+#dictionary-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+}
+
+#dictionary-overlay .dict-content {
+    background: #fff;
+    color: #000;
+    padding: 20px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90%;
+    overflow: auto;
+    position: relative;
+    text-align: center;
+}
+
+#dict-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#dictionary-overlay ul {
+    list-style: none;
+    padding: 0;
+}
+
+#dictionary-overlay li button {
+    background: none;
+    border: none;
+    color: #003399;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 1rem;
+}
+
+#flashcard-canvas {
+    border: 1px solid #ccc;
+    margin-top: 10px;
+    background: #fff;
+}

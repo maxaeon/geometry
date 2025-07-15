@@ -106,6 +106,31 @@
             <li>Back and Next navigate activities for kids mode.</li>
         </ul>
     </div>
+    <div id="dictionary-overlay">
+        <div class="dict-content">
+            <button id="dict-close" title="Close">&times;</button>
+            <h2>Geometry Dictionary</h2>
+            <div class="category" id="basic-terms">
+                <h3>Basic Key Terms</h3>
+                <ul>
+                    <li><button class="flash-btn" data-term="circle">Circle</button></li>
+                    <li><button class="flash-btn" data-term="triangle">Triangle</button></li>
+                </ul>
+            </div>
+            <div class="category" id="advanced-terms">
+                <h3>Advanced Terminology</h3>
+                <ul>
+                    <li><button class="flash-btn" data-term="circumference">Circumference</button></li>
+                    <li><button class="flash-btn" data-term="hypotenuse">Hypotenuse</button></li>
+                </ul>
+            </div>
+            <div id="flashcard" style="display:none">
+                <h3 id="flashcard-title"></h3>
+                <canvas id="flashcard-canvas" width="200" height="200"></canvas>
+                <div><button id="back-to-dictionary">Back</button></div>
+            </div>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>

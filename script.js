@@ -196,6 +196,17 @@ function setup() {
     if(dictBtn){
         dictBtn.addEventListener('click', openDictionary);
     }
+    const closeBtn = document.getElementById('dict-close');
+    if(closeBtn){
+        closeBtn.addEventListener('click', closeDictionary);
+    }
+    const backBtn = document.getElementById('back-to-dictionary');
+    if(backBtn){
+        backBtn.addEventListener('click', showCategories);
+    }
+    document.querySelectorAll('.flash-btn').forEach(btn => {
+        btn.addEventListener('click', () => showFlashcard(btn.dataset.term));
+    });
     const advBtn = document.getElementById('advanced-info-btn');
     if(advBtn){
         advBtn.addEventListener('click', showAdvancedInfo);
@@ -1083,7 +1094,59 @@ function showEqualSidesPrompt(){
 
 // ----- Utility buttons on start screen -----
 function openDictionary(){
-    alert('Dictionary coming soon!');
+    const overlay = document.getElementById('dictionary-overlay');
+    if(overlay){
+        overlay.style.display = 'flex';
+        showCategories();
+    }
+}
+
+function closeDictionary(){
+    const overlay = document.getElementById('dictionary-overlay');
+    if(overlay){
+        overlay.style.display = 'none';
+    }
+}
+
+function showCategories(){
+    document.querySelectorAll('#dictionary-overlay .category').forEach(c => c.style.display = 'block');
+    const card = document.getElementById('flashcard');
+    if(card) card.style.display = 'none';
+}
+
+function showFlashcard(term){
+    document.querySelectorAll('#dictionary-overlay .category').forEach(c => c.style.display = 'none');
+    const card = document.getElementById('flashcard');
+    if(!card) return;
+    card.style.display = 'block';
+    document.getElementById('flashcard-title').textContent = term.charAt(0).toUpperCase() + term.slice(1);
+    const canvas = document.getElementById('flashcard-canvas');
+    if(canvas){
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        if(term === 'circle' || term === 'circumference'){
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
+            ctx.stroke();
+        }
+        if(term === 'triangle' || term === 'hypotenuse'){
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2, 40);
+            ctx.lineTo(canvas.width-40, canvas.height-40);
+            ctx.lineTo(40, canvas.height-40);
+            ctx.closePath();
+            ctx.stroke();
+            if(term === 'hypotenuse'){
+                ctx.strokeStyle = 'red';
+                ctx.beginPath();
+                ctx.moveTo(canvas.width-40, canvas.height-40);
+                ctx.lineTo(40, canvas.height-40);
+                ctx.stroke();
+            }
+        }
+    }
 }
 
 function showAdvancedInfo(){
