@@ -21,6 +21,7 @@ let fillLayer;
 let showGrid = true;
 let triangleGuide = {};
 let introGuide = {};
+let rightTriangleGuide = {};
 const CANVAS_PADDING_PCT = 0;
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 let currentExample = null;
@@ -931,6 +932,7 @@ function startKidsMode(){
     }
     triangleGuide = {};
     introGuide = {};
+    rightTriangleGuide = {};
     setupKidsActivities();
     loadKidsActivity(0);
     updateBrainButton();
@@ -1318,6 +1320,71 @@ function setupKidsActivities(){
                     }
                 }
                 return ab && bc && ca;
+            }
+        },
+        {
+            prompt: 'Use the three red points to draw the two legs of a right angle. The small square marks a perfect 90\u00b0 corner.',
+            keepShapes: false,
+            setup: function(){
+                rightTriangleGuide = {};
+                const base = 160;
+                const x = width/2 - base/2;
+                const y = height/2 + base/2;
+                rightTriangleGuide.A = {x:x, y:y};
+                rightTriangleGuide.B = {x:x+base, y:y};
+                rightTriangleGuide.C = {x:x+base, y:y-base};
+                shapes.push(new Circle(rightTriangleGuide.A.x, rightTriangleGuide.A.y, 6, 'magenta'));
+                shapes.push(new Circle(rightTriangleGuide.B.x, rightTriangleGuide.B.y, 6, 'magenta'));
+                shapes.push(new Circle(rightTriangleGuide.C.x, rightTriangleGuide.C.y, 6, 'magenta'));
+                const s = 20;
+                shapes.push(new LineSeg(rightTriangleGuide.B.x, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y));
+                shapes.push(new LineSeg(rightTriangleGuide.B.x + s, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y - s));
+                shapes.push(new LineSeg(rightTriangleGuide.B.x + s, rightTriangleGuide.B.y - s, rightTriangleGuide.B.x, rightTriangleGuide.B.y - s));
+                shapes.push(new LineSeg(rightTriangleGuide.B.x, rightTriangleGuide.B.y - s, rightTriangleGuide.B.x, rightTriangleGuide.B.y));
+            },
+            check: function(){
+                function connected(p1,p2,seg){
+                    const c1 = dist(seg.x1,seg.y1,p1.x,p1.y) < 10 && dist(seg.x2,seg.y2,p2.x,p2.y) < 10;
+                    const c2 = dist(seg.x1,seg.y1,p2.x,p2.y) < 10 && dist(seg.x2,seg.y2,p1.x,p1.y) < 10;
+                    return c1 || c2;
+                }
+                let ab = false, bc = false;
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        if(connected(rightTriangleGuide.A, rightTriangleGuide.B, s)) ab = true;
+                        if(connected(rightTriangleGuide.B, rightTriangleGuide.C, s)) bc = true;
+                    }
+                }
+                return ab && bc;
+            }
+        },
+        {
+            prompt: 'Finish the right triangle by drawing the hypotenuse from point A to point C.',
+            keepShapes: true,
+            setup: function(){
+                if(rightTriangleGuide.A){
+                    shapes.push(new Circle(rightTriangleGuide.A.x, rightTriangleGuide.A.y, 6, 'magenta'));
+                    shapes.push(new Circle(rightTriangleGuide.B.x, rightTriangleGuide.B.y, 6, 'magenta'));
+                    shapes.push(new Circle(rightTriangleGuide.C.x, rightTriangleGuide.C.y, 6, 'magenta'));
+                    const s = 20;
+                    shapes.push(new LineSeg(rightTriangleGuide.B.x, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y));
+                    shapes.push(new LineSeg(rightTriangleGuide.B.x + s, rightTriangleGuide.B.y, rightTriangleGuide.B.x + s, rightTriangleGuide.B.y - s));
+                    shapes.push(new LineSeg(rightTriangleGuide.B.x + s, rightTriangleGuide.B.y - s, rightTriangleGuide.B.x, rightTriangleGuide.B.y - s));
+                    shapes.push(new LineSeg(rightTriangleGuide.B.x, rightTriangleGuide.B.y - s, rightTriangleGuide.B.x, rightTriangleGuide.B.y));
+                }
+            },
+            check: function(){
+                function connected(p1,p2,seg){
+                    const c1 = dist(seg.x1,seg.y1,p1.x,p1.y) < 10 && dist(seg.x2,seg.y2,p2.x,p2.y) < 10;
+                    const c2 = dist(seg.x1,seg.y1,p2.x,p2.y) < 10 && dist(seg.x2,seg.y2,p1.x,p1.y) < 10;
+                    return c1 || c2;
+                }
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        if(connected(rightTriangleGuide.A, rightTriangleGuide.C, s)) return true;
+                    }
+                }
+                return false;
             }
         },
         {
