@@ -33,6 +33,8 @@ let currentExample = null;
 let exampleShapes = [];
 let advancedExamples = {};
 let currentExampleStep = 0;
+let triangleAGroup = null;
+let triangleBGroup = null;
 let advancedInfo = {
     'intro-plane': {
         formula: '<strong>Dimensions:</strong> a line is 1D and our canvas is 2D.',
@@ -754,6 +756,66 @@ class LineSeg {
         if(mode==='start'){ this.x1=px; this.y1=py; }
         if(mode==='end'){ this.x2=px; this.y2=py; }
     }
+}
+
+class TextLabel {
+    constructor(x, y, text, color = 'black'){
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.color = color;
+    }
+    draw(pg){
+        const g = pg || window;
+        g.push();
+        g.fill(this.color);
+        g.noStroke();
+        g.textSize(16);
+        g.textAlign(g.CENTER, g.CENTER);
+        g.text(this.text, this.x, this.y);
+        g.pop();
+    }
+    hitTest(){ return null; }
+    move(nx, ny){ this.x = nx; this.y = ny; }
+    resize(){}
+}
+
+class TriangleGroup {
+    constructor(A,B,C,color='black'){
+        this.pts=[{x:A.x,y:A.y},{x:B.x,y:B.y},{x:C.x,y:C.y}];
+        this.color=color;
+        this.weight=1;
+        this.highlight=false;
+    }
+    get x(){ return this.pts[0].x; }
+    get y(){ return this.pts[0].y; }
+    draw(pg){
+        const g = pg || window;
+        g.push();
+        g.stroke(this.highlight? 'green' : this.color);
+        g.strokeWeight(this.weight);
+        g.noFill();
+        g.beginPath();
+        g.moveTo(this.pts[0].x, this.pts[0].y);
+        g.lineTo(this.pts[1].x, this.pts[1].y);
+        g.lineTo(this.pts[2].x, this.pts[2].y);
+        g.closePath();
+        g.stroke();
+        g.pop();
+    }
+    hitTest(px,py){
+        const d1 = pointSegDist(px,py,this.pts[0],this.pts[1]);
+        const d2 = pointSegDist(px,py,this.pts[1],this.pts[2]);
+        const d3 = pointSegDist(px,py,this.pts[2],this.pts[0]);
+        if(Math.min(d1,d2,d3) < 6) return 'body';
+        return null;
+    }
+    move(nx,ny){
+        const dx = nx - this.pts[0].x;
+        const dy = ny - this.pts[0].y;
+        this.pts.forEach(p=>{p.x += dx; p.y += dy;});
+    }
+    resize(){}
 }
 
 function findShape(px,py){
@@ -2120,48 +2182,88 @@ function setupAdvancedExamples(){
     advancedExamples = {
         'triangle-congruency': [
             {
-                prompt: 'Connect the three magenta points to make a triangle.',
+                prompt: 'Place triangle ABC on grid intersections and connect the sides.',
                 setup: function(){
-                    const cx = width/2 - 150;
-                    const cy = height/2 + 80;
+                    showGrid = true;
+                    const snap=v=>Math.round(v/25)*25;
+                    const cx = snap(width/2 - 125);
+                    const cy = snap(height/2 + 75);
                     const base = 200;
-                    this.pts = [
-                        {x: cx, y: cy},
-                        {x: cx + base/2, y: cy - 150},
-                        {x: cx + base, y: cy}
+                    this.pts=[
+                        {x:cx, y:cy},
+                        {x:cx+base/2, y:cy-150},
+                        {x:cx+base, y:cy}
+                    ];
+                    for(const p of this.pts){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                    this.labels=null;
+                },
+                check: function(){
+                    const done=triangleLinesDrawn(this.pts) && this.pts.every(p=>p.x%25===0 && p.y%25===0);
+                    if(done && !triangleAGroup){
+                        triangleAGroup = new TriangleGroup(this.pts[0],this.pts[1],this.pts[2]);
+                        removeLineBetween(this.pts[0],this.pts[1]);
+                        removeLineBetween(this.pts[1],this.pts[2]);
+                        removeLineBetween(this.pts[2],this.pts[0]);
+                        shapes.push(triangleAGroup);
+                        const labs=createSideLabels(triangleAGroup);
+                        shapes.push(...labs);
+                    }
+                    return done;
+                }
+            },
+            {
+                prompt: 'Replicate those side lengths with a second triangle using the new points.',
+                keepShapes: true,
+                setup: function(){
+                    showGrid = true;
+                    const snap=v=>Math.round(v/25)*25;
+                    const cx = snap(width/2 + 125);
+                    const cy = snap(height/2 + 75);
+                    const base = 200;
+                    this.pts=[
+                        {x:cx, y:cy},
+                        {x:cx+base/2, y:cy-150},
+                        {x:cx+base, y:cy}
                     ];
                     for(const p of this.pts){
                         shapes.push(new Circle(p.x,p.y,6,'magenta'));
                     }
                 },
                 check: function(){
-                    return triangleLinesDrawn(this.pts);
+                    const done=triangleLinesDrawn(this.pts) && this.pts.every(p=>p.x%25===0 && p.y%25===0);
+                    if(done && !triangleBGroup){
+                        triangleBGroup = new TriangleGroup(this.pts[0],this.pts[1],this.pts[2]);
+                        removeLineBetween(this.pts[0],this.pts[1]);
+                        removeLineBetween(this.pts[1],this.pts[2]);
+                        removeLineBetween(this.pts[2],this.pts[0]);
+                        shapes.push(triangleBGroup);
+                    }
+                    return done;
                 }
             },
             {
-                prompt: 'Copy the triangle on the right using the new points.',
+                prompt: 'Drag the right triangle over the left. Matching sides highlight when they align.',
                 keepShapes: true,
                 setup: function(){
-                    const cx = width/2 - 150 + 250;
-                    const cy = height/2 + 80;
-                    const base = 200;
-                    this.pts = [
-                        {x: cx, y: cy},
-                        {x: cx + base/2, y: cy - 150},
-                        {x: cx + base, y: cy}
-                    ];
-                    for(const p of this.pts){
-                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
-                    }
+                    showGrid = true;
+                    currentTool = 'select';
                 },
                 check: function(){
-                    return triangleLinesDrawn(this.pts);
+                    if(triangleAGroup && triangleBGroup){
+                        const match=trianglesCoincide(triangleAGroup,triangleBGroup);
+                        triangleAGroup.highlight=match;
+                        triangleBGroup.highlight=match;
+                        return match;
+                    }
+                    return false;
                 }
             },
             {
-                prompt: 'Great! The two triangles are congruent by SSS.',
+                prompt: 'Great! The triangles are congruent by SSS.',
                 keepShapes: true,
-                setup: function(){},
+                setup: function(){showGrid = true;},
                 check: function(){return true;}
             },
             {
@@ -2571,6 +2673,50 @@ function hasLineBetween(p1,p2){
 
 function triangleLinesDrawn(pts){
     return hasLineBetween(pts[0],pts[1]) && hasLineBetween(pts[1],pts[2]) && hasLineBetween(pts[2],pts[0]);
+}
+
+function removeLineBetween(p1,p2){
+    for(let i=shapes.length-1;i>=0;i--){
+        const s=shapes[i];
+        if(s instanceof LineSeg){
+            const c1 = dist(s.x1,s.y1,p1.x,p1.y) < 10 && dist(s.x2,s.y2,p2.x,p2.y) < 10;
+            const c2 = dist(s.x1,s.y1,p2.x,p2.y) < 10 && dist(s.x2,s.y2,p1.x,p1.y) < 10;
+            if(c1 || c2){
+                shapes.splice(i,1);
+            }
+        }
+    }
+}
+
+function pointSegDist(px,py,a,b){
+    const l2 = (a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y);
+    if(l2===0) return dist(px,py,a.x,a.y);
+    let t = ((px-a.x)*(b.x-a.x)+(py-a.y)*(b.y-a.y))/l2;
+    t = Math.max(0,Math.min(1,t));
+    const x = a.x + t*(b.x-a.x);
+    const y = a.y + t*(b.y-a.y);
+    return dist(px,py,x,y);
+}
+
+function createSideLabels(tri){
+    const names=['AB','BC','CA'];
+    const labels=[];
+    for(let i=0;i<3;i++){
+        const p1=tri.pts[i];
+        const p2=tri.pts[(i+1)%3];
+        const midX=(p1.x+p2.x)/2;
+        const midY=(p1.y+p2.y)/2 - 10;
+        const len=(dist(p1.x,p1.y,p2.x,p2.y)/25).toFixed(1);
+        labels.push(new TextLabel(midX,midY,`${names[i]}: ${len}`,'blue'));
+    }
+    return labels;
+}
+
+function trianglesCoincide(t1,t2){
+    for(let i=0;i<3;i++){
+        if(dist(t1.pts[i].x,t1.pts[i].y,t2.pts[i].x,t2.pts[i].y)>10) return false;
+    }
+    return true;
 }
 
 function lineThroughPoint(seg, pt){
