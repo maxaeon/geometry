@@ -275,7 +275,17 @@ function setup() {
         exampleShapes = [];
     });
     document.getElementById('activity-select').addEventListener('change', e => {
-        loadExample(e.target.value);
+        const val = e.target.value;
+        if(!val) return;
+        if(val.startsWith('kid-')){
+            const idx = parseInt(val.slice(4),10);
+            if(!isNaN(idx)){
+                if(mode!=='kids') startKidsMode();
+                loadKidsActivity(idx);
+            }
+        } else {
+            loadExample(val);
+        }
         e.target.value = '';
     });
 
@@ -840,6 +850,32 @@ function createColorPalette(){
     });
 }
 
+function populateActivitySelect(){
+    const select = document.getElementById('activity-select');
+    if(!select) return;
+    select.innerHTML = '';
+    const def = document.createElement('option');
+    def.value = '';
+    def.textContent = 'Activities';
+    select.appendChild(def);
+    if(Array.isArray(kidsActivities)){
+        kidsActivities.forEach((_, i) => {
+            const opt = document.createElement('option');
+            opt.value = 'kid-' + i;
+            opt.textContent = 'Activity ' + (i + 1);
+            select.appendChild(opt);
+        });
+    }
+    if(typeof advancedExamples === 'object'){
+        Object.keys(advancedExamples).forEach(key => {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = key.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            select.appendChild(opt);
+        });
+    }
+}
+
 function bucketFill(x,y,color){
     const temp = createGraphics(width, height);
     temp.pixelDensity(1);
@@ -954,6 +990,7 @@ function startKidsMode(){
     introGuide = {};
     rightTriangleGuide = {};
     setupKidsActivities();
+    populateActivitySelect();
     loadKidsActivity(0);
     updateBrainButton();
     positionInstructionPanel();
@@ -981,6 +1018,7 @@ function startAdvancedMode(){
     feedbackElem.textContent = '';
     updateBrainButton();
     setupAdvancedExamples();
+    populateActivitySelect();
     positionInstructionPanel();
 }
 
