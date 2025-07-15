@@ -28,7 +28,6 @@ let similarityGuide = {};
 let similarityDemo = null;
 let identifyCenterStep = 0;
 let identifyCenterCircles = [];
-let shapeIdentify = {};
 const CANVAS_PADDING_PCT = 0;
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 let currentExample = null;
@@ -145,10 +144,6 @@ let advancedInfo = {
     'obtuse-angle': {
         formula: 'Obtuse angle > 90° and < 180°',
         explanation: 'Angles bigger than a right angle but less than a straight line are obtuse.'
-    },
-    'shape-name-clicks': {
-        formula: 'Circle=0 sides, triangle=3, square=4',
-        explanation: 'Shapes are named by how many sides or curves they have.'
     },
     'shape-identify-sequence': {
         formula: 'Circle=0 sides, triangle=3, square=4',
@@ -2053,44 +2048,6 @@ function setupKidsActivities(){
                     }
                 }
                 return false;
-            }
-        },
-        {
-            id: 'shape-name-clicks',
-            category: 'Shapes',
-            title: 'Name That Shape',
-            prompt: 'Click the circle, square, and triangle to name each shape.',
-            setup: function(){
-                shapeIdentify = {};
-                const cx = width/2;
-                const cy = height/2;
-                const gap = 150;
-                const circ = new Circle(cx - gap, cy, 40, 'gray', true);
-                shapes.push(circ);
-                shapeIdentify.circle = circ;
-                const s = 80;
-                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2));
-                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2));
-                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2));
-                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2));
-                const sq = new Circle(cx, cy, 8, 'gray', true);
-                shapes.push(sq);
-                shapeIdentify.square = sq;
-                const tx = cx + gap;
-                const pts = [
-                    {x: tx - 40, y: cy + 40},
-                    {x: tx + 40, y: cy + 40},
-                    {x: tx, y: cy - 40}
-                ];
-                shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y));
-                shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y));
-                shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y));
-                const tri = new Circle(tx, cy, 8, 'gray', true);
-                shapes.push(tri);
-                shapeIdentify.triangle = tri;
-            },
-            check: function(){
-                return shapeIdentify.circle.clicked && shapeIdentify.square.clicked && shapeIdentify.triangle.clicked;
             }
         },
         {
