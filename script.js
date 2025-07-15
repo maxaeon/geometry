@@ -64,7 +64,7 @@ let advancedInfo = {
     },
     'identify-right-angles': {
         formula: "Euclid's Fourth Postulate",
-        explanation: 'All right angles are congruent to one another.'
+        explanation: 'All right angles are congruent to one another. They build rectangles and lead to the Pythagorean theorem.'
     },
     'parallel-through-point': {
         formula: "Euclid's Fifth Postulate",
@@ -169,7 +169,7 @@ let flashcardDefinitions = {
     'line': 'A straight path that goes on forever in both directions.',
     'plane': 'A flat surface that extends forever.',
     'angle': 'Two rays sharing the same starting point.',
-    'right angle': 'An angle that forms a perfect square corner.',
+    'right angle': 'An angle that forms a perfect square corner. Right angles make rectangles possible and are key to the Pythagorean theorem.',
     'radius': 'The distance from the center of a circle to its edge.',
     'circle': 'A round shape where every point is the same distance from the center.',
     'triangle': 'A shape made of three straight sides.',
