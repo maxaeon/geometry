@@ -1438,7 +1438,7 @@ function setupKidsActivities(){
         },
         {
             id: 'draw-square',
-            category: 'Shapes',
+            category: 'Basics',
             title: 'Construct a Square',
             prompt: 'Connect the 4 red points to make a square.',
             setup: function(){
@@ -1514,7 +1514,7 @@ function setupKidsActivities(){
         },
         {
             id: 'triangle-equal',
-            category: 'Shapes',
+            category: 'Basics',
             title: 'Equal Sides Triangle',
             prompt: 'Use line segments to connect the 3 red points into a triangle. A triangle is a polygon, a closed shape made from line segments. Can you make two line segments equal?',
             setup: function(){
@@ -1556,7 +1556,7 @@ function setupKidsActivities(){
         },
         {
             id: 'triangle-dotted-base',
-            category: 'Shapes',
+            category: 'Basics',
             title: 'Dotted Triangle Base',
             prompt: 'Use a dotted line segment to complete the base of the triangle.',
             setup: function(){
@@ -2095,7 +2095,7 @@ function setupKidsActivities(){
         },
         {
             id: 'shape-identify-sequence',
-            category: 'Shapes',
+            category: 'Basics',
             title: 'Shape Identification',
             prompt: 'Click the circle.',
             setup: function(){
