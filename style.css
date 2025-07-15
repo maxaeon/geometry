@@ -199,7 +199,7 @@ body.kids #thickness-input {
 }
 
 
-#prev-activity, #next-activity {
+#prev-activity, #next-activity, #skip-activity {
     display: none;
     position: fixed;
     bottom: 20px;
@@ -214,8 +214,13 @@ body.kids #thickness-input {
     right: 20px;
 }
 
+#skip-activity {
+    right: 80px;
+}
+
 body.kids #prev-activity,
-body.kids #next-activity {
+body.kids #next-activity,
+body.kids #skip-activity {
     display: inline-block;
 }
 
