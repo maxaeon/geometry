@@ -24,7 +24,7 @@ This interactive geometry webpage is designed for users ranging from kindergarte
   * Fractions with Shapes
   * Proving Triangle Congruency
   * Circle Theorems
-  * Pythagorean Theorem
+  * Pythagorean Theorem (interactive proof)
   * Parallel Line Theorems
   * Euclid's Five Postulates (advanced explanations under the brain icon)
 

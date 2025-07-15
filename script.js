@@ -23,6 +23,7 @@ let currentDictPage = 0;
 let triangleGuide = {};
 let introGuide = {};
 let rightTriangleGuide = {};
+let pythGuide = {};
 let identifyCenterStep = 0;
 let identifyCenterCircles = [];
 let shapeIdentify = {};
@@ -104,6 +105,10 @@ let advancedInfo = {
     'parallel-through-point': {
         formula: "Euclid's Fifth Postulate",
         explanation: 'Through a point not on a line, exactly one line can be drawn parallel to the given line.'
+    },
+    'pythagorean': {
+        formula: 'c² = a² + b²',
+        explanation: 'In a right triangle, the square on the hypotenuse equals the sum of the squares on the other two sides.'
     }
 };
 
@@ -1149,6 +1154,7 @@ function setupKidsActivities(){
         {
             id: 'intro-plane',
             category: 'Basics',
+            title: 'Welcome to the Plane',
             prompt: 'This grid is our plane—a flat surface that goes on forever.',
             setup: function(){
                 showGrid = true;
@@ -1160,6 +1166,7 @@ function setupKidsActivities(){
         {
             id: 'place-point',
             category: 'Basics',
+            title: 'Placing a Point',
             prompt: 'Place a point anywhere on the plane.',
             setup: function(){
                 // nothing pre-drawn
@@ -1177,6 +1184,7 @@ function setupKidsActivities(){
         {
             id: 'stretch-to-segment',
             category: 'Basics',
+            title: 'Make a Line Segment',
             prompt: 'Stretch your point into a line segment.',
             keepShapes: true,
             setup: function(){
@@ -1201,6 +1209,7 @@ function setupKidsActivities(){
         {
             id: 'connect-red-points',
             category: 'Basics',
+            title: 'Connect Two Points',
             prompt: 'Draw a line segment connecting the two red points. A line segment is a straight 1D path between points.',
             setup: function(){
                 const x1 = width/2 - 60;
@@ -1226,6 +1235,7 @@ function setupKidsActivities(){
         {
             id: 'extend-line',
             category: 'Basics',
+            title: 'Extend the Line',
             prompt: 'Extend your line segment past both red points so it keeps going in a straight path.',
             keepShapes: true,
             setup: function(){
@@ -1255,6 +1265,7 @@ function setupKidsActivities(){
         {
             id: 'draw-square',
             category: 'Shapes',
+            title: 'Construct a Square',
             prompt: 'Connect the 4 red points to make a square.',
             setup: function(){
                 placeSquareDots();
@@ -1289,6 +1300,7 @@ function setupKidsActivities(){
         {
             id: 'cube-dotted',
             category: 'Shapes',
+            title: 'Sketch a Cube',
             prompt: 'Use dotted line segments from each corner so the square looks like a 3-D cube.',
             keepShapes: true,
             setup: function(){
@@ -1329,6 +1341,7 @@ function setupKidsActivities(){
         {
             id: 'triangle-equal',
             category: 'Shapes',
+            title: 'Equal Sides Triangle',
             prompt: 'Use line segments to connect the 3 red points into a triangle. A triangle is a polygon, a closed shape made from line segments. Can you make two line segments equal?',
             setup: function(){
                 placeTriangleDots();
@@ -1370,6 +1383,7 @@ function setupKidsActivities(){
         {
             id: 'triangle-dotted-base',
             category: 'Shapes',
+            title: 'Dotted Triangle Base',
             prompt: 'Use a dotted line segment to complete the base of the triangle.',
             setup: function(){
                 const x1 = width/2 - 80;
@@ -1397,6 +1411,7 @@ function setupKidsActivities(){
         {
             id: 'identify-right-angles',
             category: 'Basics',
+            title: 'Identify Right Angles',
             prompt: 'Click each corner point of the square to find the right angles. An angle is the space between two lines that meet.',
             setup: function(){
                 const size=120;
@@ -1427,6 +1442,7 @@ function setupKidsActivities(){
         {
             id: 'circle-basics',
             category: 'Basics',
+            title: 'Draw a Circle',
             prompt: 'Step 1: Place a point anywhere on the canvas. Step 2: Draw a circle centered on that point. The radius is the distance from the center to the edge. The circumference is the distance all the way around the circle.',
             setup: function(){
                 // nothing pre-drawn
@@ -1453,6 +1469,7 @@ function setupKidsActivities(){
         {
             id: 'equilateral-point-a',
             category: 'Shapes',
+            title: 'Equilateral: Point A',
             prompt: 'Place the first point (point A) anywhere on the canvas.',
             keepShapes: false,
             setup: function(){
@@ -1472,6 +1489,7 @@ function setupKidsActivities(){
         {
             id: 'equilateral-circle-a',
             category: 'Shapes',
+            title: 'Equilateral: Circle A',
             prompt: 'Draw a circle centered at point A.',
             keepShapes: true,
             setup: function(){
@@ -1495,6 +1513,7 @@ function setupKidsActivities(){
         {
             id: 'equilateral-point-b',
             category: 'Shapes',
+            title: 'Equilateral: Point B',
             prompt: 'Place a second point (point B) on the circle\u2019s circumference.',
             keepShapes: true,
             setup: function(){
@@ -1520,6 +1539,7 @@ function setupKidsActivities(){
         {
             id: 'equilateral-circle-b',
             category: 'Shapes',
+            title: 'Equilateral: Circle B',
             prompt: 'Draw a second circle centered at B with the same radius as the first.',
             keepShapes: true,
             setup: function(){
@@ -1542,6 +1562,7 @@ function setupKidsActivities(){
         {
             id: 'equilateral-connect',
             category: 'Shapes',
+            title: 'Equilateral: Connect Points',
             prompt: 'Mark the intersection of both circles as point C and connect A-B-C with line segments.',
             keepShapes: true,
             setup: function(){
@@ -1589,6 +1610,7 @@ function setupKidsActivities(){
         {
             id: 'right-angle-legs',
             category: 'Basics',
+            title: 'Right Triangle Legs',
             prompt: 'Use the three red points to draw the two legs of a right angle. The small square marks a perfect 90\u00b0 corner.',
             keepShapes: false,
             setup: function(){
@@ -1627,6 +1649,7 @@ function setupKidsActivities(){
         {
             id: 'right-angle-hypotenuse',
             category: 'Basics',
+            title: 'Right Triangle Hypotenuse',
             prompt: 'Finish the right triangle by drawing the hypotenuse from point A to point C.',
             keepShapes: true,
             setup: function(){
@@ -1658,6 +1681,7 @@ function setupKidsActivities(){
         {
             id: 'identify-centers',
             category: 'Basics',
+            title: 'Centers of Shapes',
             prompt: 'Click the center of the circle.',
             setup: function(){
                 const cx = width/2;
@@ -1707,6 +1731,7 @@ function setupKidsActivities(){
         {
             id: 'rectangle-from-triangles',
             category: 'Shapes',
+            title: 'Rectangle from Triangles',
             prompt: 'Combine two triangles to form a rectangle using the four dots.',
             setup: function(){
                 const cx = width/2;
@@ -1746,6 +1771,7 @@ function setupKidsActivities(){
         {
             id: 'triangle-vertices',
             category: 'Basics',
+            title: 'Triangle Vertices',
             prompt: 'Click each vertex of the triangle to count its corners.',
             setup: function(){
                 const p = [
@@ -1770,6 +1796,7 @@ function setupKidsActivities(){
         {
             id: 'draw-diameter',
             category: 'Area & Perimeter',
+            title: 'Draw a Diameter',
             prompt: 'Draw a line across the circle using the red points to cut it in half.',
             setup: function(){
                 const r = 80;
@@ -1795,6 +1822,7 @@ function setupKidsActivities(){
         {
             id: 'acute-angle',
             category: 'Basics',
+            title: 'Acute Angle',
             prompt: 'Click the acute angle (<90\u00b0).',
             setup: function(){
                 const len = 80;
@@ -1822,6 +1850,7 @@ function setupKidsActivities(){
         {
             id: 'obtuse-angle',
             category: 'Basics',
+            title: 'Obtuse Angle',
             prompt: 'Click the obtuse angle (>90\u00b0 and <180\u00b0).',
             setup: function(){
                 const len = 80;
@@ -1855,6 +1884,7 @@ function setupKidsActivities(){
         {
             id: 'shape-name-clicks',
             category: 'Shapes',
+            title: 'Name That Shape',
             prompt: 'Click the circle, square, and triangle to name each shape.',
             setup: function(){
                 shapeIdentify = {};
@@ -2059,6 +2089,7 @@ function setupKidsActivities(){
         {
             id: 'parallel-through-point',
             category: 'Basics',
+            title: 'Parallel Line Through a Point',
             prompt: 'Draw a line through the red point that stays parallel to the black line.',
             setup: function(){
                 const y = height/2 + 50;
@@ -2251,44 +2282,60 @@ function setupAdvancedExamples(){
         ],
         'pythagorean': [
             {
-                prompt: 'Connect the three points to form a right triangle.',
+                prompt: 'Connect the magenta points to form a right triangle.',
                 setup: function(){
-                    const base=160;
-                    const x=width/2-base/2;
-                    const y=height/2+base/2;
-                    this.pts=[{x:x,y:y},{x:x+base,y:y},{x:x+base,y:y-base}];
-                    for(const p of this.pts){
+                    pythGuide = {};
+                    const base = 160;
+                    const x = width/2 - base/2;
+                    const y = height/2 + base/2;
+                    pythGuide.A = {x:x, y:y};
+                    pythGuide.B = {x:x+base, y:y};
+                    pythGuide.C = {x:x+base, y:y-base};
+                    pythGuide.pts = [pythGuide.A, pythGuide.B, pythGuide.C];
+                    for(const p of pythGuide.pts){
                         shapes.push(new Circle(p.x,p.y,6,'magenta'));
                     }
                 },
-                check: function(){return triangleLinesDrawn(this.pts);}
+                check: function(){return triangleLinesDrawn(pythGuide.pts);}
             },
             {
-                prompt: 'Squares on each side illustrate a^2 + b^2 = c^2.',
+                prompt: 'Sides are labelled a, b and c.',
                 keepShapes: true,
                 setup: function(){
-                    const base=160;
-                    const x=width/2-base/2;
-                    const y=height/2+base/2;
-                    shapes.push(new LineSeg(x,y,x,y-base));
-                    shapes.push(new LineSeg(x,y-base,x+base,y-base));
-                    shapes.push(new LineSeg(x+base,y-base,x+base,y-base-base));
-                    shapes.push(new LineSeg(x+base,y-base-base,x,y-base-base));
-                    shapes.push(new LineSeg(x,y-base-base,x,y-base));
-                    shapes.push(new LineSeg(x+base,y,x+base+base,y));
-                    shapes.push(new LineSeg(x+base+base,y,x+base+base,y-base));
-                    shapes.push(new LineSeg(x+base+base,y-base,x+base,y-base));
+                    const A = pythGuide.A, B = pythGuide.B, C = pythGuide.C;
+                    pythGuide.labels = [
+                        new Point((B.x+C.x)/2, (B.y+C.y)/2, 'blue', 'a'),
+                        new Point((A.x+B.x)/2, (A.y+B.y)/2, 'blue', 'b'),
+                        new Point((A.x+C.x)/2, (A.y+C.y)/2, 'blue', 'c')
+                    ];
+                    shapes.push(...pythGuide.labels);
                 },
                 check: function(){return true;}
             },
             {
-                prompt: 'The areas of the small squares add up to the large one.',
+                prompt: 'Construct squares on each side of the triangle.',
                 keepShapes: true,
-                setup: function(){},
+                setup: function(){
+                    const {A,B,C} = pythGuide;
+                    pythGuide.squares = drawSquaresOnTriangle(A,B,C);
+                },
                 check: function(){return true;}
             },
             {
-                prompt: 'Move the points to see the relationship hold.',
+                prompt: 'a^2 + b^2 equals c^2.',
+                keepShapes: true,
+                setup: function(){
+                    const {A,B,C} = pythGuide;
+                    pythGuide.a = dist(B.x,B.y,C.x,C.y);
+                    pythGuide.b = dist(A.x,A.y,B.x,B.y);
+                    pythGuide.c = dist(A.x,A.y,C.x,C.y);
+                    feedbackElem.textContent =
+                        `a² = ${Math.round(pythGuide.a**2)}, b² = ${Math.round(pythGuide.b**2)}, c² = ${Math.round(pythGuide.c**2)}`;
+                },
+                check: function(){return true;}
+            },
+            {
+                prompt: 'Move the points to explore the relationship.',
                 keepShapes: true,
                 setup: function(){},
                 check: function(){return true;}
@@ -2444,6 +2491,33 @@ function placeSquareDots(){
         shapes.push(new Circle(p.x, p.y, 6, 'magenta'));
     }
     feedbackElem.textContent = 'Connect the dots to form a square!';
+}
+
+function drawSquareOnSide(p1, p2, opposite){
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    const len = Math.hypot(dx, dy);
+    const ux = dx / len;
+    const uy = dy / len;
+    const ox = opposite.x - p1.x;
+    const oy = opposite.y - p1.y;
+    const cross = dx * oy - dy * ox;
+    const nx = cross > 0 ? -uy : uy;
+    const ny = cross > 0 ? ux : -ux;
+    const p3 = {x: p2.x + nx * len, y: p2.y + ny * len};
+    const p4 = {x: p1.x + nx * len, y: p1.y + ny * len};
+    shapes.push(new LineSeg(p1.x,p1.y,p2.x,p2.y));
+    shapes.push(new LineSeg(p2.x,p2.y,p3.x,p3.y));
+    shapes.push(new LineSeg(p3.x,p3.y,p4.x,p4.y));
+    shapes.push(new LineSeg(p4.x,p4.y,p1.x,p1.y));
+    return [p1,p2,p3,p4];
+}
+
+function drawSquaresOnTriangle(A,B,C){
+    const sq1 = drawSquareOnSide(A,B,C);
+    const sq2 = drawSquareOnSide(B,C,A);
+    const sq3 = drawSquareOnSide(A,C,B);
+    return {sq1, sq2, sq3};
 }
 
 function drawCube(x, y, size){
