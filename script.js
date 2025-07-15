@@ -1747,25 +1747,33 @@ function setupKidsActivities(){
                     const c2 = new Circle(triangleGuide.B.x, triangleGuide.B.y, triangleGuide.radius);
                     const inter = circleCircleIntersection(c1,c2);
                     if(inter && inter.length){
-                        triangleGuide.C = inter[0];
-                        shapes.push(new Circle(triangleGuide.C.x, triangleGuide.C.y, 6, 'magenta'));
+                        triangleGuide.intersections = inter;
+                        for(const pt of inter){
+                            shapes.push(new Circle(pt.x, pt.y, 6, 'magenta'));
+                        }
                     }
                 }
             },
             check: function(){
-                if(!triangleGuide.C) return false;
+                if(!triangleGuide.intersections || !triangleGuide.intersections.length) return false;
                 let cShape = null;
+                let chosen = null;
                 for(const s of shapes){
                     if(s instanceof Point){
-                        if(dist(s.x,s.y,triangleGuide.C.x,triangleGuide.C.y) < 5){
-                            cShape = s;
-                            break;
+                        for(const pt of triangleGuide.intersections){
+                            if(dist(s.x,s.y,pt.x,pt.y) < 5){
+                                cShape = s;
+                                chosen = pt;
+                                break;
+                            }
                         }
+                        if(cShape) break;
                     }
                 }
                 if(!cShape) return false;
                 cShape.label = 'C';
                 let cPoint = {x:cShape.x, y:cShape.y};
+                triangleGuide.C = chosen || cPoint;
                 let ab=false, bc=false, ca=false;
                 function near(px,py,qx,qy){ return dist(px,py,qx,qy) < 5; }
                 for(const s of shapes){
