@@ -173,6 +173,8 @@ function deleteSelectedShape(){
         if(idx !== -1) shapes.splice(idx,1);
         selectedShape = null;
         saveState();
+        // ensure subsequent mouseReleased events don't add duplicate history
+        actionChanged = false;
     }
 }
 
@@ -407,8 +409,8 @@ function mouseReleased() {
 
 function keyPressed() {
     if ((keyCode === DELETE || keyCode === BACKSPACE)) {
+        // deleteSelectedShape already handles history tracking
         deleteSelectedShape();
-        actionChanged = true;
     }
 }
 
