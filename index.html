@@ -156,5 +156,18 @@
         </div>
     </div>
     <script src="script.js"></script>
+    <script>
+        window.addEventListener('load', function(){
+            const mc = document.getElementById('mode-content');
+            if(mc){
+                setTimeout(() => mc.classList.add('show'), 2000);
+            }
+            setTimeout(() => {
+                if(typeof startAdvancedMode === 'function'){
+                    startAdvancedMode();
+                }
+            }, 4000);
+        });
+    </script>
 </body>
 </html>
