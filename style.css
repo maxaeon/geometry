@@ -59,11 +59,11 @@ body {
 }
 
 #bg-shapes {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
     pointer-events: none;
     z-index: 0;
     overflow: hidden;
@@ -89,6 +89,8 @@ svg.shape {
     display: flex;
     align-items: center;
     gap: 8px;
+    position: relative;
+    z-index: 20;
 }
 
 #tool-buttons {
@@ -114,6 +116,10 @@ svg.shape {
 
 .tool-btn.active {
     background: #cce5ff;
+}
+
+#brain-btn {
+    display: none;
 }
 
 #clear-btn,
@@ -159,6 +165,13 @@ svg.shape {
 
 #canvas-container {
     flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5vh 5vw;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 10;
 }
 
 canvas {
