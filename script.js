@@ -244,6 +244,12 @@ function setup() {
             loadKidsActivity(currentActivity + 1);
         }
     });
+    document.getElementById('skip-activity').addEventListener('click', () => {
+        if(currentActivity < kidsActivities.length - 1){
+            animatePageTurn('next');
+            loadKidsActivity(currentActivity + 1);
+        }
+    });
     document.getElementById('prev-activity').addEventListener('click', () => {
         if(currentActivity > 0){
             animatePageTurn('prev');
@@ -819,6 +825,7 @@ function startKidsMode(){
     document.getElementById('canvas-container').style.display = 'block';
     document.getElementById('prev-activity').style.display = 'inline-block';
     document.getElementById('next-activity').style.display = 'inline-block';
+    document.getElementById('skip-activity').style.display = 'inline-block';
     const size = calcCanvasSize();
     resizeCanvas(size.width, size.height);
     if(fillLayer){
@@ -839,6 +846,7 @@ function startAdvancedMode(){
     document.getElementById('canvas-container').style.display = 'block';
     document.getElementById('prev-activity').style.display = 'none';
     document.getElementById('next-activity').style.display = 'none';
+    document.getElementById('skip-activity').style.display = 'none';
     const size = calcCanvasSize();
     resizeCanvas(size.width, size.height);
     if(fillLayer){
@@ -1139,7 +1147,12 @@ function loadKidsActivity(i){
     act.setup();
     feedbackElem.textContent = act.prompt;
     document.getElementById('prev-activity').disabled = i === 0;
-    document.getElementById('next-activity').disabled = i === kidsActivities.length - 1;
+    const nextBtn = document.getElementById('next-activity');
+    const skipBtn = document.getElementById('skip-activity');
+    nextBtn.disabled = true;
+    const last = i === kidsActivities.length - 1;
+    if(skipBtn) skipBtn.disabled = last;
+    if(last) nextBtn.disabled = true;
     saveState();
     updateBrainButton();
 }
@@ -1149,6 +1162,10 @@ function checkKidsActivity(){
     const act = kidsActivities[currentActivity];
     if(act.check && act.check()){
         feedbackElem.textContent = 'Great job!';
+        const nextBtn = document.getElementById('next-activity');
+        if(nextBtn && currentActivity < kidsActivities.length - 1){
+            nextBtn.disabled = false;
+        }
     }
 }
 
