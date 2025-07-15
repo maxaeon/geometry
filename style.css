@@ -359,3 +359,51 @@ body.kids #skip-activity {
     max-width: 100%;
     margin: 10px 0;
 }
+
+#examples-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+}
+
+#examples-overlay .examples-content {
+    background: #fff;
+    color: #000;
+    padding: 20px;
+    max-width: 400px;
+    width: 90%;
+    max-height: 90%;
+    overflow: auto;
+    position: relative;
+    text-align: center;
+}
+
+#examples-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#examples-overlay ul {
+    list-style: none;
+    padding: 0;
+}
+
+#examples-overlay a {
+    color: #003399;
+    text-decoration: underline;
+    cursor: pointer;
+    display: inline-block;
+    margin: 4px 0;
+}

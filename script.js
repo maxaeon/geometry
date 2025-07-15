@@ -315,6 +315,29 @@ function setup() {
     if(brainBtn){
         brainBtn.addEventListener('click', showAdvancedInfo);
     }
+    const exBtn = document.getElementById('examples-btn');
+    if(exBtn){
+        exBtn.addEventListener('click', openExamples);
+    }
+    const exClose = document.getElementById('examples-close');
+    if(exClose){
+        exClose.addEventListener('click', closeExamples);
+    }
+    document.querySelectorAll('#examples-overlay .example-link').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const kid = link.dataset.kid;
+            const example = link.dataset.example;
+            closeExamples();
+            if(kid !== undefined){
+                if(mode !== 'kids') startKidsMode();
+                loadKidsActivity(parseInt(kid,10));
+            } else if(example){
+                if(mode !== 'advanced') startAdvancedMode();
+                loadExample(example);
+            }
+        });
+    });
     const advClose = document.getElementById('advanced-close');
     if(advClose){
         advClose.addEventListener('click', () => {
@@ -1411,6 +1434,20 @@ function closeDictionary(){
     if(dimensionInterval){
         clearInterval(dimensionInterval);
         dimensionInterval = null;
+    }
+}
+
+function openExamples(){
+    const overlay = document.getElementById('examples-overlay');
+    if(overlay){
+        overlay.style.display = 'flex';
+    }
+}
+
+function closeExamples(){
+    const overlay = document.getElementById('examples-overlay');
+    if(overlay){
+        overlay.style.display = 'none';
     }
 }
 
