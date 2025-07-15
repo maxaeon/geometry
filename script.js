@@ -21,7 +21,7 @@ let fillLayer;
 let showGrid = true;
 let triangleGuide = {};
 let introGuide = {};
-const CANVAS_PADDING_PCT = 0.05;
+const CANVAS_PADDING_PCT = 0;
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 let advancedInfo = {
     0: {
