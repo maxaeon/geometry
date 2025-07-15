@@ -19,6 +19,7 @@ let lineDashed = false;
 let fillLayer;
 let showGrid = true;
 let triangleGuide = {};
+let introGuide = {};
 const CANVAS_PADDING_PCT = 0.05;
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 let advancedInfo = {
@@ -842,6 +843,7 @@ function startKidsMode(){
         fillLayer.resizeCanvas(size.width, size.height);
     }
     triangleGuide = {};
+    introGuide = {};
     setupKidsActivities();
     loadKidsActivity(0);
     updateBrainButton();
@@ -870,14 +872,46 @@ function startAdvancedMode(){
 function setupKidsActivities(){
     kidsActivities = [
         {
-            prompt: 'Welcome! Our screen is a plane – a flat 2D space. A line is 1D. A point is a tiny spot with no size. Place a point anywhere on the plane.',
+            prompt: 'This grid is our plane—a flat surface that goes on forever.',
+            setup: function(){
+                showGrid = true;
+            },
+            check: function(){
+                return true;
+            }
+        },
+        {
+            prompt: 'Place a point anywhere on the plane.',
             setup: function(){
                 // nothing pre-drawn
             },
             check: function(){
                 for(const s of shapes){
                     if(s instanceof Point){
+                        introGuide.point = {x:s.x, y:s.y};
                         return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            prompt: 'Stretch your point into a line segment.',
+            keepShapes: true,
+            setup: function(){
+                if(introGuide.point){
+                    shapes.push(new Circle(introGuide.point.x, introGuide.point.y, 6, 'magenta'));
+                }
+            },
+            check: function(){
+                if(!introGuide.point) return false;
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        const near1 = dist(s.x1,s.y1,introGuide.point.x,introGuide.point.y) < 10;
+                        const near2 = dist(s.x2,s.y2,introGuide.point.x,introGuide.point.y) < 10;
+                        if((near1 || near2) && dist(s.x1,s.y1,s.x2,s.y2) > 20){
+                            return true;
+                        }
                     }
                 }
                 return false;
@@ -1169,6 +1203,7 @@ function loadKidsActivity(i){
     if(last) nextBtn.disabled = true;
     saveState();
     updateBrainButton();
+    checkKidsActivity();
 }
 
 function checkKidsActivity(){
