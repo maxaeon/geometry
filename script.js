@@ -30,6 +30,8 @@ const CANVAS_PADDING_PCT = 0;
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 let currentExample = null;
 let exampleShapes = [];
+let advancedExamples = {};
+let currentExampleStep = 0;
 let advancedInfo = {
     'intro-plane': {
         formula: '<strong>Dimensions:</strong> a line is 1D and our canvas is 2D.',
