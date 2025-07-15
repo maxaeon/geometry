@@ -112,31 +112,47 @@
         <div class="dict-content">
             <button id="dict-close" title="Close">&times;</button>
             <h2>Geometry Dictionary</h2>
-            <div class="category" id="basic-terms">
-                <h3>Basic Key Terms</h3>
-                <ul>
-                    <li><button class="flash-btn" data-term="point">Point</button></li>
-                    <li><button class="flash-btn" data-term="line">Line</button></li>
-                    <li><button class="flash-btn" data-term="plane">Plane</button></li>
-                    <li><button class="flash-btn" data-term="angle">Angle</button></li>
-                    <li><button class="flash-btn" data-term="right angle">Right Angle</button></li>
-                    <li><button class="flash-btn" data-term="radius">Radius</button></li>
-                    <li><button class="flash-btn" data-term="circle">Circle</button></li>
-                    <li><button class="flash-btn" data-term="triangle">Triangle</button></li>
-                    <li><button class="flash-btn" data-term="square">Square</button></li>
-                </ul>
+            <div id="dictionary-book">
+                <div class="dict-page" id="dict-basic">
+                    <h3>Basic Terms</h3>
+                    <ul>
+                        <li><button class="flash-btn" data-term="angle">Angle</button></li>
+                        <li><button class="flash-btn" data-term="circle">Circle</button></li>
+                        <li><button class="flash-btn" data-term="hexagon">Hexagon</button></li>
+                        <li><button class="flash-btn" data-term="line">Line</button></li>
+                        <li><button class="flash-btn" data-term="pentagon">Pentagon</button></li>
+                        <li><button class="flash-btn" data-term="plane">Plane</button></li>
+                        <li><button class="flash-btn" data-term="point">Point</button></li>
+                        <li><button class="flash-btn" data-term="polygon">Polygon</button></li>
+                        <li><button class="flash-btn" data-term="radius">Radius</button></li>
+                        <li><button class="flash-btn" data-term="right angle">Right Angle</button></li>
+                        <li><button class="flash-btn" data-term="square">Square</button></li>
+                        <li><button class="flash-btn" data-term="triangle">Triangle</button></li>
+                    </ul>
+                </div>
+                <div class="dict-page" id="dict-intermediate">
+                    <h3>Intermediate Terms</h3>
+                    <ul>
+                        <li><button class="flash-btn" data-term="area">Area</button></li>
+                        <li><button class="flash-btn" data-term="circumference">Circumference</button></li>
+                        <li><button class="flash-btn" data-term="diameter">Diameter</button></li>
+                        <li><button class="flash-btn" data-term="perimeter">Perimeter</button></li>
+                    </ul>
+                </div>
+                <div class="dict-page" id="dict-advanced">
+                    <h3>Advanced Terms</h3>
+                    <ul>
+                        <li><button class="flash-btn" data-term="cube">Cube</button></li>
+                        <li><button class="flash-btn" data-term="dimension">Dimension</button></li>
+                        <li><button class="flash-btn" data-term="hypotenuse">Hypotenuse</button></li>
+                        <li><button class="flash-btn" data-term="similarity">Similarity</button></li>
+                        <li><button class="flash-btn" data-term="tangent">Tangent</button></li>
+                    </ul>
+                </div>
             </div>
-            <div class="category" id="advanced-terms">
-                <h3>Advanced Terminology</h3>
-                <ul>
-                    <li><button class="flash-btn" data-term="tangent">Tangent</button></li>
-                    <li><button class="flash-btn" data-term="similarity">Similarity</button></li>
-                    <li><button class="flash-btn" data-term="hexagon">Hexagon</button></li>
-                    <li><button class="flash-btn" data-term="circumference">Circumference</button></li>
-                    <li><button class="flash-btn" data-term="hypotenuse">Hypotenuse</button></li>
-                    <li><button class="flash-btn" data-term="cube">Cube</button></li>
-                    <li><button class="flash-btn" data-term="dimension">Dimension</button></li>
-                </ul>
+            <div class="dict-nav">
+                <button id="dict-prev">&#9664;</button>
+                <button id="dict-next">&#9654;</button>
             </div>
             <div id="flashcard" style="display:none">
                 <h3 id="flashcard-title"></h3>

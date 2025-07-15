@@ -308,6 +308,38 @@ body.kids #skip-activity {
     font-size: 1rem;
 }
 
+#dictionary-book {
+    background: #fffbe8;
+    border: 2px solid #b88c4a;
+    border-radius: 4px;
+    padding: 10px 20px;
+    margin-top: 10px;
+    position: relative;
+    display: none;
+}
+
+#dictionary-book::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: #b88c4a;
+}
+
+.dict-page {
+    display: none;
+}
+
+.dict-nav {
+    margin-top: 8px;
+}
+
+.dict-nav button {
+    padding: 4px 8px;
+}
+
 #flashcard-canvas {
     border: 1px solid #ccc;
     margin-top: 10px;
