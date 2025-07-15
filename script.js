@@ -203,7 +203,7 @@ function setup() {
     document.getElementById('tool-select').addEventListener('change', e => {
         setTool(e.target.value);
     });
-    document.querySelectorAll('.tool-btn').forEach(btn => {
+    document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
         btn.addEventListener('click', () => setTool(btn.dataset.tool));
     });
     document.getElementById('color-input').addEventListener('input', e => {
