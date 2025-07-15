@@ -30,47 +30,47 @@ let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff
 let currentExample = null;
 let exampleShapes = [];
 let advancedInfo = {
-    0: {
+    'intro-plane': {
         formula: '<strong>Dimensions:</strong> a line is 1D and our canvas is 2D.',
         explanation: 'In 3D you add height to length and width. Time or another axis can create 4D and beyond.'
     },
-    1: {
+    'distance-formula': {
         formula: 'Length = √((x₂−x₁)² + (y₂−y₁)²)',
         explanation: 'This distance formula is derived from the Pythagorean theorem.'
     },
-    2: {
+    'triangle-area': {
         formula: 'Triangle area = base × height ÷ 2',
         explanation: 'A triangle occupies half the area of a rectangle with the same base and height.'
     },
-    3: {
+    'dotted-lines': {
         formula: 'Dotted lines show hidden or imaginary edges.',
         explanation: 'They are used when a side is not physically present but helpful for reasoning.'
     },
-    4: {
+    'right-angle-definition': {
         formula: 'Right angle = 90°',
         explanation: 'Two lines that meet to form a square corner are perpendicular.'
     },
-    5: {
+    'circle-math': {
         formula: 'Circle circumference = 2πr, area = πr²',
         explanation: 'The constant π describes the ratio between a circle’s circumference and its diameter.'
     },
-    6: {
+    'square-area': {
         formula: 'Square area = side²',
         explanation: 'A square lives in 2‑D with only length and width.'
     },
-    7: {
+    'cube-volume': {
         formula: 'Cube volume = side³',
         explanation: 'Cubes add height, giving a third dimension.'
     },
-    16: {
+    'right-triangle-basics': {
         formula: 'Right triangle \u2192 one angle = 90\u00b0',
         explanation: 'A right triangle has a single 90\u00b0 angle. The side opposite this right angle is called the hypotenuse.'
     },
-    21: {
+    'acute-angles': {
         formula: 'Acute angle < 90\u00b0',
         explanation: 'Angles smaller than a right angle are called acute.'
     },
-    22: {
+    'obtuse-angles': {
         formula: 'Obtuse angle > 90\u00b0 and < 180\u00b0',
         explanation: 'Angles bigger than a right angle but less than a straight line are obtuse.'
     }
@@ -98,7 +98,9 @@ let flashcardDefinitions = {
 function updateBrainButton(){
     const brainBtn = document.getElementById('brain-btn');
     if(!brainBtn) return;
-    if(mode === 'kids' && advancedInfo[currentActivity]){
+    const act = kidsActivities[currentActivity];
+    const info = act ? advancedInfo[act.id] : null;
+    if(mode === 'kids' && info){
         brainBtn.style.display = 'inline-block';
     } else {
         brainBtn.style.display = 'none';
@@ -1068,6 +1070,7 @@ function startAdvancedMode(){
 function setupKidsActivities(){
     kidsActivities = [
         {
+            id: 'intro-plane',
             prompt: 'This grid is our plane—a flat surface that goes on forever.',
             setup: function(){
                 showGrid = true;
@@ -1077,6 +1080,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'place-point',
             prompt: 'Place a point anywhere on the plane.',
             setup: function(){
                 // nothing pre-drawn
@@ -1092,6 +1096,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'stretch-to-segment',
             prompt: 'Stretch your point into a line segment.',
             keepShapes: true,
             setup: function(){
@@ -1114,6 +1119,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'connect-red-points',
             prompt: 'Draw a line segment connecting the two red points. A line segment is a straight 1D path between points.',
             setup: function(){
                 const x1 = width/2 - 60;
@@ -1137,6 +1143,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'draw-square',
             prompt: 'Connect the 4 red points to make a square.',
             setup: function(){
                 placeSquareDots();
@@ -1169,6 +1176,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'cube-dotted',
             prompt: 'Use dotted line segments from each corner so the square looks like a 3-D cube.',
             keepShapes: true,
             setup: function(){
@@ -1207,6 +1215,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'triangle-equal',
             prompt: 'Use line segments to connect the 3 red points into a triangle. A triangle is a polygon, a closed shape made from line segments. Can you make two line segments equal?',
             setup: function(){
                 placeTriangleDots();
@@ -1246,6 +1255,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'triangle-dotted-base',
             prompt: 'Use a dotted line segment to complete the base of the triangle.',
             setup: function(){
                 const x1 = width/2 - 80;
@@ -1271,6 +1281,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'identify-right-angles',
             prompt: 'Click each corner point of the square to find the right angles. An angle is the space between two lines that meet.',
             setup: function(){
                 const size=120;
@@ -1299,6 +1310,7 @@ function setupKidsActivities(){
         }
         },
         {
+            id: 'circle-basics',
             prompt: 'Step 1: Place a point anywhere on the canvas. Step 2: Draw a circle centered on that point. The radius is the distance from the center to the edge. The circumference is the distance all the way around the circle.',
             setup: function(){
                 // nothing pre-drawn
@@ -1323,6 +1335,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'equilateral-point-a',
             prompt: 'Place the first point (point A) anywhere on the canvas.',
             keepShapes: false,
             setup: function(){
@@ -1340,6 +1353,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'equilateral-circle-a',
             prompt: 'Draw a circle centered at point A.',
             keepShapes: true,
             setup: function(){
@@ -1361,6 +1375,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'equilateral-point-b',
             prompt: 'Place a second point (point B) on the circle\u2019s circumference.',
             keepShapes: true,
             setup: function(){
@@ -1384,6 +1399,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'equilateral-circle-b',
             prompt: 'Draw a second circle centered at B with the same radius as the first.',
             keepShapes: true,
             setup: function(){
@@ -1404,6 +1420,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'equilateral-connect',
             prompt: 'Mark the intersection of both circles as point C and connect A-B-C with line segments.',
             keepShapes: true,
             setup: function(){
@@ -1449,6 +1466,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'right-angle-legs',
             prompt: 'Use the three red points to draw the two legs of a right angle. The small square marks a perfect 90\u00b0 corner.',
             keepShapes: false,
             setup: function(){
@@ -1485,6 +1503,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'right-angle-hypotenuse',
             prompt: 'Finish the right triangle by drawing the hypotenuse from point A to point C.',
             keepShapes: true,
             setup: function(){
@@ -1562,6 +1581,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'rectangle-from-triangles',
             prompt: 'Combine two triangles to form a rectangle using the four dots.',
             setup: function(){
                 const cx = width/2;
@@ -1599,6 +1619,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'triangle-vertices',
             prompt: 'Click each vertex of the triangle to count its corners.',
             setup: function(){
                 const p = [
@@ -1621,6 +1642,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'draw-diameter',
             prompt: 'Draw a line across the circle using the red points to cut it in half.',
             setup: function(){
                 const r = 80;
@@ -1644,6 +1666,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'acute-angle',
             prompt: 'Click the acute angle (<90\u00b0).',
             setup: function(){
                 const len = 80;
@@ -1669,6 +1692,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'obtuse-angle',
             prompt: 'Click the obtuse angle (>90\u00b0 and <180\u00b0).',
             setup: function(){
                 const len = 80;
@@ -1700,6 +1724,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'shape-name-clicks',
             prompt: 'Click the circle, square, and triangle to name each shape.',
             setup: function(){
                 shapeIdentify = {};
@@ -1735,6 +1760,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'shape-identify-sequence',
             title: 'Shape Identification',
             prompt: 'Click the circle.',
             setup: function(){
@@ -1783,6 +1809,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'compose-house',
             title: 'Compose Shapes',
             prompt: 'Use the dots to build a house shape.',
             setup: function(){
@@ -1809,6 +1836,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'shape-attributes',
             title: 'Shape Attributes',
             prompt: 'Click the shape with 3 sides.',
             setup: function(){
@@ -1869,6 +1897,7 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'fraction-square-quarters',
             title: 'Fractions with Shapes',
             prompt: 'Divide the square into 4 equal parts using line segments.',
             setup: function(){
@@ -2503,10 +2532,12 @@ function showAdvancedInfo(){
     const imgEl = document.getElementById('advanced-image');
     if(!overlay || !formulaEl || !explEl || !imgEl) return;
     explEl.style.display = 'none';
-    if(mode === 'kids' && advancedInfo[currentActivity]){
-        formulaEl.innerHTML = advancedInfo[currentActivity].formula;
-        explEl.textContent = advancedInfo[currentActivity].explanation;
-        if(currentActivity === 0){
+    const act = kidsActivities[currentActivity];
+    const info = act ? advancedInfo[act.id] : null;
+    if(mode === 'kids' && info){
+        formulaEl.innerHTML = info.formula;
+        explEl.textContent = info.explanation;
+        if(act.id === 'intro-plane'){
             imgEl.src = '4d.png';
             imgEl.style.display = 'block';
         } else {
