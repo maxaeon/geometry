@@ -22,6 +22,8 @@ let showGrid = true;
 let triangleGuide = {};
 let introGuide = {};
 let rightTriangleGuide = {};
+let identifyCenterStep = 0;
+let identifyCenterCircles = [];
 const CANVAS_PADDING_PCT = 0;
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 let currentExample = null;
@@ -405,12 +407,28 @@ function windowResized() {
 function mousePressed() {
     if (mouseButton !== LEFT) return;
     if(mode==='kids'){
-        for(const s of shapes){
-            if(s instanceof Circle && s.clickable){
-                if(dist(mouseX,mouseY,s.x,s.y) <= s.r + 5){
-                    s.clicked = true;
-                    checkKidsActivity();
-                    return;
+        const act = kidsActivities[currentActivity];
+        if(act && act.id === 'identify-centers'){
+            for(const s of shapes){
+                if(s instanceof Circle && s.clickable){
+                    if(dist(mouseX,mouseY,s.x,s.y) <= s.r + 5){
+                        const expected = identifyCenterCircles[identifyCenterStep];
+                        if(s === expected){
+                            s.clicked = true;
+                            checkKidsActivity();
+                        }
+                        return;
+                    }
+                }
+            }
+        } else {
+            for(const s of shapes){
+                if(s instanceof Circle && s.clickable){
+                    if(dist(mouseX,mouseY,s.x,s.y) <= s.r + 5){
+                        s.clicked = true;
+                        checkKidsActivity();
+                        return;
+                    }
                 }
             }
         }
@@ -1435,21 +1453,26 @@ function setupKidsActivities(){
             }
         },
         {
-            prompt: 'Identify each shape by clicking its center.',
+            id: 'identify-centers',
+            prompt: 'Click the center of the circle.',
             setup: function(){
                 const cx = width/2;
                 const cy = height/2;
                 const gap = 150;
+                identifyCenterStep = 0;
+                identifyCenterCircles = [];
                 // circle
                 shapes.push(new Circle(cx - gap, cy, 40));
-                shapes.push(new Circle(cx - gap, cy, 8, 'magenta', true));
+                const circleCenter = new Circle(cx - gap, cy, 8, 'magenta', true);
+                shapes.push(circleCenter);
                 // square
                 const s = 80;
                 shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2));
                 shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2));
                 shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2));
                 shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2));
-                shapes.push(new Circle(cx, cy, 8, 'magenta', true));
+                const squareCenter = new Circle(cx, cy, 8, 'magenta', true);
+                shapes.push(squareCenter);
                 // triangle
                 const tx = cx + gap;
                 const pts = [
@@ -1460,16 +1483,21 @@ function setupKidsActivities(){
                 shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y));
                 shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y));
                 shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y));
-                shapes.push(new Circle(tx, cy, 8, 'magenta', true));
+                const triangleCenter = new Circle(tx, cy, 8, 'magenta', true);
+                shapes.push(triangleCenter);
+                identifyCenterCircles.push(circleCenter, squareCenter, triangleCenter);
             },
             check: function(){
-                let clicked = 0;
-                for(const s of shapes){
-                    if(s instanceof Circle && s.clickable && s.clicked){
-                        clicked++;
+                const expected = identifyCenterCircles[identifyCenterStep];
+                if(expected && expected.clicked){
+                    identifyCenterStep++;
+                    if(identifyCenterStep === 1){
+                        feedbackElem.textContent = 'Now click the center of the square.';
+                    } else if(identifyCenterStep === 2){
+                        feedbackElem.textContent = 'Finally click the center of the triangle.';
                     }
                 }
-                return clicked >= 3;
+                return identifyCenterStep >= 3;
             }
         },
         {
