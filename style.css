@@ -354,7 +354,7 @@ body.kids #skip-activity {
     margin: 10px 0;
 }
 
-#examples-overlay {
+#activities-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -367,7 +367,7 @@ body.kids #skip-activity {
     z-index: 300;
 }
 
-#examples-overlay .examples-content {
+#activities-overlay .activities-content {
     background: #fff;
     color: #000;
     padding: 20px;
@@ -379,7 +379,7 @@ body.kids #skip-activity {
     text-align: center;
 }
 
-#examples-close {
+#activities-close {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -389,12 +389,12 @@ body.kids #skip-activity {
     cursor: pointer;
 }
 
-#examples-overlay ul {
+#activities-overlay ul {
     list-style: none;
     padding: 0;
 }
 
-#examples-overlay a {
+#activities-overlay a {
     color: #003399;
     text-decoration: underline;
     cursor: pointer;
