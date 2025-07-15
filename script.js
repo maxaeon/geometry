@@ -18,7 +18,7 @@ let lineDashed = false;
 let fillLayer;
 let showGrid = true;
 let triangleGuide = {};
-let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
+let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 
 function showTutorial(){
     const steps = [
@@ -564,11 +564,17 @@ function createColorPalette(){
     paletteColors.forEach(color => {
         const btn = document.createElement('button');
         btn.className = 'color-swatch';
-        btn.style.background = color;
+        if(color === 'transparent'){
+            btn.classList.add('transparent');
+        }else{
+            btn.style.background = color;
+        }
         btn.title = color;
         btn.addEventListener('click', () => {
             currentColor = color;
-            document.getElementById('color-input').value = color;
+            if(color !== 'transparent'){
+                document.getElementById('color-input').value = color;
+            }
         });
         palette.appendChild(btn);
     });
@@ -591,8 +597,14 @@ function bucketFill(x,y,color){
         b: temp.pixels[idx+2],
         a: temp.pixels[idx+3]
     };
-    const fc = hexToRgb(color);
-    if(target.r===fc.r && target.g===fc.g && target.b===fc.b && target.a===255) {
+    let fc;
+    if(color === 'transparent'){
+        fc = {r:0,g:0,b:0,a:0};
+    }else{
+        const rgb = hexToRgb(color);
+        fc = {r: rgb.r, g: rgb.g, b: rgb.b, a:255};
+    }
+    if(target.r===fc.r && target.g===fc.g && target.b===fc.b && target.a===fc.a) {
         return;
     }
     const stack=[[startX,startY]];
@@ -608,11 +620,11 @@ function bucketFill(x,y,color){
             temp.pixels[pidx]=fc.r;
             temp.pixels[pidx+1]=fc.g;
             temp.pixels[pidx+2]=fc.b;
-            temp.pixels[pidx+3]=255;
+            temp.pixels[pidx+3]=fc.a;
             fillLayer.pixels[pidx]=fc.r;
             fillLayer.pixels[pidx+1]=fc.g;
             fillLayer.pixels[pidx+2]=fc.b;
-            fillLayer.pixels[pidx+3]=255;
+            fillLayer.pixels[pidx+3]=fc.a;
             stack.push([cx+1,cy]);
             stack.push([cx-1,cy]);
             stack.push([cx,cy+1]);
