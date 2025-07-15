@@ -318,6 +318,16 @@ body.kids #skip-activity {
     display: none;
 }
 
+#dictionary-book ul {
+    text-align: left;
+    column-count: 2;
+    column-gap: 40px;
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    width: 90%;
+}
+
 #dictionary-book::before {
     content: '';
     position: absolute;
