@@ -21,15 +21,9 @@ let triangleGuide = {};
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 
 function showTutorial(){
-    const steps = [
-        'Use the tool buttons to draw points, circles or lines.',
-        'Select a shape and press Delete to remove it.',
-        'Use the \u232b button to clear the entire canvas.',
-        'Back and Next navigate activities for kids mode.'
-    ];
-    for(const msg of steps){
-        alert(msg);
-    }
+    const box = document.getElementById('info-box');
+    if(!box) return;
+    box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
 function setTool(tool){
@@ -182,6 +176,11 @@ function setup() {
             loadKidsActivity(currentActivity - 1);
         }
     });
+
+    const infoBtn = document.getElementById('info-btn');
+    if(infoBtn){
+        infoBtn.addEventListener('click', showTutorial);
+    }
 
     document.getElementById('kids-mode').addEventListener('click', startKidsMode);
     document.getElementById('advanced-mode').addEventListener('click', startAdvancedMode);
@@ -715,9 +714,6 @@ function startKidsMode(){
     triangleGuide = {};
     setupKidsActivities();
     loadKidsActivity(0);
-    if(confirm('Show a quick tutorial of the controls?')){
-        showTutorial();
-    }
 }
 
 function startAdvancedMode(){
@@ -730,9 +726,6 @@ function startAdvancedMode(){
     document.getElementById('next-activity').style.display = 'none';
     resizeCanvas(window.innerWidth, window.innerHeight);
     feedbackElem.textContent = '';
-    if(confirm('Show a quick tutorial of the controls?')){
-        showTutorial();
-    }
 }
 
 function setupKidsActivities(){
