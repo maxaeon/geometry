@@ -1567,8 +1567,14 @@ function setupKidsActivities(){
                 shapes.push(new Circle(leftX, y, 8, 'gray'));
                 // obtuse angle on right
                 const rightX = width/2 + 120;
+                const obtuseAngle = 3 * Math.PI / 4;            // 135°
                 shapes.push(new LineSeg(rightX, y, rightX - len, y));
-                shapes.push(new LineSeg(rightX, y, rightX - len * Math.cos(Math.PI/4), y - len * Math.sin(Math.PI/4)));
+                shapes.push(new LineSeg(
+                    rightX,
+                    y,
+                    rightX + len * Math.cos(obtuseAngle),
+                    y + len * Math.sin(obtuseAngle)
+                ));
                 shapes.push(new Circle(rightX, y, 8, 'gray', true));
             },
             check: function(){
