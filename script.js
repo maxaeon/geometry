@@ -58,6 +58,18 @@ let advancedInfo = {
     7: {
         formula: 'Cube volume = side³',
         explanation: 'Cubes add height, giving a third dimension.'
+    },
+    16: {
+        formula: 'Right triangle \u2192 one angle = 90\u00b0',
+        explanation: 'A right triangle has a single 90\u00b0 angle. The side opposite this right angle is called the hypotenuse.'
+    },
+    21: {
+        formula: 'Acute angle < 90\u00b0',
+        explanation: 'Angles smaller than a right angle are called acute.'
+    },
+    22: {
+        formula: 'Obtuse angle > 90\u00b0 and < 180\u00b0',
+        explanation: 'Angles bigger than a right angle but less than a straight line are obtuse.'
     }
 };
 
@@ -1513,6 +1525,56 @@ function setupKidsActivities(){
                         const c1 = dist(s.x1,s.y1,p1.x,p1.y) < 10 && dist(s.x2,s.y2,p2.x,p2.y) < 10;
                         const c2 = dist(s.x1,s.y1,p2.x,p2.y) < 10 && dist(s.x2,s.y2,p1.x,p1.y) < 10;
                         if(c1 || c2) return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            prompt: 'Click the acute angle (<90\u00b0).',
+            setup: function(){
+                const len = 80;
+                const leftX = width/2 - 120;
+                const y = height/2;
+                // acute angle on left
+                shapes.push(new LineSeg(leftX, y, leftX + len, y));
+                shapes.push(new LineSeg(leftX, y, leftX + len * Math.cos(-Math.PI/4), y + len * Math.sin(-Math.PI/4)));
+                shapes.push(new Circle(leftX, y, 8, 'gray', true));
+                // obtuse example on right (not clickable)
+                const rightX = width/2 + 120;
+                shapes.push(new LineSeg(rightX, y, rightX - len, y));
+                shapes.push(new LineSeg(rightX, y, rightX - len * Math.cos(Math.PI/4), y - len * Math.sin(Math.PI/4)));
+                shapes.push(new Circle(rightX, y, 8, 'gray'));
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Circle && s.clickable && s.clicked){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            prompt: 'Click the obtuse angle (>90\u00b0 and <180\u00b0).',
+            setup: function(){
+                const len = 80;
+                const leftX = width/2 - 120;
+                const y = height/2;
+                // acute example on left (not clickable)
+                shapes.push(new LineSeg(leftX, y, leftX + len, y));
+                shapes.push(new LineSeg(leftX, y, leftX + len * Math.cos(-Math.PI/4), y + len * Math.sin(-Math.PI/4)));
+                shapes.push(new Circle(leftX, y, 8, 'gray'));
+                // obtuse angle on right
+                const rightX = width/2 + 120;
+                shapes.push(new LineSeg(rightX, y, rightX - len, y));
+                shapes.push(new LineSeg(rightX, y, rightX - len * Math.cos(Math.PI/4), y - len * Math.sin(Math.PI/4)));
+                shapes.push(new Circle(rightX, y, 8, 'gray', true));
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Circle && s.clickable && s.clicked){
+                        return true;
                     }
                 }
                 return false;
