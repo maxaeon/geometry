@@ -394,21 +394,6 @@ function setup() {
     if(exClose){
         exClose.addEventListener('click', closeActivities);
     }
-    document.querySelectorAll('#activities-overlay .example-link').forEach(link => {
-        link.addEventListener('click', e => {
-            e.preventDefault();
-            const kid = link.dataset.kid;
-            const example = link.dataset.example;
-            closeActivities();
-            if(kid !== undefined){
-                if(mode !== 'kids') startKidsMode();
-                loadKidsActivity(parseInt(kid,10));
-            } else if(example){
-                if(mode !== 'advanced') startAdvancedMode();
-                loadExample(example);
-            }
-        });
-    });
     const advClose = document.getElementById('advanced-close');
     if(advClose){
         advClose.addEventListener('click', () => {
@@ -887,6 +872,51 @@ function populateActivitySelect(){
     }
 }
 
+function populateActivitiesOverlay(){
+    const list = document.querySelector('#activities-overlay ul');
+    if(!list) return;
+    list.innerHTML = '';
+    if(Array.isArray(kidsActivities)){
+        kidsActivities.forEach((_, i) => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#';
+            a.className = 'example-link';
+            a.dataset.kid = i;
+            a.textContent = 'Activity ' + (i + 1);
+            li.appendChild(a);
+            list.appendChild(li);
+        });
+    }
+    if(typeof advancedExamples === 'object'){
+        Object.keys(advancedExamples).forEach(key => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#';
+            a.className = 'example-link';
+            a.dataset.example = key;
+            a.textContent = key.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            li.appendChild(a);
+            list.appendChild(li);
+        });
+    }
+    list.querySelectorAll('.example-link').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const kid = link.dataset.kid;
+            const example = link.dataset.example;
+            closeActivities();
+            if(kid !== undefined){
+                if(mode !== 'kids') startKidsMode();
+                loadKidsActivity(parseInt(kid,10));
+            } else if(example){
+                if(mode !== 'advanced') startAdvancedMode();
+                loadExample(example);
+            }
+        });
+    });
+}
+
 function bucketFill(x,y,color){
     const temp = createGraphics(width, height);
     temp.pixelDensity(1);
@@ -1002,6 +1032,7 @@ function startKidsMode(){
     rightTriangleGuide = {};
     setupKidsActivities();
     populateActivitySelect();
+    populateActivitiesOverlay();
     loadKidsActivity(0);
     updateBrainButton();
     positionInstructionPanel();
@@ -1030,6 +1061,7 @@ function startAdvancedMode(){
     updateBrainButton();
     setupAdvancedExamples();
     populateActivitySelect();
+    populateActivitiesOverlay();
     positionInstructionPanel();
 }
 
@@ -2040,6 +2072,7 @@ function closeDictionary(){
 }
 
 function openActivities(){
+    populateActivitiesOverlay();
     const overlay = document.getElementById('activities-overlay');
     if(overlay){
         overlay.style.display = 'flex';
