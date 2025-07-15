@@ -363,9 +363,13 @@ function setup() {
     }
 
     document.getElementById('start-btn').addEventListener('click', () => transitionToMode('kids'));
-    const dictBtn = document.getElementById('dictionary-btn');
-    if(dictBtn){
-        dictBtn.addEventListener('click', openDictionary);
+    const dictBtnStart = document.getElementById('dictionary-btn');
+    if(dictBtnStart){
+        dictBtnStart.addEventListener('click', openDictionary);
+    }
+    const dictBtnCanvas = document.getElementById('dictionary-btn-canvas');
+    if(dictBtnCanvas){
+        dictBtnCanvas.addEventListener('click', openDictionary);
     }
     const closeBtn = document.getElementById('dict-close');
     if(closeBtn){
@@ -1133,7 +1137,7 @@ function setupKidsActivities(){
             }
         },
         {
-            prompt: 'Draw lines from each corner so the square looks like a 3-D cube.',
+            prompt: 'Use dotted line segments from each corner so the square looks like a 3-D cube.',
             keepShapes: true,
             setup: function(){
                 // square from previous step remains
@@ -2159,11 +2163,11 @@ function showFlashcard(term){
             ctx.stroke();
         } else if(term === 'cube'){
             const size = 70;
-            // back square
-            ctx.strokeRect(80, 40, size, size);
-            // front square
+            // front square in solid lines
             ctx.strokeRect(50, 70, size, size);
-            // connecting lines
+            // back square and connecting edges with dashed lines
+            ctx.setLineDash([5,5]);
+            ctx.strokeRect(80, 40, size, size);
             ctx.beginPath();
             ctx.moveTo(50, 70);
             ctx.lineTo(80, 40);
@@ -2174,6 +2178,7 @@ function showFlashcard(term){
             ctx.moveTo(50 + size, 70 + size);
             ctx.lineTo(80 + size, 40 + size);
             ctx.stroke();
+            ctx.setLineDash([]);
         } else if(term === 'dimension'){
             let step = 0;
             const drawSteps = [
