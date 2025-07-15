@@ -23,6 +23,8 @@ let triangleGuide = {};
 let introGuide = {};
 const CANVAS_PADDING_PCT = 0;
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
+let currentExample = null;
+let exampleShapes = [];
 let advancedInfo = {
     0: {
         formula: '<strong>Dimensions:</strong> a line is 1D and our canvas is 2D.',
@@ -142,6 +144,16 @@ function restoreState(state){
     fillLayer.image(state.fill, 0, 0);
 }
 
+function updateExampleVisibility(){
+    if(!currentExample) return;
+    const still = exampleShapes.every(s => shapes.includes(s));
+    if(!still){
+        currentExample = null;
+        exampleShapes = [];
+        feedbackElem.textContent = '';
+    }
+}
+
 function saveState(){
     undoStack.push(cloneState());
     if(undoStack.length > HISTORY_LIMIT) undoStack.shift();
@@ -153,6 +165,7 @@ function undo(){
         const current = undoStack.pop();
         redoStack.push(current);
         restoreState(undoStack[undoStack.length-1]);
+        updateExampleVisibility();
         selectedShape = null;
         drawingShape = null;
     }
@@ -163,6 +176,7 @@ function redo(){
         const state = redoStack.pop();
         restoreState(state);
         undoStack.push(cloneState());
+        updateExampleVisibility();
         selectedShape = null;
         drawingShape = null;
     }
@@ -173,6 +187,7 @@ function deleteSelectedShape(){
         if(idx !== -1) shapes.splice(idx,1);
         selectedShape = null;
         saveState();
+        updateExampleVisibility();
         // ensure subsequent mouseReleased events don't add duplicate history
         actionChanged = false;
     }
@@ -227,6 +242,8 @@ function setup() {
             feedbackElem.textContent = '';
             saveState();
         }
+        currentExample = null;
+        exampleShapes = [];
     });
     document.getElementById('example-select').addEventListener('change', e => {
         loadExample(e.target.value);
@@ -278,7 +295,7 @@ function setup() {
         infoBtn.addEventListener('click', showTutorial);
     }
 
-    document.getElementById('start-btn').addEventListener('click', startKidsMode);
+    document.getElementById('start-btn').addEventListener('click', () => transitionToMode('kids'));
     const dictBtn = document.getElementById('dictionary-btn');
     if(dictBtn){
         dictBtn.addEventListener('click', openDictionary);
@@ -777,6 +794,8 @@ function bucketFill(x,y,color){
 
 function loadExample(name){
     shapes = [];
+    currentExample = null;
+    exampleShapes = [];
     if(name==='equilateral'){
         const side=200;
         const x1=width/2-side/2;
@@ -790,6 +809,8 @@ function loadExample(name){
         shapes.push(new LineSeg(x2,y2,x3,y3,false));
         shapes.push(new LineSeg(x3,y3,x1,y1,false));
         feedbackElem.textContent='Equilateral triangle constructed';
+        currentExample = name;
+        exampleShapes = [...shapes];
     } else if(name==='triangle-congruency'){
         const left=[{x:200,y:300},{x:300,y:150},{x:400,y:300}];
         shapes.push(new LineSeg(left[0].x,left[0].y,left[1].x,left[1].y,false));
@@ -801,6 +822,8 @@ function loadExample(name){
             shapes.push(new LineSeg(left[i].x+dx,left[i].y,left[j].x+dx,left[j].y,false));
         }
         feedbackElem.textContent='Two triangles with equal sides - congruent (SSS)';
+        currentExample = name;
+        exampleShapes = [...shapes];
     } else if(name==='circle-theorem'){
         const c=new Circle(width/2, height/2, 120);
         const aAngle=PI/6, bAngle=-PI/6, cAngle=PI/2;
@@ -812,6 +835,8 @@ function loadExample(name){
         shapes.push(new LineSeg(ax,ay,cxp,cyp,false));
         shapes.push(new LineSeg(bx,by,cxp,cyp,false));
         feedbackElem.textContent='Angles subtended by the same arc are equal';
+        currentExample = name;
+        exampleShapes = [...shapes];
     } else if(name==='pythagorean'){
         const base=160;
         const x=width/2-base/2, y=height/2+base/2;
@@ -828,6 +853,8 @@ function loadExample(name){
         shapes.push(new LineSeg(x+base+base,y,x+base+base,y-base,false));
         shapes.push(new LineSeg(x+base+base,y-base,x+base,y-base,false));
         feedbackElem.textContent='Right triangle with squares demonstrates a^2+b^2=c^2';
+        currentExample = name;
+        exampleShapes = [...shapes];
     } else if(name==='parallel-lines'){
         const y1=height/2-60, y2=height/2+60;
         const x1=width/2-120, x2=width/2+120;
@@ -836,15 +863,33 @@ function loadExample(name){
         const tx=width/2, ty1=height/2-100, ty2=height/2+100;
         shapes.push(new LineSeg(tx,ty1,tx,ty2,false));
         feedbackElem.textContent='Parallel lines with a transversal';
+        currentExample = name;
+        exampleShapes = [...shapes];
     } else {
         feedbackElem.textContent='';
     }
     saveState();
 }
 
+function transitionToMode(target){
+    const mc = document.getElementById('mode-content');
+    if(mc){
+        mc.classList.remove('show');
+        setTimeout(() => {
+            if(target === 'kids') startKidsMode();
+            else startAdvancedMode();
+        }, 1000);
+    } else {
+        if(target === 'kids') startKidsMode();
+        else startAdvancedMode();
+    }
+}
+
 // ----- Mode Switching -----
 function startKidsMode(){
     mode = 'kids';
+    currentExample = null;
+    exampleShapes = [];
     document.body.classList.add('kids');
     document.getElementById('mode-selector').style.display = 'none';
     document.getElementById('toolbar').style.display = 'flex';
@@ -867,6 +912,8 @@ function startKidsMode(){
 
 function startAdvancedMode(){
     mode = 'advanced';
+    currentExample = null;
+    exampleShapes = [];
     document.body.classList.remove('kids');
     document.getElementById('mode-selector').style.display = 'none';
     document.getElementById('toolbar').style.display = 'flex';
@@ -1252,6 +1299,8 @@ function loadKidsActivity(i){
     if(!act.keepShapes){
         shapes = [];
     }
+    currentExample = null;
+    exampleShapes = [];
     symmetryDemo = null;
     act.setup();
     feedbackElem.textContent = act.prompt;
