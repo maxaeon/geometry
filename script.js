@@ -877,13 +877,13 @@ function populateActivitiesOverlay(){
     if(!list) return;
     list.innerHTML = '';
     if(Array.isArray(kidsActivities)){
-        kidsActivities.forEach((_, i) => {
+        kidsActivities.forEach((act, i) => {
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.href = '#';
             a.className = 'example-link';
             a.dataset.kid = i;
-            a.textContent = 'Activity ' + (i + 1);
+            a.textContent = act.title || ('Activity ' + (i + 1));
             li.appendChild(a);
             list.appendChild(li);
         });
@@ -1733,6 +1733,165 @@ function setupKidsActivities(){
             check: function(){
                 return shapeIdentify.circle.clicked && shapeIdentify.square.clicked && shapeIdentify.triangle.clicked;
             }
+        },
+        {
+            title: 'Shape Identification',
+            prompt: 'Click the circle.',
+            setup: function(){
+                const cx = width/2;
+                const cy = height/2;
+                const gap = 150;
+                this.step = 0;
+                this.shapes = {};
+                const circ = new Circle(cx - gap, cy, 40, 'gray', true);
+                shapes.push(circ);
+                this.shapes.circle = circ;
+                const s = 80;
+                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2));
+                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2));
+                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2));
+                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2));
+                const squareDot = new Circle(cx, cy, 8, 'gray', true);
+                shapes.push(squareDot);
+                this.shapes.square = squareDot;
+                const tx = cx + gap;
+                const pts = [
+                    {x: tx - 40, y: cy + 40},
+                    {x: tx + 40, y: cy + 40},
+                    {x: tx, y: cy - 40}
+                ];
+                shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y));
+                shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y));
+                shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y));
+                const triDot = new Circle(tx, cy, 8, 'gray', true);
+                shapes.push(triDot);
+                this.shapes.triangle = triDot;
+                feedbackElem.textContent = 'Click the circle.';
+            },
+            check: function(){
+                const order = ['circle', 'square', 'triangle'];
+                if(this.step < order.length){
+                    const name = order[this.step];
+                    if(this.shapes[name].clicked){
+                        this.step++;
+                        if(this.step < order.length){
+                            feedbackElem.textContent = 'Now click the ' + order[this.step] + '.';
+                        }
+                    }
+                }
+                return this.step >= order.length;
+            }
+        },
+        {
+            title: 'Compose Shapes',
+            prompt: 'Use the dots to build a house shape.',
+            setup: function(){
+                const cx = width/2;
+                const cy = height/2;
+                const size = 80;
+                const roof = 60;
+                this.points = {
+                    bl: {x: cx - size/2, y: cy + size/2},
+                    br: {x: cx + size/2, y: cy + size/2},
+                    tr: {x: cx + size/2, y: cy - size/2},
+                    tl: {x: cx - size/2, y: cy - size/2},
+                    roof: {x: cx, y: cy - size/2 - roof}
+                };
+                for(const p of Object.values(this.points)){
+                    shapes.push(new Circle(p.x, p.y, 6, 'magenta'));
+                }
+            },
+            check: function(){
+                const p = this.points;
+                return hasLineBetween(p.bl,p.br) && hasLineBetween(p.br,p.tr) &&
+                       hasLineBetween(p.tr,p.tl) && hasLineBetween(p.tl,p.bl) &&
+                       hasLineBetween(p.tr,p.roof) && hasLineBetween(p.tl,p.roof);
+            }
+        },
+        {
+            title: 'Shape Attributes',
+            prompt: 'Click the shape with 3 sides.',
+            setup: function(){
+                this.step = 0;
+                this.shapes = {};
+                const cx = width/2;
+                const cy = height/2;
+                const gap = 150;
+                const tpts = [
+                    {x: cx - gap - 30, y: cy + 40},
+                    {x: cx - gap + 30, y: cy + 40},
+                    {x: cx - gap, y: cy - 40}
+                ];
+                shapes.push(new LineSeg(tpts[0].x,tpts[0].y,tpts[1].x,tpts[1].y));
+                shapes.push(new LineSeg(tpts[1].x,tpts[1].y,tpts[2].x,tpts[2].y));
+                shapes.push(new LineSeg(tpts[2].x,tpts[2].y,tpts[0].x,tpts[0].y));
+                const tri = new Circle(cx - gap, cy, 8, 'gray', true);
+                shapes.push(tri);
+                this.shapes.triangle = tri;
+                const s = 60;
+                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2));
+                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2));
+                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2));
+                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2));
+                const squareDot = new Circle(cx, cy, 8, 'gray', true);
+                shapes.push(squareDot);
+                this.shapes.square = squareDot;
+                const pr = 40;
+                const angleStep = 2 * Math.PI / 5;
+                const ptx = cx + gap;
+                let pentPts = [];
+                for(let i=0;i<5;i++){
+                    const a = -Math.PI/2 + i * angleStep;
+                    pentPts.push({x: ptx + pr*Math.cos(a), y: cy + pr*Math.sin(a)});
+                }
+                for(let i=0;i<5;i++){
+                    const j=(i+1)%5;
+                    shapes.push(new LineSeg(pentPts[i].x,pentPts[i].y,pentPts[j].x,pentPts[j].y));
+                }
+                const pent = new Circle(ptx, cy, 8, 'gray', true);
+                shapes.push(pent);
+                this.shapes.pentagon = pent;
+                this.names = ['triangle','square','pentagon'];
+                this.sides = [3,4,5];
+                feedbackElem.textContent = 'Click the shape with 3 sides.';
+            },
+            check: function(){
+                if(this.step < this.names.length){
+                    const name = this.names[this.step];
+                    if(this.shapes[name].clicked){
+                        this.step++;
+                        if(this.step < this.names.length){
+                            feedbackElem.textContent = 'Now click the shape with ' + this.sides[this.step] + ' sides.';
+                        }
+                    }
+                }
+                return this.step >= this.names.length;
+            }
+        },
+        {
+            title: 'Fractions with Shapes',
+            prompt: 'Divide the square into 4 equal parts using line segments.',
+            setup: function(){
+                const s = 120;
+                const cx = width/2;
+                const cy = height/2;
+                const half = s/2;
+                shapes.push(new LineSeg(cx-half,cy-half,cx+half,cy-half));
+                shapes.push(new LineSeg(cx+half,cy-half,cx+half,cy+half));
+                shapes.push(new LineSeg(cx+half,cy+half,cx-half,cy+half));
+                shapes.push(new LineSeg(cx-half,cy+half,cx-half,cy-half));
+                this.left = {x: cx - half, y: cy};
+                this.right = {x: cx + half, y: cy};
+                this.top = {x: cx, y: cy - half};
+                this.bottom = {x: cx, y: cy + half};
+                shapes.push(new Circle(this.left.x,this.left.y,6,'magenta'));
+                shapes.push(new Circle(this.right.x,this.right.y,6,'magenta'));
+                shapes.push(new Circle(this.top.x,this.top.y,6,'magenta'));
+                shapes.push(new Circle(this.bottom.x,this.bottom.y,6,'magenta'));
+            },
+            check: function(){
+                return hasLineBetween(this.left,this.right) && hasLineBetween(this.top,this.bottom);
+            }
         }
     ];
 }
@@ -1784,6 +1943,58 @@ function setupAdvancedExamples(){
                 keepShapes: true,
                 setup: function(){},
                 check: function(){return true;}
+            },
+            {
+                prompt: 'Use the points to form two triangles showing SAS.',
+                keepShapes: false,
+                setup: function(){
+                    const cx = width/2 - 160;
+                    const cy = height/2 - 100;
+                    const base = 180;
+                    this.pts = [
+                        {x: cx, y: cy},
+                        {x: cx + base, y: cy},
+                        {x: cx + base/2, y: cy - 120}
+                    ];
+                    for(const p of this.pts){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                },
+                check: function(){
+                    return triangleLinesDrawn(this.pts);
+                }
+            },
+            {
+                prompt: 'Great! Those triangles are congruent by SAS.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){return true;}
+            },
+            {
+                prompt: 'Finally, connect these points for ASA.',
+                keepShapes: false,
+                setup: function(){
+                    const cx = width/2 + 160;
+                    const cy = height/2 - 100;
+                    const base = 180;
+                    this.pts = [
+                        {x: cx, y: cy},
+                        {x: cx + base/2, y: cy - 120},
+                        {x: cx + base, y: cy}
+                    ];
+                    for(const p of this.pts){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                },
+                check: function(){
+                    return triangleLinesDrawn(this.pts);
+                }
+            },
+            {
+                prompt: 'Excellent! Triangles are congruent by ASA.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){return true;}
             }
         ],
         'circle-theorem': [
@@ -1827,6 +2038,26 @@ function setupAdvancedExamples(){
                 keepShapes: true,
                 setup: function(){},
                 check: function(){return true;}
+            },
+            {
+                prompt: 'Draw the diameter using the new magenta points.',
+                keepShapes: true,
+                setup: function(){
+                    const c = this.center;
+                    this.d1 = {x: c.x - c.r, y: c.y};
+                    this.d2 = {x: c.x + c.r, y: c.y};
+                    shapes.push(new Circle(this.d1.x,this.d1.y,6,'magenta'));
+                    shapes.push(new Circle(this.d2.x,this.d2.y,6,'magenta'));
+                },
+                check: function(){
+                    return hasLineBetween(this.d1,this.d2);
+                }
+            },
+            {
+                prompt: 'An angle subtended by a diameter is a right angle.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){return true;}
             }
         ],
         'pythagorean': [
@@ -1866,6 +2097,12 @@ function setupAdvancedExamples(){
                 keepShapes: true,
                 setup: function(){},
                 check: function(){return true;}
+            },
+            {
+                prompt: 'Move the points to see the relationship hold.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){return true;}
             }
         ],
         'parallel-lines': [
@@ -1901,6 +2138,26 @@ function setupAdvancedExamples(){
             },
             {
                 prompt: 'Parallel lines with a transversal create equal angles.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){return true;}
+            },
+            {
+                prompt: 'Identify the alternate interior angles by clicking the circles.',
+                keepShapes: true,
+                setup: function(){
+                    const midX = width/2;
+                    const midY = height/2;
+                    this.a1 = new Circle(midX - 40, midY - 20, 8, 'gray', true);
+                    this.a2 = new Circle(midX + 40, midY + 20, 8, 'gray', true);
+                    shapes.push(this.a1, this.a2);
+                },
+                check: function(){
+                    return this.a1.clicked && this.a2.clicked;
+                }
+            },
+            {
+                prompt: 'Great! Those are alternate interior angles.',
                 keepShapes: true,
                 setup: function(){},
                 check: function(){return true;}
