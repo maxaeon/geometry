@@ -97,6 +97,8 @@ svg.shape {
     gap: 8px;
     position: relative;
     z-index: 20;
+    opacity: 0;
+    transition: opacity 0.8s ease;
 }
 
 #tool-buttons {
@@ -179,6 +181,8 @@ svg.shape {
     box-sizing: border-box;
     position: relative;
     z-index: 10;
+    opacity: 0;
+    transition: opacity 0.8s ease;
 }
 
 canvas {
