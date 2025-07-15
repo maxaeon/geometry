@@ -1,17 +1,44 @@
-# Geometry
+### Interactive Geometry Page README
 
-This project contains an interactive geometry playground.
+#### Project Overview:
 
-Open `index.html` in a modern web browser and click **Start** to launch the drawing interface.
+This interactive geometry webpage is designed for users ranging from kindergarten through graduate school. It offers engaging, interactive activities that guide learners through the construction and exploration of geometric shapes and principles based on Euclidean geometry.
 
-Select the page icon to open the activities overlay and browse step-by-step tutorials.
-Pick a tutorial from the overlay or use the **Activities** dropdown in the toolbar to switch tasks at any time.
+#### Current Status:
 
-Shapes can be dragged, resized and combined. Intersections are highlighted automatically for visual feedback.
-Use the **Fill** tool, now shown as a bucket icon, to color enclosed regions. The grid is displayed by default; toggle the **Grid** checkbox to hide or show it.
-The toolbar now provides icon-style buttons for common tools, similar to classic paint programs. A color palette lets you quickly pick or add colors, and a **Delete Shape** button removes the currently selected shape.
-There is also a cross-hatched swatch for choosing **transparent** fill. Bucket fill with this option clears pixels instead of painting them.
+* The site is actively under development. Many features and activities are still in progress.
 
-Click the new **brain icon** in the toolbar to see additional context about the current activity. The pop-up shows formulas like area or circumference and you can reveal a short explanation of why they work.
+#### Key Features:
 
-Use the **book icon** to open the dictionary and flashcard set. This icon is available on the start screen and in the drawing toolbar so you can quickly review terms at any time.
+* **Interactive Canvas:** Allows dynamic shape creation, manipulation, and exploration.
+* **Step-by-Step Activities:** Each activity is designed to provide detailed, interactive, and immediate feedback for learners.
+
+#### Activities (Status):
+
+* **Equilateral Triangles:** Fully implemented interactive tutorial.
+* **Other Euclidean Activities:** Currently being developed and expanded.
+
+  * Shape Identification
+  * Compose Shapes
+  * Shape Attributes
+  * Fractions with Shapes
+  * Proving Triangle Congruency
+  * Circle Theorems
+  * Pythagorean Theorem
+  * Parallel Line Theorems
+
+#### Upcoming Goals:
+
+* Expand step-by-step interactive tutorials for all listed Euclidean activities.
+* Enhance user interface for improved visual appeal and intuitive interaction.
+* Further align activities clearly with educational standards from California and Michigan.
+
+#### Technical Information:
+
+* Utilizes JavaScript libraries such as p5.js or Paper.js for responsive and dynamic geometry interactions.
+* Continuous improvements in user experience, including visual feedback and interaction clarity.
+
+#### Feedback and Contributions:
+
+* Feedback is welcome to help refine and enhance the project.
+* Future contributions may include additional interactive features, instructional refinements, and educational resources aligned with school standards.
