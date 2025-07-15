@@ -1090,17 +1090,41 @@ function setupKidsActivities(){
             }
         },
         {
-            prompt: 'Add lines or shading to turn your square into a cube.',
+            prompt: 'Draw lines from each corner so the square looks like a 3-D cube.',
             keepShapes: true,
             setup: function(){
                 // square from previous step remains
             },
             check: function(){
-                let lines=0;
-                for(const s of shapes){
-                    if(s instanceof LineSeg) lines++;
+                const corners = [
+                    {x: width/2 - 60, y: height/2 - 60},
+                    {x: width/2 + 60, y: height/2 - 60},
+                    {x: width/2 + 60, y: height/2 + 60},
+                    {x: width/2 - 60, y: height/2 + 60}
+                ];
+                let lineCount = 0;
+                const cornerHits = new Set();
+                function near(px, py, pt){
+                    return dist(px, py, pt.x, pt.y) < 10;
                 }
-                return lines>=8;
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        lineCount++;
+                        for(let i=0;i<4;i++){
+                            if(near(s.x1,s.y1,corners[i])||near(s.x2,s.y2,corners[i])){
+                                const next=(i+1)%4;
+                                const prev=(i+3)%4;
+                                const other={x: near(s.x1,s.y1,corners[i])? s.x2:s.x1,
+                                             y: near(s.x1,s.y1,corners[i])? s.y2:s.y1};
+                                if(!near(other.x,other.y,corners[next]) && !near(other.x,other.y,corners[prev])){
+                                    cornerHits.add(i);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                return lineCount>=8 && cornerHits.size===4;
             }
         },
         {
