@@ -104,6 +104,17 @@ function showTutorial(){
     box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
+function fadeInElements(...els){
+    els.forEach(el => {
+        if(el){
+            el.style.opacity = 0;
+            requestAnimationFrame(() => {
+                el.style.opacity = 1;
+            });
+        }
+    });
+}
+
 function setTool(tool){
     currentTool = tool;
     lineDashed = tool === 'dotted';
@@ -915,8 +926,11 @@ function startKidsMode(){
     exampleShapes = [];
     document.body.classList.add('kids');
     document.getElementById('mode-selector').style.display = 'none';
-    document.getElementById('toolbar').style.display = 'flex';
-    document.getElementById('canvas-container').style.display = 'block';
+    const tb = document.getElementById('toolbar');
+    const cc = document.getElementById('canvas-container');
+    tb.style.display = 'flex';
+    cc.style.display = 'block';
+    fadeInElements(tb, cc);
     document.getElementById('prev-activity').style.display = 'inline-block';
     document.getElementById('next-activity').style.display = 'inline-block';
     document.getElementById('skip-activity').style.display = 'inline-block';
@@ -939,8 +953,11 @@ function startAdvancedMode(){
     exampleShapes = [];
     document.body.classList.remove('kids');
     document.getElementById('mode-selector').style.display = 'none';
-    document.getElementById('toolbar').style.display = 'flex';
-    document.getElementById('canvas-container').style.display = 'block';
+    const tb = document.getElementById('toolbar');
+    const cc = document.getElementById('canvas-container');
+    tb.style.display = 'flex';
+    cc.style.display = 'block';
+    fadeInElements(tb, cc);
     document.getElementById('prev-activity').style.display = 'none';
     document.getElementById('next-activity').style.display = 'none';
     document.getElementById('skip-activity').style.display = 'none';
