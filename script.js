@@ -113,6 +113,94 @@ let advancedInfo = {
     'pythagorean': {
         formula: 'c² = a² + b²',
         explanation: 'In a right triangle, the square on the hypotenuse equals the sum of the squares on the other two sides.'
+    },
+    'place-point': {
+        formula: 'Point = (x, y)',
+        explanation: 'A point is named by its coordinates along the horizontal x and vertical y axes.'
+    },
+    'stretch-to-segment': {
+        formula: 'Length = √((x₂−x₁)² + (y₂−y₁)²)',
+        explanation: 'The distance formula finds how long your line segment is.'
+    },
+    'draw-square': {
+        formula: 'Square perimeter = 4×side, area = side²',
+        explanation: 'All four sides of a square are equal and meet at right angles.'
+    },
+    'cube-dotted': {
+        formula: 'Dotted lines show hidden or imaginary edges.',
+        explanation: 'They are used when a side is not physically present but helpful for reasoning.'
+    },
+    'triangle-equal': {
+        formula: 'Isosceles triangle → at least two equal sides',
+        explanation: 'When two sides match, the angles opposite them are also equal.'
+    },
+    'triangle-dotted-base': {
+        formula: 'Dotted lines show hidden or imaginary edges.',
+        explanation: 'They are used when a side is not physically present but helpful for reasoning.'
+    },
+    'equilateral-point-a': {
+        formula: 'Equilateral △ → all sides equal, all angles 60°',
+        explanation: 'Using equal-radius circles marks off points so each triangle side matches.'
+    },
+    'equilateral-circle-a': {
+        formula: 'Equilateral △ → all sides equal, all angles 60°',
+        explanation: 'Using equal-radius circles marks off points so each triangle side matches.'
+    },
+    'equilateral-point-b': {
+        formula: 'Equilateral △ → all sides equal, all angles 60°',
+        explanation: 'Using equal-radius circles marks off points so each triangle side matches.'
+    },
+    'equilateral-circle-b': {
+        formula: 'Equilateral △ → all sides equal, all angles 60°',
+        explanation: 'Using equal-radius circles marks off points so each triangle side matches.'
+    },
+    'equilateral-connect': {
+        formula: 'Equilateral △ → all sides equal, all angles 60°',
+        explanation: 'Using equal-radius circles marks off points so each triangle side matches.'
+    },
+    'right-angle-legs': {
+        formula: 'Right triangle → one angle = 90°',
+        explanation: 'The two legs meet at a right angle, forming the corner of the triangle.'
+    },
+    'right-angle-hypotenuse': {
+        formula: 'c² = a² + b²',
+        explanation: 'The hypotenuse is opposite the right angle and relates to the legs through the Pythagorean theorem.'
+    },
+    'identify-centers': {
+        formula: 'Centers lie where diagonals cross',
+        explanation: 'The center of a circle or polygon is equally far from key edges or vertices.'
+    },
+    'rectangle-from-triangles': {
+        formula: 'Rectangle area = base × height',
+        explanation: 'Two congruent right triangles can combine to form a rectangle.'
+    },
+    'triangle-vertices': {
+        formula: 'Angles in a triangle sum to 180°',
+        explanation: 'A triangle has three vertices whose interior angles always add up to 180°.'
+    },
+    'acute-angle': {
+        formula: 'Acute angle < 90°',
+        explanation: 'Angles smaller than a right angle are called acute.'
+    },
+    'obtuse-angle': {
+        formula: 'Obtuse angle > 90° and < 180°',
+        explanation: 'Angles bigger than a right angle but less than a straight line are obtuse.'
+    },
+    'shape-name-clicks': {
+        formula: 'Circle=0 sides, triangle=3, square=4',
+        explanation: 'Shapes are named by how many sides or curves they have.'
+    },
+    'shape-identify-sequence': {
+        formula: 'Circle=0 sides, triangle=3, square=4',
+        explanation: 'Shapes are named by how many sides or curves they have.'
+    },
+    'compose-house': {
+        formula: 'Composite area = sum of parts',
+        explanation: 'Complex figures like a house can be built from simpler shapes.'
+    },
+    'shape-attributes': {
+        formula: 'Triangle=3 sides, square=4, pentagon=5',
+        explanation: 'Counting sides lets us identify different polygons.'
     }
 };
 
