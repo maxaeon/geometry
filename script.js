@@ -202,6 +202,8 @@ function deleteSelectedShape(){
         updateExampleVisibility();
         // ensure subsequent mouseReleased events don't add duplicate history
         actionChanged = false;
+    } else if(feedbackElem){
+        feedbackElem.textContent = 'Select a shape to delete.';
     }
 }
 
@@ -274,7 +276,12 @@ function setup() {
     });
 
     document.addEventListener('keydown', e => {
-        if((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z'){
+        if(e.key === 'Escape'){
+            closeDictionary();
+            closeExamples();
+            const adv = document.getElementById('advanced-overlay');
+            if(adv) adv.style.display = 'none';
+        } else if((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z'){
             undo();
             e.preventDefault();
         } else if((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))){
@@ -397,13 +404,16 @@ function mousePressed() {
         }
     }
     if (currentTool === 'point') {
+        saveState();
         shapes.push(new Point(mouseX, mouseY));
         actionChanged = true;
     } else if (currentTool === 'circle') {
+        saveState();
         drawingShape = new Circle(mouseX, mouseY, 0, currentColor, false, currentWeight);
         shapes.push(drawingShape);
         actionChanged = true;
     } else if (currentTool === 'line' || currentTool === 'dotted') {
+        saveState();
         drawingShape = new LineSeg(mouseX, mouseY, mouseX, mouseY, lineDashed, currentColor, currentWeight);
         shapes.push(drawingShape);
         actionChanged = true;
@@ -413,6 +423,7 @@ function mousePressed() {
     } else if (currentTool === 'select') {
         selectedShape = findShape(mouseX, mouseY);
         if (selectedShape) {
+            saveState();
             const hit = selectedShape.hitTest(mouseX, mouseY);
             if (hit) {
                 resizeMode = hit;
