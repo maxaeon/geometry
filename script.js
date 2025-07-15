@@ -191,8 +191,15 @@ function setup() {
         infoBtn.addEventListener('click', showTutorial);
     }
 
-    document.getElementById('kids-mode').addEventListener('click', startKidsMode);
-    document.getElementById('advanced-mode').addEventListener('click', startAdvancedMode);
+    document.getElementById('start-btn').addEventListener('click', startKidsMode);
+    const dictBtn = document.getElementById('dictionary-btn');
+    if(dictBtn){
+        dictBtn.addEventListener('click', openDictionary);
+    }
+    const advBtn = document.getElementById('advanced-info-btn');
+    if(advBtn){
+        advBtn.addEventListener('click', showAdvancedInfo);
+    }
 
     createColorPalette();
     setTool('select');
@@ -1072,4 +1079,13 @@ function demonstrateCircleSymmetry(){
 
 function showEqualSidesPrompt(){
     feedbackElem.textContent = 'Can you make this triangle have two equal sides?';
+}
+
+// ----- Utility buttons on start screen -----
+function openDictionary(){
+    alert('Dictionary coming soon!');
+}
+
+function showAdvancedInfo(){
+    alert('Advanced info coming soon!');
 }
