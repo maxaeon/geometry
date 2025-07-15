@@ -79,7 +79,7 @@
         <button id="add-color-btn" title="Add Color">+</button>
         <input id="thickness-input" type="range" min="1" max="10" value="1">
         <label><input type="checkbox" id="grid-toggle" checked> Grid</label>
-        <button id="clear-btn" class="tool-btn" title="Clear Canvas">📄</button>
+        <button id="clear-btn" class="tool-btn" title="Clear Canvas">🗋</button>
         <button id="undo-btn">Undo</button>
         <button id="redo-btn">Redo</button>
         <button id="delete-btn" class="tool-btn" title="Delete Selected">❌</button>
@@ -103,7 +103,7 @@
         <ul>
             <li>Use the tool buttons to draw points, circles or lines.</li>
             <li>Select a shape and press Delete to remove it.</li>
-            <li>Use the &#x232b; button to clear the entire canvas.</li>
+            <li>Use the 🗋 button to clear the entire canvas.</li>
             <li>Back and Next navigate activities for kids mode.</li>
         </ul>
     </div>
@@ -163,8 +163,8 @@
                 setTimeout(() => mc.classList.add('show'), 2000);
             }
             setTimeout(() => {
-                if(typeof startAdvancedMode === 'function'){
-                    startAdvancedMode();
+                if(typeof transitionToMode === 'function'){
+                    transitionToMode('advanced');
                 }
             }, 4000);
         });
