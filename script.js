@@ -18,6 +18,7 @@ let lineDashed = false;
 let fillLayer;
 let showGrid = true;
 let triangleGuide = {};
+const CANVAS_PADDING_PCT = 0.05;
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 let advancedInfo = {
     0: {
@@ -45,6 +46,16 @@ let advancedInfo = {
         explanation: 'The constant π describes the ratio between a circle’s circumference and its diameter.'
     }
 };
+
+function updateBrainButton(){
+    const brainBtn = document.getElementById('brain-btn');
+    if(!brainBtn) return;
+    if(mode === 'kids' && advancedInfo[currentActivity]){
+        brainBtn.style.display = 'inline-block';
+    } else {
+        brainBtn.style.display = 'none';
+    }
+}
 
 function positionInstructionPanel(){
     const panel = document.getElementById('instruction-panel');
@@ -133,11 +144,18 @@ function animatePageTurn(dir){
     setTimeout(() => c.classList.remove(cls), 500);
 }
 
+function calcCanvasSize(){
+    const width = window.innerWidth * (1 - CANVAS_PADDING_PCT * 2);
+    const height = window.innerHeight * (1 - CANVAS_PADDING_PCT * 2);
+    return {width, height};
+}
+
 function setup() {
     const container = document.getElementById('canvas-container');
-    const canvas = createCanvas(window.innerWidth, window.innerHeight);
+    const size = calcCanvasSize();
+    const canvas = createCanvas(size.width, size.height);
     canvas.parent('canvas-container');
-    fillLayer = createGraphics(window.innerWidth, window.innerHeight);
+    fillLayer = createGraphics(size.width, size.height);
     fillLayer.pixelDensity(1);
     feedbackElem = document.getElementById('instruction-panel');
     document.getElementById('tool-select').addEventListener('change', e => {
@@ -233,10 +251,6 @@ function setup() {
     document.querySelectorAll('.flash-btn').forEach(btn => {
         btn.addEventListener('click', () => showFlashcard(btn.dataset.term));
     });
-    const advBtn = document.getElementById('advanced-info-btn');
-    if(advBtn){
-        advBtn.addEventListener('click', showAdvancedInfo);
-    }
     const brainBtn = document.getElementById('brain-btn');
     if(brainBtn){
         brainBtn.addEventListener('click', showAdvancedInfo);
@@ -266,9 +280,10 @@ function setup() {
 }
 
 function windowResized() {
-    resizeCanvas(window.innerWidth, window.innerHeight);
+    const size = calcCanvasSize();
+    resizeCanvas(size.width, size.height);
     if(fillLayer){
-        fillLayer.resizeCanvas(window.innerWidth, window.innerHeight);
+        fillLayer.resizeCanvas(size.width, size.height);
     }
     positionInstructionPanel();
 }
@@ -786,10 +801,15 @@ function startKidsMode(){
     document.getElementById('canvas-container').style.display = 'block';
     document.getElementById('prev-activity').style.display = 'inline-block';
     document.getElementById('next-activity').style.display = 'inline-block';
-    resizeCanvas(window.innerWidth, window.innerHeight);
+    const size = calcCanvasSize();
+    resizeCanvas(size.width, size.height);
+    if(fillLayer){
+        fillLayer.resizeCanvas(size.width, size.height);
+    }
     triangleGuide = {};
     setupKidsActivities();
     loadKidsActivity(0);
+    updateBrainButton();
     positionInstructionPanel();
 }
 
@@ -801,8 +821,13 @@ function startAdvancedMode(){
     document.getElementById('canvas-container').style.display = 'block';
     document.getElementById('prev-activity').style.display = 'none';
     document.getElementById('next-activity').style.display = 'none';
-    resizeCanvas(window.innerWidth, window.innerHeight);
+    const size = calcCanvasSize();
+    resizeCanvas(size.width, size.height);
+    if(fillLayer){
+        fillLayer.resizeCanvas(size.width, size.height);
+    }
     feedbackElem.textContent = '';
+    updateBrainButton();
     positionInstructionPanel();
 }
 
@@ -1098,6 +1123,7 @@ function loadKidsActivity(i){
     document.getElementById('prev-activity').disabled = i === 0;
     document.getElementById('next-activity').disabled = i === kidsActivities.length - 1;
     saveState();
+    updateBrainButton();
 }
 
 function checkKidsActivity(){
