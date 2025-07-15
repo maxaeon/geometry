@@ -20,6 +20,18 @@ let showGrid = true;
 let triangleGuide = {};
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
 
+function showTutorial(){
+    const steps = [
+        'Use the tool buttons to draw points, circles or lines.',
+        'Select a shape and press Delete to remove it.',
+        'Use the \u232b button to clear the entire canvas.',
+        'Back and Next navigate activities for kids mode.'
+    ];
+    for(const msg of steps){
+        alert(msg);
+    }
+}
+
 function setTool(tool){
     currentTool = tool;
     lineDashed = tool === 'dotted';
@@ -83,6 +95,13 @@ function redo(){
         selectedShape = null;
         drawingShape = null;
     }
+}
+
+function animatePageTurn(dir){
+    const c = document.getElementById('canvas-container');
+    const cls = dir === 'next' ? 'turn-forward' : 'turn-back';
+    c.classList.add(cls);
+    setTimeout(() => c.classList.remove(cls), 500);
 }
 
 function setup() {
@@ -153,11 +172,13 @@ function setup() {
 
     document.getElementById('next-activity').addEventListener('click', () => {
         if(currentActivity < kidsActivities.length - 1){
+            animatePageTurn('next');
             loadKidsActivity(currentActivity + 1);
         }
     });
     document.getElementById('prev-activity').addEventListener('click', () => {
         if(currentActivity > 0){
+            animatePageTurn('prev');
             loadKidsActivity(currentActivity - 1);
         }
     });
@@ -682,6 +703,9 @@ function startKidsMode(){
     triangleGuide = {};
     setupKidsActivities();
     loadKidsActivity(0);
+    if(confirm('Show a quick tutorial of the controls?')){
+        showTutorial();
+    }
 }
 
 function startAdvancedMode(){
@@ -694,6 +718,9 @@ function startAdvancedMode(){
     document.getElementById('next-activity').style.display = 'none';
     resizeCanvas(window.innerWidth, window.innerHeight);
     feedbackElem.textContent = '';
+    if(confirm('Show a quick tutorial of the controls?')){
+        showTutorial();
+    }
 }
 
 function setupKidsActivities(){
