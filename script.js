@@ -1438,7 +1438,7 @@ function setupKidsActivities(){
         },
         {
             id: 'draw-square',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Construct a Square',
             prompt: 'Connect the 4 red points to make a square.',
             setup: function(){
@@ -1473,7 +1473,7 @@ function setupKidsActivities(){
         },
         {
             id: 'cube-dotted',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Sketch a Cube',
             prompt: 'Use dotted line segments from each corner so the square looks like a 3-D cube.',
             keepShapes: true,
@@ -1514,7 +1514,7 @@ function setupKidsActivities(){
         },
         {
             id: 'triangle-equal',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equal Sides Triangle',
             prompt: 'Use line segments to connect the 3 red points into a triangle. A triangle is a polygon, a closed shape made from line segments. Can you make two line segments equal?',
             setup: function(){
@@ -1556,7 +1556,7 @@ function setupKidsActivities(){
         },
         {
             id: 'triangle-dotted-base',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Dotted Triangle Base',
             prompt: 'Use a dotted line segment to complete the base of the triangle.',
             setup: function(){
@@ -1642,7 +1642,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-point-a',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equilateral: Point A',
             prompt: 'Place the first point (point A) anywhere on the canvas.',
             keepShapes: false,
@@ -1662,7 +1662,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-circle-a',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equilateral: Circle A',
             prompt: 'Draw a circle centered at point A.',
             keepShapes: true,
@@ -1686,7 +1686,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-point-b',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equilateral: Point B',
             prompt: 'Place a second point (point B) on the circle\u2019s circumference.',
             keepShapes: true,
@@ -1712,7 +1712,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-circle-b',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equilateral: Circle B',
             prompt: 'Draw a second circle centered at B with the same radius as the first.',
             keepShapes: true,
@@ -1735,7 +1735,7 @@ function setupKidsActivities(){
         },
         {
             id: 'equilateral-connect',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Equilateral: Connect Points',
             prompt: 'Mark the intersection of both circles as point C and connect A-B-C with line segments.',
             keepShapes: true,
@@ -1904,7 +1904,7 @@ function setupKidsActivities(){
         },
         {
             id: 'rectangle-from-triangles',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Rectangle from Triangles',
             prompt: 'Combine two triangles to form a rectangle using the four dots.',
             setup: function(){
@@ -2057,7 +2057,7 @@ function setupKidsActivities(){
         },
         {
             id: 'shape-name-clicks',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Name That Shape',
             prompt: 'Click the circle, square, and triangle to name each shape.',
             setup: function(){
@@ -2095,7 +2095,7 @@ function setupKidsActivities(){
         },
         {
             id: 'shape-identify-sequence',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Shape Identification',
             prompt: 'Click the circle.',
             setup: function(){
@@ -2145,7 +2145,7 @@ function setupKidsActivities(){
         },
         {
             id: 'compose-house',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Compose Shapes',
             prompt: 'Use the dots to build a house shape.',
             setup: function(){
@@ -2173,7 +2173,7 @@ function setupKidsActivities(){
         },
         {
             id: 'shape-attributes',
-            category: 'Shapes',
+            category: 'More About Shapes',
             title: 'Shape Attributes',
             prompt: 'Click the shape with 3 sides.',
             setup: function(){
