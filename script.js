@@ -439,6 +439,7 @@ function windowResized() {
 }
 
 function mousePressed() {
+    if(!isMouseOnCanvas()) return;
     if (mouseButton !== LEFT) return;
     if(mode==='kids'){
         const act = kidsActivities[currentActivity];
@@ -502,6 +503,7 @@ function mousePressed() {
 }
 
 function mouseDragged() {
+    if(!isMouseOnCanvas()) return;
     if (drawingShape) {
         if (drawingShape instanceof Circle) {
             drawingShape.r = dist(drawingShape.x, drawingShape.y, mouseX, mouseY);
@@ -527,6 +529,7 @@ function mouseDragged() {
 }
 
 function mouseReleased() {
+    if(!isMouseOnCanvas()) return;
     if(actionChanged){
         saveState();
         actionChanged = false;
@@ -718,6 +721,10 @@ function findShape(px,py){
         if(shapes[i].hitTest && shapes[i].hitTest(px,py)) return shapes[i];
     }
     return null;
+}
+
+function isMouseOnCanvas(){
+    return mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height;
 }
 
 function updateCursor(){
