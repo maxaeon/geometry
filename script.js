@@ -28,6 +28,10 @@ let similarityGuide = {};
 let similarityDemo = null;
 let identifyCenterStep = 0;
 let identifyCenterCircles = [];
+let shapeIdentify = {};
+let squareGuide = {};
+
+
 const CANVAS_PADDING_PCT = 0;
 let paletteColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', 'transparent'];
 let currentExample = null;
@@ -1975,7 +1979,7 @@ function setupKidsActivities(){
         },
         {
             id: 'draw-diameter',
-            category: 'Area & Perimeter',
+            category: 'More About Shapes',
             title: 'Draw a Diameter',
             prompt: 'Draw a line across the circle using the red points to cut it in half.',
             setup: function(){
@@ -2202,8 +2206,112 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'square-add-points',
+            category: 'More About Shapes',
+            title: 'Add Square Points',
+            prompt: 'Place four points at the corners of a square.',
+            setup: function(){
+                squareGuide = {
+                    pts: [
+                        {x: width/2 - 60, y: height/2 - 60},
+                        {x: width/2 + 60, y: height/2 - 60},
+                        {x: width/2 + 60, y: height/2 + 60},
+                        {x: width/2 - 60, y: height/2 + 60}
+                    ]
+                };
+            },
+            check: function(){
+                let count = 0;
+                for(const s of shapes){
+                    if(s instanceof Point){
+                        for(const p of squareGuide.pts){
+                            if(dist(s.x,s.y,p.x,p.y) < 10){
+                                count++; break;
+                            }
+                        }
+                    }
+                }
+                return count >= 4;
+            }
+        },
+        {
+            id: 'square-connect',
+            category: 'More About Shapes',
+            title: 'Connect the Square',
+            prompt: 'Connect the points to complete the square.',
+            keepShapes: true,
+            setup: function(){
+                if(squareGuide.pts){
+                    for(const p of squareGuide.pts){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                }
+            },
+            check: function(){
+                if(!squareGuide.pts) return false;
+                for(let i=0;i<4;i++){
+                    const j=(i+1)%4;
+                    if(!hasLineBetween(squareGuide.pts[i], squareGuide.pts[j])) return false;
+                }
+                return true;
+            }
+        },
+        {
+            id: 'polygon-add-points',
+            category: 'More About Shapes',
+            title: 'Add More Points',
+            prompt: 'Add extra points to make a new polygon.',
+            keepShapes: true,
+            setup: function(){
+                if(squareGuide.pts){
+                    for(const p of squareGuide.pts){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                }
+            },
+            check: function(){
+                let pointCount = 0;
+                for(const s of shapes){
+                    if(s instanceof Point) pointCount++;
+                }
+                return pointCount >= 5;
+            }
+        },
+        {
+            id: 'polygon-connect',
+            category: 'More About Shapes',
+            title: 'Connect the Polygon',
+            prompt: 'Connect all the points to finish your polygon.',
+            keepShapes: true,
+            setup: function(){
+                if(squareGuide.pts){
+                    for(const p of squareGuide.pts){
+                        shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    }
+                }
+            },
+            check: function(){
+                const pts = shapes.filter(s => s instanceof Point);
+                if(pts.length < 5) return false;
+                const counts = new Map(pts.map(p => [p,0]));
+                for(const seg of shapes){
+                    if(seg instanceof LineSeg){
+                        for(const p of pts){
+                            if(dist(seg.x1,seg.y1,p.x,p.y) < 10 || dist(seg.x2,seg.y2,p.x,p.y) < 10){
+                                counts.set(p, counts.get(p)+1);
+                            }
+                        }
+                    }
+                }
+                for(const v of counts.values()){
+                    if(v < 2) return false;
+                }
+                return true;
+            }
+        },
+        {
             id: 'fraction-square-quarters',
-            category: 'Area & Perimeter',
+            category: 'More About Shapes',
             title: 'Fractions with Shapes',
             prompt: 'Divide the square into 4 equal parts using line segments.',
             setup: function(){
