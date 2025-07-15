@@ -273,7 +273,7 @@ function setup() {
         currentExample = null;
         exampleShapes = [];
     });
-    document.getElementById('example-select').addEventListener('change', e => {
+    document.getElementById('activity-select').addEventListener('change', e => {
         loadExample(e.target.value);
         e.target.value = '';
     });
@@ -292,7 +292,7 @@ function setup() {
     document.addEventListener('keydown', e => {
         if(e.key === 'Escape'){
             closeDictionary();
-            closeExamples();
+            closeActivities();
             const adv = document.getElementById('advanced-overlay');
             if(adv) adv.style.display = 'none';
         } else if((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z'){
@@ -348,20 +348,20 @@ function setup() {
     if(brainBtn){
         brainBtn.addEventListener('click', showAdvancedInfo);
     }
-    const exBtn = document.getElementById('examples-btn');
+    const exBtn = document.getElementById('activities-btn');
     if(exBtn){
-        exBtn.addEventListener('click', openExamples);
+        exBtn.addEventListener('click', openActivities);
     }
-    const exClose = document.getElementById('examples-close');
+    const exClose = document.getElementById('activities-close');
     if(exClose){
-        exClose.addEventListener('click', closeExamples);
+        exClose.addEventListener('click', closeActivities);
     }
-    document.querySelectorAll('#examples-overlay .example-link').forEach(link => {
+    document.querySelectorAll('#activities-overlay .example-link').forEach(link => {
         link.addEventListener('click', e => {
             e.preventDefault();
             const kid = link.dataset.kid;
             const example = link.dataset.example;
-            closeExamples();
+            closeActivities();
             if(kid !== undefined){
                 if(mode !== 'kids') startKidsMode();
                 loadKidsActivity(parseInt(kid,10));
@@ -1762,15 +1762,15 @@ function closeDictionary(){
     }
 }
 
-function openExamples(){
-    const overlay = document.getElementById('examples-overlay');
+function openActivities(){
+    const overlay = document.getElementById('activities-overlay');
     if(overlay){
         overlay.style.display = 'flex';
     }
 }
 
-function closeExamples(){
-    const overlay = document.getElementById('examples-overlay');
+function closeActivities(){
+    const overlay = document.getElementById('activities-overlay');
     if(overlay){
         overlay.style.display = 'none';
     }
