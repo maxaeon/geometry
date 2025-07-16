@@ -195,9 +195,14 @@ let flashcardDefinitions = {
 function updateBrainButton(){
     const brainBtn = document.getElementById('brain-btn');
     if(!brainBtn) return;
-    const act = kidsActivities[currentActivity];
-    const info = act ? advancedInfo[act.id] : null;
-    if(mode === 'kids' && info){
+    let info = null;
+    if(mode === 'kids'){
+        const act = kidsActivities[currentActivity];
+        info = act ? advancedInfo[act.id] : null;
+    } else if(mode === 'advanced'){
+        info = advancedInfo[currentExample];
+    }
+    if(info){
         brainBtn.style.display = 'inline-block';
     } else {
         brainBtn.style.display = 'none';
@@ -3427,21 +3432,31 @@ function showAdvancedInfo(){
     const canvas = document.getElementById('advanced-canvas');
     if(!overlay || !formulaEl || !explEl || !canvas) return;
     explEl.style.display = 'none';
-    const act = kidsActivities[currentActivity];
-    const info = act ? advancedInfo[act.id] : null;
-    if(mode === 'kids' && info){
+    let act = null;
+    let info = null;
+    if(mode === 'kids'){
+        act = kidsActivities[currentActivity];
+        info = act ? advancedInfo[act.id] : null;
+    } else if(mode === 'advanced'){
+        info = advancedInfo[currentExample];
+    }
+    if(info){
         formulaEl.innerHTML = info.formula;
         explEl.textContent = info.explanation;
-        if(act.id === 'intro-plane'){
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            drawCubeImage(ctx);
-            canvas.style.display = 'block';
-        } else if(act.id === 'obtuse-angle'){
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            drawReflexAngleImage(ctx);
-            canvas.style.display = 'block';
+        if(mode === 'kids'){
+            if(act.id === 'intro-plane'){
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                drawCubeImage(ctx);
+                canvas.style.display = 'block';
+            } else if(act.id === 'obtuse-angle'){
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                drawReflexAngleImage(ctx);
+                canvas.style.display = 'block';
+            } else {
+                canvas.style.display = 'none';
+            }
         } else {
             canvas.style.display = 'none';
         }
