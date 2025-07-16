@@ -93,6 +93,7 @@ svg.shape {
     background: #f0f0f0;
     padding: 8px;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
     position: relative;
@@ -103,6 +104,7 @@ svg.shape {
 
 #tool-buttons {
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
 }
 
@@ -141,7 +143,8 @@ svg.shape {
 }
 
 #color-palette {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
     gap: 4px;
 }
 
@@ -449,3 +452,20 @@ body.kids #skip-activity {
     margin: 4px 0;
 }
 
+@media (max-width: 600px) {
+    #toolbar {
+        gap: 4px;
+        padding: 4px;
+    }
+    #tool-buttons {
+        gap: 2px;
+    }
+    #color-palette {
+        grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
+        gap: 2px;
+    }
+    .color-swatch {
+        width: 16px;
+        height: 16px;
+    }
+}
