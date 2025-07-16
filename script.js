@@ -2706,33 +2706,9 @@ function setupKidsActivities(){
                     }
                 }
                 const pts = shapes.filter(p => p instanceof Point);
-                if(pts.length < 3) return false;
-                const counts = new Map(pts.map(p=>[p,0]));
-                function near(p,x,y){ return dist(p.x,p.y,x,y) < 10; }
-                for(const seg of shapes){
-                    if(seg instanceof LineSeg){
-                        let p1=null, p2=null;
-                        for(const p of pts){
-                            if(near(p,seg.x1,seg.y1)) p1=p;
-                            if(near(p,seg.x2,seg.y2)) p2=p;
-                        }
-                        if(p1 && p2 && p1!==p2){
-                            counts.set(p1, counts.get(p1)+1);
-                            counts.set(p2, counts.get(p2)+1);
-                        }
-                    }
-                }
-                for(const v of counts.values()) if(v < 2) return false;
-                const arr = Array.from(counts.keys());
-                const cx = arr.reduce((s,p)=>s+p.x,0)/arr.length;
-                const cy = arr.reduce((s,p)=>s+p.y,0)/arr.length;
-                arr.sort((a,b)=>Math.atan2(a.y-cy,a.x-cx)-Math.atan2(b.y-cy,b.x-cx));
-                let area = 0;
-                for(let i=0;i<arr.length;i++){
-                    const j=(i+1)%arr.length;
-                    area += arr[i].x*arr[j].y - arr[j].x*arr[i].y;
-                }
-                area = Math.abs(area)/2;
+                const segs = shapes.filter(s => s instanceof LineSeg);
+                const area = calculatePolygonArea(pts, segs);
+                if(area === null) return false;
                 const units = (area/(25*25)).toFixed(1);
                 feedbackElem.textContent = 'Area \u2248 ' + units + ' square units';
                 return true;
@@ -3559,6 +3535,35 @@ function calculatePolygonPerimeter(points, segments){
     }
     if(visited.size !== points.length) return null;
     return perim;
+}
+
+function calculatePolygonArea(points, segments){
+    if(points.length < 3) return null;
+    const near = (p, x, y) => dist(p.x, p.y, x, y) < 10;
+    const counts = new Map(points.map(p => [p, 0]));
+    for (const seg of segments) {
+        if (!(seg instanceof LineSeg)) continue;
+        let p1 = null, p2 = null;
+        for (const pt of points) {
+            if (!p1 && near(pt, seg.x1, seg.y1)) p1 = pt;
+            if (!p2 && near(pt, seg.x2, seg.y2)) p2 = pt;
+        }
+        if (p1 && p2 && p1 !== p2) {
+            counts.set(p1, counts.get(p1) + 1);
+            counts.set(p2, counts.get(p2) + 1);
+        }
+    }
+    for (const v of counts.values()) if (v < 2) return null;
+    const arr = Array.from(counts.keys());
+    const cx = arr.reduce((s, p) => s + p.x, 0) / arr.length;
+    const cy = arr.reduce((s, p) => s + p.y, 0) / arr.length;
+    arr.sort((a, b) => Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx));
+    let area = 0;
+    for (let i = 0; i < arr.length; i++) {
+        const j = (i + 1) % arr.length;
+        area += arr[i].x * arr[j].y - arr[j].x * arr[i].y;
+    }
+    return Math.abs(area) / 2;
 }
 
 function calculateCircleCircumference(radius){
