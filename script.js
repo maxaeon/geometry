@@ -562,7 +562,7 @@ function windowResized() {
 function mousePressed() {
     if(!isMouseOnCanvas()) return;
     if (mouseButton !== LEFT) return;
-    if(mode==='kids'){
+    if(mode==='kids' || mode === 'advanced'){
         const act = kidsActivities[currentActivity];
         if(act && act.id === 'identify-centers'){
             for(const s of shapes){
