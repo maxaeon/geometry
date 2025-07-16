@@ -30,6 +30,7 @@ let identifyCenterStep = 0;
 let identifyCenterCircles = [];
 let shapeIdentify = {};
 let squareGuide = {};
+let perimeterGuide = {};
 
 
 const CANVAS_PADDING_PCT = 0;
@@ -160,6 +161,18 @@ let advancedInfo = {
     'shape-attributes': {
         formula: 'Triangle=3 sides, square=4, pentagon=5',
         explanation: 'Counting sides lets us identify different polygons.'
+    },
+    'polygon-perimeter': {
+        formula: 'Perimeter = sum of side lengths',
+        explanation: 'Add up each side to find the distance around the polygon.'
+    },
+    'circle-circumference': {
+        formula: 'Circumference = 2πr',
+        explanation: 'A circle\'s perimeter equals its radius times 2π.'
+    },
+    'shape-area': {
+        formula: 'Circle area = πr²; polygon area from its vertices',
+        explanation: 'Area measures the space inside a shape.'
     }
 };
 
@@ -2334,6 +2347,107 @@ function setupKidsActivities(){
             },
             check: function(){
                 return hasLineBetween(this.left,this.right) && hasLineBetween(this.top,this.bottom);
+            }
+        },
+        {
+            id: 'polygon-perimeter',
+            category: 'More About Shapes',
+            title: 'Polygon Perimeter',
+            prompt: 'Draw a closed polygon. We\'ll add the side lengths to find its perimeter.',
+            keepShapes: true,
+            setup: function(){
+                perimeterGuide = {};
+            },
+            check: function(){
+                const pts = shapes.filter(s => s instanceof Point);
+                const segs = shapes.filter(s => s instanceof LineSeg);
+                if(pts.length < 3) return false;
+                const counts = new Map(pts.map(p => [p,0]));
+                for(const seg of segs){
+                    for(const p of pts){
+                        if(dist(seg.x1,seg.y1,p.x,p.y) < 10 || dist(seg.x2,seg.y2,p.x,p.y) < 10){
+                            counts.set(p, counts.get(p)+1);
+                        }
+                    }
+                }
+                for(const v of counts.values()) if(v < 2) return false;
+                let perim = 0;
+                for(const seg of segs){
+                    perim += dist(seg.x1,seg.y1,seg.x2,seg.y2);
+                }
+                if(!perimeterGuide.perimeterShown){
+                    perimeterGuide.shape = 'polygon';
+                    perimeterGuide.perimeter = perim/25;
+                    feedbackElem.textContent = 'Add the sides together. Perimeter \u2248 ' + perimeterGuide.perimeter.toFixed(1) + ' units.';
+                    perimeterGuide.perimeterShown = true;
+                }
+                return true;
+            }
+        },
+        {
+            id: 'circle-circumference',
+            category: 'More About Shapes',
+            title: 'Circle Circumference',
+            prompt: 'Draw a circle and we\'ll compute 2\u03C0r for its circumference.',
+            keepShapes: true,
+            setup: function(){},
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Circle && s.r > 10){
+                        if(!perimeterGuide.circumferenceShown){
+                            const rUnits = s.r/25;
+                            perimeterGuide.shape = 'circle';
+                            perimeterGuide.circle = s;
+                            perimeterGuide.circumference = 2*Math.PI*rUnits;
+                            feedbackElem.textContent = 'Circumference \u2248 ' + perimeterGuide.circumference.toFixed(1) + ' units using 2\u03C0r.';
+                            perimeterGuide.circumferenceShown = true;
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            id: 'shape-area',
+            category: 'More About Shapes',
+            title: 'Shape Area',
+            prompt: 'Now compute the area for your polygon or circle.',
+            keepShapes: true,
+            setup: function(){},
+            check: function(){
+                if(perimeterGuide.shape === 'circle' && perimeterGuide.circle){
+                    const rUnits = perimeterGuide.circle.r/25;
+                    const area = Math.PI*rUnits*rUnits;
+                    feedbackElem.textContent = 'Area = \u03C0r\u00B2 \u2248 ' + area.toFixed(1) + ' square units.';
+                    return true;
+                }
+                const pts = shapes.filter(s => s instanceof Point);
+                const segs = shapes.filter(s => s instanceof LineSeg);
+                if(pts.length < 3 || segs.length < 3) return false;
+                const counts = new Map(pts.map(p => [p,0]));
+                for(const seg of segs){
+                    for(const p of pts){
+                        if(dist(seg.x1,seg.y1,p.x,p.y) < 10 || dist(seg.x2,seg.y2,p.x,p.y) < 10){
+                            counts.set(p, counts.get(p)+1);
+                        }
+                    }
+                }
+                for(const v of counts.values()) if(v < 2) return false;
+                let centroid = {x:0, y:0};
+                pts.forEach(p => { centroid.x += p.x; centroid.y += p.y; });
+                centroid.x /= pts.length; centroid.y /= pts.length;
+                const ordered = pts.slice().sort((a,b)=>{
+                    return Math.atan2(a.y-centroid.y,a.x-centroid.x) - Math.atan2(b.y-centroid.y,b.x-centroid.x);
+                });
+                let area=0;
+                for(let i=0;i<ordered.length;i++){
+                    const j=(i+1)%ordered.length;
+                    area += ordered[i].x*ordered[j].y - ordered[j].x*ordered[i].y;
+                }
+                area = Math.abs(area)/2/(25*25);
+                feedbackElem.textContent = 'Approximate area \u2248 ' + area.toFixed(1) + ' square units.';
+                return true;
             }
         },
         {
