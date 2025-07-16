@@ -151,6 +151,14 @@ let advancedInfo = {
         formula: 'Angles in a triangle sum to 180°',
         explanation: 'A triangle has three vertices whose interior angles always add up to 180°.'
     },
+    'triangle-scalene': {
+        formula: 'Scalene triangle → no equal sides',
+        explanation: 'All three sides are different lengths so each angle is unique.'
+    },
+    'triangle-angle-classify': {
+        formula: 'Acute < 90°; Right = 90°; Obtuse > 90°',
+        explanation: 'Triangles are named by their largest angle as acute, right, or obtuse.'
+    },
     'acute-angle': {
         formula: 'Acute angle < 90°',
         explanation: 'Angles smaller than a right angle are called acute.'
@@ -237,7 +245,11 @@ let flashcardDefinitions = {
     'dimension': 'A measurable extent like length, width, or height.',
     'congruent triangles': 'Triangles that are identical in size and shape.',
     'SSS criterion': 'If all three sides of one triangle match those of another, the triangles are congruent.',
-    'corresponding sides': 'Matching sides in congruent triangles.'
+    'corresponding sides': 'Matching sides in congruent triangles.',
+    'scalene triangle': 'A triangle with no equal sides.',
+    'right triangle': 'A triangle containing a 90\u00b0 angle.',
+    'acute triangle': 'A triangle where all angles are less than 90\u00b0.',
+    'obtuse triangle': 'A triangle with one angle greater than 90\u00b0.'
 };
 
 function updateBrainButton(){
@@ -2311,6 +2323,90 @@ function setupKidsActivities(){
                     if(s instanceof Circle && s.clickable && !s.clicked) return false;
                 }
                 return true;
+            }
+        },
+        {
+            id: 'triangle-scalene',
+            category: 'Basics',
+            title: 'Scalene Triangle',
+            prompt: 'Connect the red points to form a triangle with all sides unequal.',
+            setup: function(){
+                this.pts = [
+                    {x: width/2 - 100, y: height/2 + 80},
+                    {x: width/2 + 60, y: height/2 + 40},
+                    {x: width/2 + 20, y: height/2 - 90}
+                ];
+                for(const p of this.pts){
+                    shapes.push(new Point(p.x, p.y, 'magenta'));
+                }
+            },
+            check: function(){
+                if(triangleLinesDrawn(this.pts)){
+                    const [a,b,c] = this.pts;
+                    const l1 = dist(a.x,a.y,b.x,b.y);
+                    const l2 = dist(b.x,b.y,c.x,c.y);
+                    const l3 = dist(c.x,c.y,a.x,a.y);
+                    const tol = 10;
+                    return Math.abs(l1-l2)>tol && Math.abs(l2-l3)>tol && Math.abs(l3-l1)>tol;
+                }
+                return false;
+            }
+        },
+        {
+            id: 'triangle-angle-classify',
+            category: 'Basics',
+            title: 'Triangle Angle Types',
+            prompt: 'Click the acute triangle.',
+            setup: function(){
+                const cx = width/2;
+                const cy = height/2;
+                const gap = 150;
+                this.step = 0;
+                this.shapes = {};
+                const aPts = [
+                    {x: cx - gap - 40, y: cy + 50},
+                    {x: cx - gap + 40, y: cy + 50},
+                    {x: cx - gap, y: cy - 60}
+                ];
+                for(let i=0;i<3;i++) shapes.push(new LineSeg(aPts[i].x,aPts[i].y,aPts[(i+1)%3].x,aPts[(i+1)%3].y));
+                const acuteDot = new Circle(cx - gap, cy, 8, 'gray', true);
+                shapes.push(acuteDot);
+                this.shapes.acute = acuteDot;
+
+                const rPts = [
+                    {x: cx - 40, y: cy + 60},
+                    {x: cx + 40, y: cy + 60},
+                    {x: cx + 40, y: cy - 20}
+                ];
+                for(let i=0;i<3;i++) shapes.push(new LineSeg(rPts[i].x,rPts[i].y,rPts[(i+1)%3].x,rPts[(i+1)%3].y));
+                const rightDot = new Circle(cx, cy, 8, 'gray', true);
+                shapes.push(rightDot);
+                this.shapes.right = rightDot;
+
+                const oPts = [
+                    {x: cx + gap - 50, y: cy + 60},
+                    {x: cx + gap + 50, y: cy + 60},
+                    {x: cx + gap - 10, y: cy - 20}
+                ];
+                for(let i=0;i<3;i++) shapes.push(new LineSeg(oPts[i].x,oPts[i].y,oPts[(i+1)%3].x,oPts[(i+1)%3].y));
+                const obtuseDot = new Circle(cx + gap, cy, 8, 'gray', true);
+                shapes.push(obtuseDot);
+                this.shapes.obtuse = obtuseDot;
+                feedbackElem.textContent = 'Click the acute triangle.';
+            },
+            check: function(){
+                const order = ['acute','right','obtuse'];
+                if(this.step < order.length){
+                    const name = order[this.step];
+                    if(this.shapes[name].clicked){
+                        this.step++;
+                        if(this.step < order.length){
+                            const nextMsg = this.step===1 ? 'Click the right triangle.' : 'Click the obtuse triangle.';
+                            feedbackElem.textContent = nextMsg;
+                        }
+                    }
+                }
+                return this.step >= order.length;
             }
         },
         {
