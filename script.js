@@ -31,6 +31,7 @@ let identifyCenterStep = 0;
 let identifyCenterCircles = [];
 let shapeIdentify = {};
 let squareGuide = {};
+let parallelGuide = {};
 let compassPoints = [];
 
 
@@ -74,6 +75,10 @@ let advancedInfo = {
     'parallel-through-point': {
         formula: "Euclid's Fifth Postulate",
         explanation: 'Through a point not on a line, exactly one line can be drawn parallel to the given line.'
+    },
+    'parallel-lines': {
+        formula: "Euclid's Fifth Postulate",
+        explanation: 'Corresponding and alternate interior angles prove the constructed line is parallel.'
     },
     'pythagorean': {
         formula: 'c² = a² + b²',
@@ -2963,59 +2968,96 @@ function setupAdvancedExamples(){
         ],
         'parallel-lines': [
             {
-                prompt: 'Draw two parallel lines through the points.',
+                prompt: 'Use the line tool to draw a horizontal line through points A and B.',
                 setup: function(){
-                    const y1=height/2-60, y2=height/2+60;
-                    const x1=width/2-120, x2=width/2+120;
-                    this.pairs=[[{x:x1,y:y1},{x:x2,y:y1}],[{x:x1,y:y2},{x:x2,y:y2}]];
-                    for(const pair of this.pairs){
-                        for(const p of pair){
-                            shapes.push(new Circle(p.x,p.y,6,'magenta'));
+                    const y = height/2 + 40;
+                    const x1 = width/2 - 120, x2 = width/2 + 120;
+                    parallelGuide = {};
+                    parallelGuide.A = {x:x1, y:y};
+                    parallelGuide.B = {x:x2, y:y};
+                    parallelGuide.base = {x1:x1, y1:y, x2:x2, y2:y};
+                    shapes.push(new Point(x1, y, 'magenta', 'A'));
+                    shapes.push(new Point(x2, y, 'magenta', 'B'));
+                },
+                check: function(){
+                    return hasLineBetween(parallelGuide.A, parallelGuide.B);
+                }
+            },
+            {
+                prompt: 'Place point C above line AB.',
+                keepShapes: true,
+                setup: function(){
+                    const x = width/2 - 40;
+                    const y = parallelGuide.A.y - 80;
+                    parallelGuide.C = {x:x, y:y};
+                    shapes.push(new Circle(x, y, 6, 'magenta', 'C'));
+                },
+                check: function(){
+                    for(const s of shapes){
+                        if(s instanceof Point && dist(s.x,s.y,parallelGuide.C.x,parallelGuide.C.y) < 10){
+                            return true;
                         }
                     }
-                },
-                check: function(){
-                    return hasLineBetween(this.pairs[0][0],this.pairs[0][1]) && hasLineBetween(this.pairs[1][0],this.pairs[1][1]);
+                    return false;
                 }
             },
             {
-                prompt: 'Add a transversal connecting the new points.',
+                prompt: 'Draw a line through C intersecting AB at point D.',
                 keepShapes: true,
                 setup: function(){
-                    const tx=width/2, ty1=height/2-100, ty2=height/2+100;
-                    this.p1={x:tx,y:ty1};
-                    this.p2={x:tx,y:ty2};
-                    shapes.push(new Circle(tx,ty1,6,'magenta'));
-                    shapes.push(new Circle(tx,ty2,6,'magenta'));
+                    const x = width/2 + 40;
+                    const y = parallelGuide.A.y;
+                    parallelGuide.D = {x:x, y:y};
+                    shapes.push(new Circle(x, y, 6, 'magenta', 'D'));
                 },
                 check: function(){
-                    return hasLineBetween(this.p1,this.p2);
+                    return hasLineBetween(parallelGuide.C, parallelGuide.D);
                 }
             },
             {
-                prompt: 'Parallel lines with a transversal create equal angles.',
+                prompt: 'Use the compass tool to copy \u2220CDAB to point C.',
                 keepShapes: true,
                 setup: function(){},
-                check: function(){return true;}
+                check: function(){
+                    for(const s of shapes){
+                        if(s instanceof AngleSnapshot && dist(s.x,s.y,parallelGuide.C.x,parallelGuide.C.y) < 10){
+                            return true;
+                        }
+                    }
+                    return false;
+                }
             },
             {
-                prompt: 'Identify the alternate interior angles by clicking the circles.',
+                prompt: 'Draw the new parallel line through C and label it EF.',
                 keepShapes: true,
                 setup: function(){
-                    const midX = width/2;
-                    const midY = height/2;
-                    this.a1 = new Circle(midX - 40, midY - 20, 8, 'gray', true);
-                    this.a2 = new Circle(midX + 40, midY + 20, 8, 'gray', true);
-                    shapes.push(this.a1, this.a2);
+                    const y = parallelGuide.C.y;
+                    const x1 = width/2 - 120, x2 = width/2 + 120;
+                    parallelGuide.E = {x:x1, y:y};
+                    parallelGuide.F = {x:x2, y:y};
+                    shapes.push(new Circle(x1, y, 6, 'magenta', 'E'));
+                    shapes.push(new Circle(x2, y, 6, 'magenta', 'F'));
                 },
                 check: function(){
-                    return this.a1.clicked && this.a2.clicked;
+                    if(hasLineBetween(parallelGuide.E, parallelGuide.F)){
+                        const seg = {x1: parallelGuide.E.x, y1: parallelGuide.E.y, x2: parallelGuide.F.x, y2: parallelGuide.F.y};
+                        return lineThroughPoint(seg, parallelGuide.C);
+                    }
+                    return false;
                 }
             },
             {
-                prompt: 'Great! Those are alternate interior angles.',
+                prompt: 'Lines AB and EF are parallel because corresponding and alternate interior angles are congruent.',
                 keepShapes: true,
-                setup: function(){},
+                setup: function(){
+                    const d = parallelGuide.D;
+                    const c = parallelGuide.C;
+                    const off = 40;
+                    shapes.push(new AngleSnapshot(d, {x:d.x-off, y:d.y}, c, 'orange', 2));
+                    shapes.push(new AngleSnapshot(c, {x:c.x-off, y:c.y}, d, 'orange', 2));
+                    shapes.push(new AngleSnapshot(d, c, {x:d.x+off, y:d.y}, 'green', 2));
+                    shapes.push(new AngleSnapshot(c, d, {x:c.x+off, y:c.y}, 'green', 2));
+                },
                 check: function(){return true;}
             }
         ]
