@@ -191,6 +191,22 @@ let advancedInfo = {
         formula: 'AA ⇒ proportional sides',
         explanation: 'Two equal angles guarantee triangles have the same shape. Their corresponding sides scale by a constant ratio.'
     },
+    'square-add-points': {
+        formula: '4 vertices → 4 edges',
+        explanation: 'Place a point at each corner. These vertices mark where the square\'s edges will meet.'
+    },
+    'square-connect': {
+        formula: 'Edges join vertices',
+        explanation: 'Connect the corner points so each edge links two vertices at right angles, completing the square.'
+    },
+    'polygon-add-points': {
+        formula: 'More vertices create more sides',
+        explanation: 'Extra points become vertices. When connected in order they form the edges of a new polygon.'
+    },
+    'polygon-connect': {
+        formula: 'Closed shape = polygon',
+        explanation: 'A polygon forms when every vertex connects to two edges, creating a loop of straight segments.'
+    },
     'circle-theorem': {
         formula: '∠AOB = 2∠ACB',
         explanation: 'An inscribed angle measures half the central angle subtending the same arc, as shown with points A, B, C and center O.'

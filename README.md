@@ -39,6 +39,10 @@ This interactive geometry webpage is designed for users ranging from kindergarte
 * Utilizes JavaScript libraries such as p5.js or Paper.js for responsive and dynamic geometry interactions.
 * Continuous improvements in user experience, including visual feedback and interaction clarity.
 
+#### Vertices and Edges
+
+A **vertex** is a point where two edges meet. An **edge** is the line segment connecting one vertex to another. When several points are connected so every vertex links to two edges and the path closes, those edges form a polygon.
+
 #### Feedback and Contributions:
 
 * Feedback is welcome to help refine and enhance the project.
