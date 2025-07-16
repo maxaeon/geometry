@@ -181,7 +181,7 @@ let advancedInfo = {
     },
     'shape-area': {
         formula: 'Circle area = πr²',
-        explanation: 'Count grid squares for polygons or use πr² for circles.'
+        explanation: 'Close a polygon or draw a circle and the area will appear in square grid units. Use πr² for circles.'
     }
 };
 
@@ -2692,7 +2692,7 @@ function setupKidsActivities(){
             id: 'shape-area',
             category: 'More About Shapes',
             title: 'Shape Area',
-            prompt: 'Use your perimeter work to figure out the area of the shape.',
+            prompt: 'Draw a closed polygon or circle on the grid. As soon as you finish connecting the sides, the canvas will show its area in square grid units.',
             keepShapes: true,
             setup: function(){
                 showGrid = true;
