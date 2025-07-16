@@ -1732,8 +1732,9 @@ function setupKidsActivities(){
                 const x1 = width/2 - 60;
                 const x2 = width/2 + 60;
                 const y = height/2;
-                shapes.push(new Circle(x1, y, 6, 'magenta'));
-                shapes.push(new Circle(x2, y, 6, 'magenta'));
+                // Use non-interactive circles so only the line can be adjusted
+                shapes.push(new Circle(x1, y, 6, 'magenta', true));
+                shapes.push(new Circle(x2, y, 6, 'magenta', true));
             },
             check: function(){
                 const x1 = width/2 - 60;
