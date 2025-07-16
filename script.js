@@ -2207,7 +2207,7 @@ function setupKidsActivities(){
         },
         {
             id: 'square-add-points',
-            category: 'More About Shapes',
+            category: 'Basics',
             title: 'Add Square Points',
             prompt: 'Place four points at the corners of a square.',
             setup: function(){
@@ -2236,7 +2236,7 @@ function setupKidsActivities(){
         },
         {
             id: 'square-connect',
-            category: 'More About Shapes',
+            category: 'Basics',
             title: 'Connect the Square',
             prompt: 'Connect the points to complete the square.',
             keepShapes: true,
@@ -2258,7 +2258,7 @@ function setupKidsActivities(){
         },
         {
             id: 'polygon-add-points',
-            category: 'More About Shapes',
+            category: 'Basics',
             title: 'Add More Points',
             prompt: 'Add extra points to make a new polygon.',
             keepShapes: true,
@@ -2279,7 +2279,7 @@ function setupKidsActivities(){
         },
         {
             id: 'polygon-connect',
-            category: 'More About Shapes',
+            category: 'Basics',
             title: 'Connect the Polygon',
             prompt: 'Connect all the points to finish your polygon.',
             keepShapes: true,
