@@ -385,8 +385,15 @@ function setup() {
     document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
         btn.addEventListener('click', () => setTool(btn.dataset.tool));
     });
-    document.getElementById('color-input').addEventListener('input', e => {
+    const colorInput = document.getElementById('color-input');
+    const paletteEl = document.getElementById('color-palette');
+    colorInput.addEventListener('input', e => {
         currentColor = e.target.value;
+    });
+    colorInput.addEventListener('click', () => {
+        if(window.innerWidth <= 600 && paletteEl){
+            paletteEl.classList.toggle('show');
+        }
     });
     document.getElementById('thickness-input').addEventListener('input', e => {
         currentWeight = parseInt(e.target.value, 10) || 1;
@@ -1230,6 +1237,9 @@ function createColorPalette(){
             currentColor = color;
             if(color !== 'transparent'){
                 document.getElementById('color-input').value = color;
+            }
+            if(window.innerWidth <= 600 && palette){
+                palette.classList.remove('show');
             }
         });
         palette.appendChild(btn);
@@ -2508,7 +2518,10 @@ function setupKidsActivities(){
             },
             check: function(){
                 const pts = shapes.filter(s => s instanceof Point);
-                if(pts.length < 3) return false;
+                if(pts.length < 3){
+                    feedbackElem.textContent = '';
+                    return false;
+                }
                 const counts = new Map(pts.map(p => [p,0]));
                 let perimeter = 0;
                 function near(p,x,y){ return dist(p.x,p.y,x,y) < 10; }
@@ -2526,9 +2539,9 @@ function setupKidsActivities(){
                         }
                     }
                 }
-                for(const v of counts.values()) if(v < 2) return false;
                 const units = (perimeter/25).toFixed(1);
                 feedbackElem.textContent = 'Perimeter \u2248 ' + units + ' units';
+                for(const v of counts.values()) if(v < 2) return false;
                 return true;
             }
         },
@@ -2549,6 +2562,7 @@ function setupKidsActivities(){
                         return true;
                     }
                 }
+                feedbackElem.textContent = '';
                 return false;
             }
         },
@@ -2774,16 +2788,25 @@ function setupAdvancedExamples(){
         ],
         'circle-theorem': [
             {
-                prompt: 'Draw a circle with center O.',
+                prompt: 'Draw a circle and label its center O.',
                 setup: function(){
                     circleGuide = {};
                     showGrid = true;
-                    circleGuide.center = {x: width/2, y: height/2};
-                    circleGuide.radius = 120;
-                    shapes.push(new Circle(circleGuide.center.x, circleGuide.center.y, circleGuide.radius));
-                    shapes.push(new Point(circleGuide.center.x, circleGuide.center.y, 'blue', 'O'));
                 },
-                check: function(){ return true; }
+                check: function(){
+                    for(const s of shapes){
+                        if(s instanceof Circle && s.r > 10){
+                            for(const p of shapes){
+                                if(p instanceof Point && p.label === 'O' && dist(p.x,p.y,s.x,s.y) < 6){
+                                    circleGuide.center = {x:s.x,y:s.y};
+                                    circleGuide.radius = s.r;
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                }
             },
             {
                 prompt: 'Mark arc AB on the circumference.',
@@ -2892,7 +2915,17 @@ function setupAdvancedExamples(){
                 check: function(){return true;}
             },
             {
-                prompt: 'a^2 + b^2 equals c^2.',
+                prompt: 'Draw a matching triangle inside each square.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){
+                    const {A,B,C,squares} = pythGuide;
+                    if(!squares) return false;
+                    return trianglesInSquaresDrawn(A,B,C,squares);
+                }
+            },
+            {
+                prompt: 'Calculate to see that a^2 + b^2 equals c^2.',
                 keepShapes: true,
                 setup: function(){
                     const {A,B,C} = pythGuide;
@@ -2901,11 +2934,12 @@ function setupAdvancedExamples(){
                     pythGuide.c = dist(A.x,A.y,C.x,C.y);
                     feedbackElem.textContent =
                         `a² = ${Math.round(pythGuide.a**2)}, b² = ${Math.round(pythGuide.b**2)}, c² = ${Math.round(pythGuide.c**2)}`;
+                    drawInnerTrianglesOnSquares(A,B,C,pythGuide.squares);
                 },
                 check: function(){return true;}
             },
             {
-                prompt: 'Move the points to explore the relationship.',
+                prompt: 'Move the points to explore how the areas stay equal.',
                 keepShapes: true,
                 setup: function(){},
                 check: function(){return true;}
@@ -3226,6 +3260,25 @@ function drawSquaresOnTriangle(A,B,C){
     const sq2 = drawSquareOnSide(B,C,A);
     const sq3 = drawSquareOnSide(A,C,B);
     return {sq1, sq2, sq3};
+}
+
+function drawInnerTrianglesOnSquares(A,B,C,squares){
+    const tris = [];
+    const t1 = new TriangleGroup(A,B,squares.sq1[2],'purple');
+    const t2 = new TriangleGroup(B,C,squares.sq2[2],'purple');
+    const t3 = new TriangleGroup(A,C,squares.sq3[2],'purple');
+    tris.push(t1,t2,t3);
+    shapes.push(t1,t2,t3);
+    return tris;
+}
+
+function trianglesInSquaresDrawn(A,B,C,squares){
+    function triDone(sq,p1,p2){
+        const [s1,s2,s3,s4] = sq;
+        return (hasLineBetween(p1,s3)&&hasLineBetween(p2,s3)) ||
+               (hasLineBetween(p1,s4)&&hasLineBetween(p2,s4));
+    }
+    return triDone(squares.sq1,A,B) && triDone(squares.sq2,B,C) && triDone(squares.sq3,A,C);
 }
 
 function drawCube(x, y, size){

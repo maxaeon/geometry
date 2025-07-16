@@ -143,9 +143,13 @@ svg.shape {
 }
 
 #color-palette {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+    display: flex;
+    flex-wrap: nowrap;
     gap: 4px;
+}
+
+#color-palette.show {
+    display: flex;
 }
 
 .color-swatch {
@@ -461,8 +465,18 @@ body.kids #skip-activity {
         gap: 2px;
     }
     #color-palette {
-        grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
+        position: absolute;
+        top: 42px;
+        left: 8px;
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 4px;
+        display: none;
+        flex-wrap: wrap;
         gap: 2px;
+    }
+    #color-palette.show {
+        display: flex;
     }
     .color-swatch {
         width: 16px;
