@@ -2775,7 +2775,7 @@ function setupKidsActivities(){
             id: 'polygon-perimeter',
             category: 'More About Shapes',
             title: 'Polygon Perimeter',
-            prompt: 'Draw a closed polygon. The side lengths will be added automatically.',
+            prompt: 'Draw a closed polygon. Its perimeter shows up by adding all the side lengths.',
             setup: function(){
                 showGrid = true;
             },
@@ -2817,7 +2817,7 @@ function setupKidsActivities(){
             id: 'shape-area',
             category: 'More About Shapes',
             title: 'Shape Area',
-            prompt: 'Draw a closed polygon or circle on the grid. As soon as you finish connecting the sides, the canvas will show its area in square grid units.',
+            prompt: 'Draw a closed polygon or circle. The area appears in square units—count squares or use πr² for a circle.',
             keepShapes: true,
             setup: function(){
                 showGrid = true;
