@@ -25,6 +25,7 @@ let introGuide = {};
 let rightTriangleGuide = {};
 let pythGuide = {};
 let similarityGuide = {};
+let circleGuide = {};
 let similarityDemo = null;
 let identifyCenterStep = 0;
 let identifyCenterCircles = [];
@@ -2508,65 +2509,76 @@ function setupAdvancedExamples(){
         ],
         'circle-theorem': [
             {
-                prompt: 'Connect the three points on the circle.',
+                prompt: 'Draw a circle and label the center O.',
                 setup: function(){
-                    const c = new Circle(width/2,height/2,120);
-                    shapes.push(c);
-                    this.center = c;
-                    this.pts = [];
-                    const angles=[Math.PI/6,-Math.PI/6,Math.PI/2];
-                    for(const a of angles){
-                        const x=c.x+Math.cos(a)*c.r;
-                        const y=c.y+Math.sin(a)*c.r;
-                        const pt={x,y};
-                        this.pts.push(pt);
-                        shapes.push(new Circle(x,y,6,'magenta'));
+                    circleGuide = {};
+                    showGrid = true;
+                    circleGuide.center = {x: width/2, y: height/2};
+                    circleGuide.radius = 120;
+                    shapes.push(new Circle(circleGuide.center.x, circleGuide.center.y, circleGuide.radius));
+                    shapes.push(new Point(circleGuide.center.x, circleGuide.center.y, 'blue', 'O'));
+                },
+                check: function(){ return true; }
+            },
+            {
+                prompt: 'Mark points A and B on the circumference.',
+                keepShapes: true,
+                setup: function(){
+                    const c = circleGuide.center;
+                    const r = circleGuide.radius;
+                    circleGuide.A = {x: c.x + Math.cos(Math.PI/6)*r, y: c.y + Math.sin(Math.PI/6)*r};
+                    circleGuide.B = {x: c.x + Math.cos(-Math.PI/6)*r, y: c.y + Math.sin(-Math.PI/6)*r};
+                    shapes.push(new Point(circleGuide.A.x, circleGuide.A.y, 'magenta', 'A'));
+                    shapes.push(new Point(circleGuide.B.x, circleGuide.B.y, 'magenta', 'B'));
+                },
+                check: function(){ return true; }
+            },
+            {
+                prompt: 'Construct radii OA and OB to form \u2220AOB.',
+                keepShapes: true,
+                setup: function(){},
+                check: function(){
+                    const ok = hasLineBetween(circleGuide.center,circleGuide.A) &&
+                               hasLineBetween(circleGuide.center,circleGuide.B);
+                    if(ok){
+                        const ang = angleAt(circleGuide.A, circleGuide.center, circleGuide.B);
+                        circleGuide.central = ang;
+                        feedbackElem.textContent = `\u2220AOB = ${Math.round(toDegrees(ang))}\u00B0`;
                     }
-                },
-                check: function(){
-                    return triangleLinesDrawn(this.pts);
+                    return ok;
                 }
             },
             {
-                prompt: 'Add the angle on the same arc using the new point.',
+                prompt: 'Choose point C on the circle and connect it to A and B.',
                 keepShapes: true,
                 setup: function(){
-                    const a=-Math.PI/2;
-                    const c=this.center;
-                    const x=c.x+Math.cos(a)*c.r;
-                    const y=c.y+Math.sin(a)*c.r;
-                    this.extra={x,y};
-                    shapes.push(new Circle(x,y,6,'magenta'));
+                    const c = circleGuide.center;
+                    const r = circleGuide.radius;
+                    circleGuide.C = {x: c.x + Math.cos(Math.PI/2)*r, y: c.y + Math.sin(Math.PI/2)*r};
+                    shapes.push(new Point(circleGuide.C.x, circleGuide.C.y, 'magenta', 'C'));
                 },
                 check: function(){
-                    return hasLineBetween(this.pts[0],this.extra) && hasLineBetween(this.pts[1],this.extra);
+                    const ok = hasLineBetween(circleGuide.A,circleGuide.C) &&
+                               hasLineBetween(circleGuide.C,circleGuide.B);
+                    if(ok){
+                        const ang = angleAt(circleGuide.A, circleGuide.C, circleGuide.B);
+                        circleGuide.inscribed = ang;
+                        feedbackElem.textContent = `\u2220ACB = ${Math.round(toDegrees(ang))}\u00B0`;
+                    }
+                    return ok;
                 }
             },
             {
-                prompt: 'Angles subtended by the same arc are equal.',
+                prompt: 'Great! \u2220AOB is twice \u2220ACB.',
                 keepShapes: true,
                 setup: function(){},
-                check: function(){return true;}
-            },
-            {
-                prompt: 'Draw the diameter using the new magenta points.',
-                keepShapes: true,
-                setup: function(){
-                    const c = this.center;
-                    this.d1 = {x: c.x - c.r, y: c.y};
-                    this.d2 = {x: c.x + c.r, y: c.y};
-                    shapes.push(new Circle(this.d1.x,this.d1.y,6,'magenta'));
-                    shapes.push(new Circle(this.d2.x,this.d2.y,6,'magenta'));
-                },
                 check: function(){
-                    return hasLineBetween(this.d1,this.d2);
+                    const central = angleAt(circleGuide.A, circleGuide.center, circleGuide.B);
+                    const inscribed = angleAt(circleGuide.A, circleGuide.C, circleGuide.B);
+                    feedbackElem.textContent = `\u2220AOB \u2248 ${Math.round(toDegrees(central))}\u00B0, ` +
+                        `\u2220ACB \u2248 ${Math.round(toDegrees(inscribed))}\u00B0`;
+                    return Math.abs(central - 2*inscribed) < 0.1;
                 }
-            },
-            {
-                prompt: 'An angle subtended by a diameter is a right angle.',
-                keepShapes: true,
-                setup: function(){},
-                check: function(){return true;}
             }
         ],
         'pythagorean': [
@@ -2975,6 +2987,10 @@ function angleAt(a, b, c){
     let diff = Math.abs(ab - cb);
     if(diff > Math.PI) diff = Math.PI * 2 - diff;
     return diff;
+}
+
+function toDegrees(rad){
+    return rad * 180 / Math.PI;
 }
 
 function triangleAngles(pts){
