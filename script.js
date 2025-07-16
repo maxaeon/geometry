@@ -2008,8 +2008,14 @@ function setupKidsActivities(){
                 shapes.push(new Circle(leftX, y, 8, 'gray', true));
                 // obtuse example on right (not clickable)
                 const rightX = width/2 + 120;
+                const obtuse = 3 * Math.PI / 4; // clearly obtuse
                 shapes.push(new LineSeg(rightX, y, rightX - len, y));
-                shapes.push(new LineSeg(rightX, y, rightX - len * Math.cos(Math.PI/4), y - len * Math.sin(Math.PI/4)));
+                shapes.push(new LineSeg(
+                    rightX,
+                    y,
+                    rightX - len * Math.cos(obtuse),
+                    y - len * Math.sin(obtuse)
+                ));
                 shapes.push(new Circle(rightX, y, 8, 'gray'));
             },
             check: function(){
