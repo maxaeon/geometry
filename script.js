@@ -2650,36 +2650,20 @@ function setupKidsActivities(){
             id: 'polygon-perimeter',
             category: 'More About Shapes',
             title: 'Polygon Perimeter',
-            prompt: 'Draw a closed polygon. When finished we\'ll add up the side lengths.',
+            prompt: 'Draw a closed polygon. The side lengths will be added automatically.',
             setup: function(){
                 showGrid = true;
             },
             check: function(){
                 const pts = shapes.filter(s => s instanceof Point);
-                if(pts.length < 3){
+                const segs = shapes.filter(s => s instanceof LineSeg);
+                const p = calculatePolygonPerimeter(pts, segs);
+                if(p === null){
                     feedbackElem.textContent = '';
                     return false;
                 }
-                const counts = new Map(pts.map(p => [p,0]));
-                let perimeter = 0;
-                function near(p,x,y){ return dist(p.x,p.y,x,y) < 10; }
-                for(const seg of shapes){
-                    if(seg instanceof LineSeg){
-                        let p1=null, p2=null;
-                        for(const p of pts){
-                            if(near(p,seg.x1,seg.y1)) p1=p;
-                            if(near(p,seg.x2,seg.y2)) p2=p;
-                        }
-                        if(p1 && p2 && p1!==p2){
-                            counts.set(p1, counts.get(p1)+1);
-                            counts.set(p2, counts.get(p2)+1);
-                            perimeter += dist(seg.x1, seg.y1, seg.x2, seg.y2);
-                        }
-                    }
-                }
-                const units = (perimeter/25).toFixed(1);
+                const units = (p/25).toFixed(1);
                 feedbackElem.textContent = 'Perimeter \u2248 ' + units + ' units';
-                for(const v of counts.values()) if(v < 2) return false;
                 return true;
             }
         },
@@ -2687,7 +2671,7 @@ function setupKidsActivities(){
             id: 'circle-circumference',
             category: 'More About Shapes',
             title: 'Circle Circumference',
-            prompt: 'Draw a circle and see 2\u03C0r in units.',
+            prompt: 'Draw a circle to automatically see its 2\u03C0r circumference in units.',
             setup: function(){
                 showGrid = true;
             },
@@ -2695,7 +2679,7 @@ function setupKidsActivities(){
                 for(const s of shapes){
                     if(s instanceof Circle && s.r > 5){
                         const rUnits = (s.r/25).toFixed(1);
-                        const cUnits = ((2*Math.PI*s.r)/25).toFixed(1);
+                        const cUnits = (calculateCircleCircumference(s.r)/25).toFixed(1);
                         feedbackElem.textContent = 'Radius \u2248 ' + rUnits + ' units, circumference \u2248 ' + cUnits + ' units';
                         return true;
                     }
@@ -3538,6 +3522,47 @@ function areParallel(l1, l2){
     if(dx1 === 0 && dx2 === 0) return true;
     if(dx1 === 0 || dx2 === 0) return false;
     return abs(dy1/dx1 - dy2/dx2) < 0.05;
+}
+
+function calculatePolygonPerimeter(points, segments){
+    if(points.length < 3) return null;
+    const near = (p, x, y) => dist(p.x, p.y, x, y) < 10;
+    const adj = new Map(points.map(p => [p, []]));
+    let perim = 0;
+    for(const seg of segments){
+        if(!(seg instanceof LineSeg)) continue;
+        let p1 = null, p2 = null;
+        for(const pt of points){
+            if(!p1 && near(pt, seg.x1, seg.y1)) p1 = pt;
+            if(!p2 && near(pt, seg.x2, seg.y2)) p2 = pt;
+        }
+        if(p1 && p2 && p1 !== p2){
+            adj.get(p1).push(p2);
+            adj.get(p2).push(p1);
+            perim += dist(seg.x1, seg.y1, seg.x2, seg.y2);
+        }
+    }
+    for(const ns of adj.values()) if(ns.length !== 2) return null;
+    const start = points[0];
+    let prev = null;
+    let curr = start;
+    const visited = new Set();
+    while(true){
+        visited.add(curr);
+        const ns = adj.get(curr);
+        const next = ns[0] === prev ? ns[1] : ns[0];
+        if(!next) return null;
+        prev = curr;
+        curr = next;
+        if(curr === start) break;
+        if(visited.has(curr)) return null;
+    }
+    if(visited.size !== points.length) return null;
+    return perim;
+}
+
+function calculateCircleCircumference(radius){
+    return 2 * Math.PI * radius;
 }
 function openDictionary(){
     const overlay = document.getElementById('dictionary-overlay');
