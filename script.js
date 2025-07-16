@@ -148,7 +148,7 @@ let advancedInfo = {
     },
     'obtuse-angle': {
         formula: 'Obtuse angle > 90° and < 180°',
-        explanation: 'Angles bigger than a right angle but less than a straight line are obtuse.'
+        explanation: 'Angles bigger than a right angle but less than a straight line are obtuse. If the angle continues past 180° it becomes a reflex angle.'
     },
     'shape-identify-sequence': {
         formula: 'Circle=0 sides, triangle=3, square=4',
@@ -3421,6 +3421,11 @@ function showAdvancedInfo(){
             ctx.clearRect(0,0,canvas.width,canvas.height);
             drawCubeImage(ctx);
             canvas.style.display = 'block';
+        } else if(act.id === 'obtuse-angle'){
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            drawReflexAngleImage(ctx);
+            canvas.style.display = 'block';
         } else {
             canvas.style.display = 'none';
         }
@@ -3446,6 +3451,24 @@ function drawCubeImage(ctx){
     ctx.lineTo(80, 40 + size);
     ctx.moveTo(50 + size, 70 + size);
     ctx.lineTo(80 + size, 40 + size);
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+function drawReflexAngleImage(ctx){
+    const cx = 100;
+    const cy = 100;
+    const len = 60;
+    const angle = 4 * Math.PI / 3; // 240°
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + len, cy);
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + len * Math.cos(angle), cy + len * Math.sin(angle));
+    ctx.stroke();
+    ctx.setLineDash([5,3]);
+    ctx.beginPath();
+    ctx.arc(cx, cy, 40, 0, angle, false);
     ctx.stroke();
     ctx.setLineDash([]);
 }
