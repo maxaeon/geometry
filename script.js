@@ -3011,7 +3011,7 @@ function setupAdvancedExamples(){
         ],
         'circle-theorem': [
             {
-                prompt: 'Draw a circle and label its center O.',
+                prompt: 'Draw a circle with a center point. The center will be labelled O automatically.',
                 setup: function(){
                     circleGuide = {};
                     showGrid = true;
@@ -3020,7 +3020,8 @@ function setupAdvancedExamples(){
                     for(const s of shapes){
                         if(s instanceof Circle && s.r > 10){
                             for(const p of shapes){
-                                if(p instanceof Point && p.label === 'O' && dist(p.x,p.y,s.x,s.y) < 6){
+                                if(p instanceof Point && dist(p.x,p.y,s.x,s.y) < 6){
+                                    if(!p.label) p.label = 'O';
                                     circleGuide.center = {x:s.x,y:s.y};
                                     circleGuide.radius = s.r;
                                     return true;
@@ -3115,7 +3116,7 @@ function setupAdvancedExamples(){
                 check: function(){return triangleLinesDrawn(pythGuide.pts);}
             },
             {
-                prompt: 'Sides are labelled a, b and c.',
+                prompt: 'Sides are automatically labelled a, b and c.',
                 keepShapes: true,
                 setup: function(){
                     const A = pythGuide.A, B = pythGuide.B, C = pythGuide.C;
@@ -3312,7 +3313,7 @@ function setupAdvancedExamples(){
                 check: function(){return true;}
             },
             {
-                prompt: 'Draw the new parallel line through C and label it EF.',
+                prompt: 'Draw the new parallel line through C. It will be labelled EF automatically.',
                 keepShapes: true,
                 setup: function(){
                     const y = parallelGuide.C.y;
@@ -3323,9 +3324,10 @@ function setupAdvancedExamples(){
                     shapes.push(new Circle(x2, y, 6, 'magenta', 'F'));
                 },
                 check: function(){
-                    if(hasLineBetween(parallelGuide.E, parallelGuide.F)){
-                        const seg = {x1: parallelGuide.E.x, y1: parallelGuide.E.y, x2: parallelGuide.F.x, y2: parallelGuide.F.y};
-                        return lineThroughPoint(seg, parallelGuide.C);
+                    const line = findLineSegBetween(parallelGuide.E, parallelGuide.F);
+                    if(line && lineThroughPoint(line, parallelGuide.C)){
+                        if(!line.label) line.label = 'EF';
+                        return true;
                     }
                     return false;
                 }
@@ -3552,6 +3554,17 @@ function hasLineBetween(p1,p2){
         }
     }
     return false;
+}
+
+function findLineSegBetween(p1,p2,tol=12){
+    for(const s of shapes){
+        if(s instanceof LineSeg){
+            const c1 = dist(s.x1,s.y1,p1.x,p1.y) < tol && dist(s.x2,s.y2,p2.x,p2.y) < tol;
+            const c2 = dist(s.x1,s.y1,p2.x,p2.y) < tol && dist(s.x2,s.y2,p1.x,p1.y) < tol;
+            if(c1 || c2) return s;
+        }
+    }
+    return null;
 }
 
 function triangleLinesDrawn(pts){
