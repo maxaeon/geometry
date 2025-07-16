@@ -419,7 +419,6 @@ function setup() {
         } else {
             loadExample(val);
         }
-        e.target.value = '';
     });
 
     document.getElementById('undo-btn').addEventListener('click', undo);
@@ -1402,6 +1401,8 @@ function loadExample(name){
     exampleShapes = [];
     if(advancedExamples[name]){
         currentExample = name;
+        const select = document.getElementById('activity-select');
+        if(select) select.value = name;
         document.getElementById('prev-activity').style.display = 'inline-block';
         document.getElementById('next-activity').style.display = 'inline-block';
         document.getElementById('skip-activity').style.display = 'inline-block';
@@ -3095,6 +3096,8 @@ function setupAdvancedExamples(){
 }
 function loadKidsActivity(i){
     currentActivity = i;
+    const select = document.getElementById('activity-select');
+    if(select) select.value = 'kid-' + i;
     const act = kidsActivities[i];
     if(!act.keepShapes){
         shapes = [];
