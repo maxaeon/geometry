@@ -273,7 +273,13 @@ let flashcardDefinitions = {
     'scalene triangle': 'A triangle with no equal sides.',
     'right triangle': 'A triangle containing a 90\u00b0 angle.',
     'acute triangle': 'A triangle where all angles are less than 90\u00b0.',
-    'obtuse triangle': 'A triangle with one angle greater than 90\u00b0.'
+    'obtuse triangle': 'A triangle with one angle greater than 90\u00b0.',
+    'isosceles': 'A triangle with two sides the same length.',
+    'scalene': 'A triangle with no equal sides.',
+    'vertex': 'The point where two sides meet.',
+    'edge': 'A straight side where two surfaces meet.',
+    'parallel': 'Lines in a plane that never meet.',
+    'perpendicular': 'Lines that meet to form right angles.'
 };
 
 function updateBrainButton(){
