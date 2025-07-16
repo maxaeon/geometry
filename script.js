@@ -276,6 +276,9 @@ function cloneShapeList(list){
         if(s instanceof LineSeg){
             return new LineSeg(s.x1, s.y1, s.x2, s.y2, s.dotted, s.color, s.weight, s.label);
         }
+        if(s instanceof ArcSeg){
+            return new ArcSeg(s.cx, s.cy, s.r, s.a1, s.a2, s.color, s.weight, s.dashed);
+        }
         if(s instanceof AngleSnapshot){
             const v = {x: s.x, y: s.y};
             const p1 = s.getP1();
@@ -905,6 +908,29 @@ class LineSeg {
         if(mode==='start'){ this.x1=px; this.y1=py; }
         if(mode==='end'){ this.x2=px; this.y2=py; }
     }
+}
+
+class ArcSeg {
+    constructor(cx, cy, r, a1, a2, color='black', weight=1, dashed=false){
+        this.cx = cx; this.cy = cy; this.r = r;
+        this.a1 = a1; this.a2 = a2;
+        this.color = color; this.weight = weight;
+        this.dashed = dashed;
+    }
+    draw(pg){
+        const g = pg || window;
+        g.push();
+        g.noFill();
+        g.stroke(this.color);
+        g.strokeWeight(this.weight);
+        if(this.dashed) g.drawingContext.setLineDash([5,5]);
+        g.arc(this.cx, this.cy, this.r*2, this.r*2, this.a1, this.a2);
+        g.drawingContext.setLineDash([]);
+        g.pop();
+    }
+    hitTest(){ return null; }
+    move(nx, ny){ this.cx = nx; this.cy = ny; }
+    resize(){}
 }
 
 class TextLabel {
@@ -2744,7 +2770,7 @@ function setupAdvancedExamples(){
         ],
         'circle-theorem': [
             {
-                prompt: 'Draw a circle and label the center O.',
+                prompt: 'Draw a circle with center O.',
                 setup: function(){
                     circleGuide = {};
                     showGrid = true;
@@ -2756,20 +2782,22 @@ function setupAdvancedExamples(){
                 check: function(){ return true; }
             },
             {
-                prompt: 'Mark points A and B on the circumference.',
+                prompt: 'Mark arc AB on the circumference.',
                 keepShapes: true,
                 setup: function(){
                     const c = circleGuide.center;
                     const r = circleGuide.radius;
                     circleGuide.A = {x: c.x + Math.cos(Math.PI/6)*r, y: c.y + Math.sin(Math.PI/6)*r};
                     circleGuide.B = {x: c.x + Math.cos(-Math.PI/6)*r, y: c.y + Math.sin(-Math.PI/6)*r};
+                    circleGuide.arcAB = new ArcSeg(c.x, c.y, r, -Math.PI/6, Math.PI/6, 'magenta');
+                    shapes.push(circleGuide.arcAB);
                     shapes.push(new Point(circleGuide.A.x, circleGuide.A.y, 'magenta', 'A'));
                     shapes.push(new Point(circleGuide.B.x, circleGuide.B.y, 'magenta', 'B'));
                 },
                 check: function(){ return true; }
             },
             {
-                prompt: 'Construct radii OA and OB to form \u2220AOB.',
+                prompt: 'Measure \u2220AOB.',
                 keepShapes: true,
                 setup: function(){},
                 check: function(){
@@ -2784,7 +2812,7 @@ function setupAdvancedExamples(){
                 }
             },
             {
-                prompt: 'Choose point C on the circle and connect it to A and B.',
+                prompt: 'Measure \u2220ACB.',
                 keepShapes: true,
                 setup: function(){
                     const c = circleGuide.center;
@@ -2804,14 +2832,16 @@ function setupAdvancedExamples(){
                 }
             },
             {
-                prompt: 'Great! \u2220AOB is twice \u2220ACB.',
+                prompt: 'Compare the measures to confirm \u2220AOB is twice \u2220ACB.',
                 keepShapes: true,
                 setup: function(){},
                 check: function(){
                     const central = angleAt(circleGuide.A, circleGuide.center, circleGuide.B);
                     const inscribed = angleAt(circleGuide.A, circleGuide.C, circleGuide.B);
-                    feedbackElem.textContent = `\u2220AOB \u2248 ${Math.round(toDegrees(central))}\u00B0, ` +
-                        `\u2220ACB \u2248 ${Math.round(toDegrees(inscribed))}\u00B0`;
+                    const cenDeg = Math.round(toDegrees(central));
+                    const insDeg = Math.round(toDegrees(inscribed));
+                    feedbackElem.textContent = `\u2220AOB = ${cenDeg}\u00B0, \u2220ACB = ${insDeg}\u00B0. ` +
+                        `\u2220AOB is exactly twice \u2220ACB.`;
                     return Math.abs(central - 2*inscribed) < 0.1;
                 }
             }
