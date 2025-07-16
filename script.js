@@ -131,10 +131,6 @@ let advancedInfo = {
         formula: 'Isosceles triangle → at least two equal sides',
         explanation: 'When two sides match, the angles opposite them are also equal.'
     },
-    'triangle-dotted-base': {
-        formula: 'Dotted lines show hidden or imaginary edges.',
-        explanation: 'They are used when a side is not physically present but helpful for reasoning.'
-    },
     'equilateral-point-a': {
         formula: 'Equilateral △ → all sides equal, all angles 60°',
         explanation: 'Using equal-radius circles marks off points so each triangle side matches.'
@@ -1907,34 +1903,6 @@ function setupKidsActivities(){
                                 return true;
                             }
                         }
-                    }
-                }
-                return false;
-            }
-        },
-        {
-            id: 'triangle-dotted-base',
-            category: 'Basics',
-            title: 'Dotted Triangle Base',
-            prompt: 'Use a dotted line segment to complete the base of the triangle.',
-            setup: function(){
-                const x1 = width/2 - 80;
-                const x2 = width/2 + 80;
-                const y1 = height/2 + 60;
-                const x3 = width/2;
-                const y3 = height/2 - 60;
-                shapes.push(new LineSeg(x1,y1,x3,y3,false));
-                shapes.push(new LineSeg(x3,y3,x2,y1,false));
-            },
-            check: function(){
-                const x1 = width/2 - 80;
-                const x2 = width/2 + 80;
-                const y1 = height/2 + 60;
-                for(const s of shapes){
-                    if(s instanceof LineSeg && s.dotted){
-                        const c1 = dist(s.x1,s.y1,x1,y1) < 10 && dist(s.x2,s.y2,x2,y1) < 10;
-                        const c2 = dist(s.x1,s.y1,x2,y1) < 10 && dist(s.x2,s.y2,x1,y1) < 10;
-                        if(c1 || c2) return true;
                     }
                 }
                 return false;
