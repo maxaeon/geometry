@@ -182,6 +182,18 @@ let advancedInfo = {
     'shape-area': {
         formula: 'Circle area = πr²',
         explanation: 'Close a polygon or draw a circle and the area will appear in square grid units. Use πr² for circles.'
+    },
+    'triangle-congruency': {
+        formula: 'SSS / SAS / ASA',
+        explanation: 'If all three sides, two sides and the included angle, or two angles and a side match, the triangles are congruent.'
+    },
+    'triangle-similarity': {
+        formula: 'AA ⇒ proportional sides',
+        explanation: 'Two equal angles guarantee triangles have the same shape. Their corresponding sides scale by a constant ratio.'
+    },
+    'circle-theorem': {
+        formula: '∠AOB = 2∠ACB',
+        explanation: 'An inscribed angle measures half the central angle subtending the same arc, as shown with points A, B, C and center O.'
     }
 };
 
