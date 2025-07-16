@@ -57,7 +57,7 @@ let advancedInfo = {
     },
     'fraction-square-quarters': {
         formula: 'Each quarter area = (side/2)²',
-        explanation: 'Splitting a square into four pieces shows how fractions work. Each part is one quarter of the whole area.'
+        explanation: 'Think of a square pizza cut by two crossing lines. Each slice represents 1/4 of the pizza, showing how fractions divide a whole.'
     },
     'connect-red-points': {
         formula: "Euclid's First Postulate",
@@ -2623,7 +2623,7 @@ function setupKidsActivities(){
             id: 'fraction-square-quarters',
             category: 'More About Shapes',
             title: 'Fractions with Shapes',
-            prompt: 'Divide the square into 4 equal parts using line segments.',
+            prompt: 'Pretend the square is a pizza. Cut it into four equal slices by drawing two straight lines that cross in the middle. Each slice is 1/4 of the pizza.',
             setup: function(){
                 const s = 120;
                 const cx = width/2;
