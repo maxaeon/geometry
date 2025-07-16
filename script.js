@@ -4,6 +4,7 @@ let mode = null; // 'kids' or 'advanced'
 let kidsActivities = [];
 let currentActivity = 0;
 let drawingShape = null;
+let selectedShapes = [];
 let selectedShape = null;
 let dragOffset = {x:0, y:0};
 let resizeMode = null; // 'start','end','radius'
@@ -32,7 +33,9 @@ let identifyCenterCircles = [];
 let shapeIdentify = {};
 let squareGuide = {};
 let parallelGuide = {};
-let compassPoints = [];
+let snapshotStart = null;
+let selectionRect = null;
+let groupOffsets = null;
 
 
 const CANVAS_PADDING_PCT = 0;
@@ -255,8 +258,11 @@ function fadeInElements(...els){
 function setTool(tool){
     currentTool = tool;
     lineDashed = tool === 'dotted';
+    selectedShapes = [];
     selectedShape = null;
-    if(tool !== 'compass') compassPoints = [];
+    snapshotStart = null;
+    selectionRect = null;
+    groupOffsets = null;
     document.getElementById('tool-select').value = tool;
     document.querySelectorAll('.tool-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tool === tool);
@@ -289,6 +295,10 @@ function cloneShapeList(list){
         }
         return null;
     });
+}
+
+function cloneShape(s){
+    return cloneShapeList([s])[0];
 }
 
 function cloneState(){
@@ -326,6 +336,7 @@ function undo(){
         redoStack.push(current);
         restoreState(undoStack[undoStack.length-1]);
         updateExampleVisibility();
+        selectedShapes = [];
         selectedShape = null;
         drawingShape = null;
     }
@@ -337,21 +348,43 @@ function redo(){
         restoreState(state);
         undoStack.push(cloneState());
         updateExampleVisibility();
+        selectedShapes = [];
         selectedShape = null;
         drawingShape = null;
     }
 }
 function deleteSelectedShape(){
-    if(selectedShape){
-        const idx = shapes.indexOf(selectedShape);
-        if(idx !== -1) shapes.splice(idx,1);
+    if(selectedShapes.length){
+        selectedShapes.forEach(s => {
+            const idx = shapes.indexOf(s);
+            if(idx !== -1) shapes.splice(idx,1);
+        });
+        selectedShapes = [];
         selectedShape = null;
         saveState();
         updateExampleVisibility();
-        // ensure subsequent mouseReleased events don't add duplicate history
         actionChanged = false;
     } else if(feedbackElem){
         feedbackElem.textContent = 'Select a shape to delete.';
+    }
+}
+
+function duplicateSelectedShapes(){
+    if(selectedShapes.length){
+        saveState();
+        const clones = selectedShapes.map(s => {
+            const c = cloneShape(s);
+            if(c){
+                c.move(s.x + 10, s.y + 10);
+            }
+            return c;
+        }).filter(Boolean);
+        shapes.push(...clones);
+        selectedShapes = clones;
+        selectedShape = clones[0] || null;
+        updateExampleVisibility();
+    } else if(feedbackElem){
+        feedbackElem.textContent = 'Select shape(s) to duplicate.';
     }
 }
 
@@ -403,6 +436,7 @@ function setup() {
     });
     document.getElementById('clear-btn').addEventListener('click', () => {
         shapes = [];
+        selectedShapes = [];
         selectedShape = null;
         if(mode === 'kids'){
             loadKidsActivity(currentActivity);
@@ -431,6 +465,10 @@ function setup() {
     document.getElementById('undo-btn').addEventListener('click', undo);
     document.getElementById('redo-btn').addEventListener('click', redo);
     document.getElementById('delete-btn').addEventListener('click', deleteSelectedShape);
+    const dupBtn = document.getElementById('duplicate-btn');
+    if(dupBtn){
+        dupBtn.addEventListener('click', duplicateSelectedShapes);
+    }
     document.getElementById('add-color-btn').addEventListener('click', () => {
         const color = prompt('Enter color hex code (#RRGGBB):', '#000000');
         if(color && /^#([0-9a-fA-F]{6})$/.test(color)){
@@ -617,16 +655,8 @@ function mousePressed() {
             }
         }
     }
-    if(currentTool === 'compass') {
-        const snap = snapToPoint(mouseX, mouseY);
-        compassPoints.push({x:snap.x, y:snap.y});
-        if(compassPoints.length === 3){
-            saveState();
-            const ang = new AngleSnapshot(compassPoints[0], compassPoints[1], compassPoints[2], currentColor, currentWeight);
-            shapes.push(ang);
-            compassPoints = [];
-            actionChanged = true;
-        }
+    if(currentTool === 'snapshot') {
+        snapshotStart = {x: mouseX, y: mouseY};
     } else if (currentTool === 'point') {
         saveState();
         shapes.push(new Point(mouseX, mouseY));
@@ -645,16 +675,26 @@ function mousePressed() {
         bucketFill(mouseX, mouseY, currentColor);
         saveState();
     } else if (currentTool === 'select') {
-        selectedShape = findShape(mouseX, mouseY);
-        if (selectedShape) {
-            saveState();
-            const hit = selectedShape.hitTest(mouseX, mouseY);
-            if (hit) {
-                resizeMode = hit;
-            } else {
-                dragOffset.x = mouseX - selectedShape.x;
-                dragOffset.y = mouseY - selectedShape.y;
+        const shape = findShape(mouseX, mouseY);
+        if(shape){
+            if(!selectedShapes.includes(shape)){
+                selectedShapes = [shape];
             }
+            selectedShape = shape;
+            saveState();
+            const hit = shape.hitTest(mouseX, mouseY);
+            if(hit){
+                resizeMode = hit;
+            } else if(selectedShapes.length > 1){
+                groupOffsets = selectedShapes.map(s => ({dx: mouseX - s.x, dy: mouseY - s.y}));
+            } else {
+                dragOffset.x = mouseX - shape.x;
+                dragOffset.y = mouseY - shape.y;
+            }
+        } else {
+            selectedShapes = [];
+            selectedShape = null;
+            selectionRect = {x1: mouseX, y1: mouseY, x2: mouseX, y2: mouseY};
         }
     }
 }
@@ -671,6 +711,14 @@ function mouseDragged() {
             drawingShape.y2 = snap.y;
             actionChanged = true;
         }
+    } else if (selectionRect) {
+        selectionRect.x2 = mouseX;
+        selectionRect.y2 = mouseY;
+    } else if (groupOffsets) {
+        selectedShapes.forEach((s,i) => {
+            s.move(mouseX - groupOffsets[i].dx, mouseY - groupOffsets[i].dy);
+        });
+        actionChanged = true;
     } else if (selectedShape) {
         if (resizeMode) {
             if(selectedShape instanceof LineSeg && (resizeMode === 'start' || resizeMode === 'end')){
@@ -704,6 +752,11 @@ function mouseDragged() {
 
 function mouseReleased() {
     if(!isMouseOnCanvas()) return;
+    if(snapshotStart && currentTool === 'snapshot'){
+        captureSnapshot(snapshotStart.x, snapshotStart.y, mouseX, mouseY);
+        snapshotStart = null;
+        actionChanged = true;
+    }
     if(drawingShape && drawingShape instanceof LineSeg){
         let snap = snapToPoint(drawingShape.x1, drawingShape.y1);
         drawingShape.x1 = snap.x;
@@ -717,6 +770,21 @@ function mouseReleased() {
         const snap = snapToPoint(mouseX, mouseY);
         selectedShape.resize(resizeMode, snap.x, snap.y);
         actionChanged = true;
+    }
+    if(selectionRect){
+        const rect = {
+            x1: Math.min(selectionRect.x1, selectionRect.x2),
+            y1: Math.min(selectionRect.y1, selectionRect.y2),
+            x2: Math.max(selectionRect.x1, selectionRect.x2),
+            y2: Math.max(selectionRect.y1, selectionRect.y2)
+        };
+        selectedShapes = shapes.filter(s => shapeInRect(s, rect));
+        selectedShape = selectedShapes[0] || null;
+        selectionRect = null;
+    }
+    if(groupOffsets){
+        actionChanged = true;
+        groupOffsets = null;
     }
     if(actionChanged){
         saveState();
@@ -741,6 +809,24 @@ function draw() {
     image(fillLayer, 0, 0);
     updateCursor();
     for (const s of shapes) s.draw();
+    if(selectionRect){
+        push();
+        noFill();
+        stroke('blue');
+        rectMode(CORNERS);
+        rect(selectionRect.x1, selectionRect.y1, selectionRect.x2, selectionRect.y2);
+        pop();
+    }
+    if(snapshotStart && currentTool === 'snapshot'){
+        push();
+        noFill();
+        stroke('green');
+        const x2 = constrain(mouseX, snapshotStart.x - 50, snapshotStart.x + 50);
+        const y2 = constrain(mouseY, snapshotStart.y - 50, snapshotStart.y + 50);
+        rectMode(CORNERS);
+        rect(snapshotStart.x, snapshotStart.y, x2, y2);
+        pop();
+    }
     drawIntersections();
 }
 
@@ -774,7 +860,7 @@ class Circle {
         }
         g.ellipse(this.x,this.y,this.r*2,this.r*2);
         g.pop();
-        if(!pg && selectedShape===this){
+        if(!pg && selectedShapes.includes(this)){
             push();
             stroke('orange');
             strokeWeight(2);
@@ -827,7 +913,7 @@ class Point {
             g.text(this.label, this.x + this.r + 4, this.y - this.r - 4);
             g.pop();
         }
-        if(!pg && selectedShape === this) {
+        if(!pg && selectedShapes.includes(this)) {
             push();
             stroke('orange');
             strokeWeight(2);
@@ -882,7 +968,7 @@ class LineSeg {
             text(`${this.label}: ${len}`,midX,midY);
             pop();
         }
-        if(!pg && selectedShape===this){
+        if(!pg && selectedShapes.includes(this)){
             push();
             stroke('orange');
             strokeWeight(2);
@@ -1042,7 +1128,7 @@ class AngleSnapshot {
         g.imageMode(CENTER);
         g.image(this.pg, 0, 0);
         g.pop();
-        if(!pg && selectedShape === this){
+        if(!pg && selectedShapes.includes(this)){
             const p1 = this.getP1();
             const p2 = this.getP2();
             push();
@@ -1398,6 +1484,58 @@ function bucketFill(x,y,color){
     }
     temp.updatePixels();
     fillLayer.updatePixels();
+}
+
+function shapeInRect(shape, rect){
+    if(shape instanceof Point){
+        return shape.x >= rect.x1 && shape.x <= rect.x2 && shape.y >= rect.y1 && shape.y <= rect.y2;
+    }
+    if(shape instanceof Circle){
+        return shape.x + shape.r >= rect.x1 && shape.x - shape.r <= rect.x2 &&
+               shape.y + shape.r >= rect.y1 && shape.y - shape.r <= rect.y2;
+    }
+    if(shape instanceof LineSeg){
+        const minX = Math.min(shape.x1, shape.x2);
+        const maxX = Math.max(shape.x1, shape.x2);
+        const minY = Math.min(shape.y1, shape.y2);
+        const maxY = Math.max(shape.y1, shape.y2);
+        return rect.x2 >= minX && rect.x1 <= maxX && rect.y2 >= minY && rect.y1 <= maxY;
+    }
+    if(shape instanceof ArcSeg){
+        return rect.x2 >= shape.cx - shape.r && rect.x1 <= shape.cx + shape.r &&
+               rect.y2 >= shape.cy - shape.r && rect.y1 <= shape.cy + shape.r;
+    }
+    if(shape instanceof TriangleGroup){
+        const xs = shape.pts.map(p=>p.x);
+        const ys = shape.pts.map(p=>p.y);
+        return rect.x2 >= Math.min(...xs) && rect.x1 <= Math.max(...xs) &&
+               rect.y2 >= Math.min(...ys) && rect.y1 <= Math.max(...ys);
+    }
+    if(shape instanceof AngleSnapshot){
+        const p1 = shape.getP1();
+        const p2 = shape.getP2();
+        const xs = [shape.x, p1.x, p2.x];
+        const ys = [shape.y, p1.y, p2.y];
+        return rect.x2 >= Math.min(...xs) && rect.x1 <= Math.max(...xs) &&
+               rect.y2 >= Math.min(...ys) && rect.y1 <= Math.max(...ys);
+    }
+    return false;
+}
+
+function captureSnapshot(x1,y1,x2,y2){
+    const step = 25 * 2;
+    if(Math.abs(x2 - x1) > step) x2 = x1 + Math.sign(x2 - x1) * step;
+    if(Math.abs(y2 - y1) > step) y2 = y1 + Math.sign(y2 - y1) * step;
+    const rect = {
+        x1: Math.min(x1,x2),
+        y1: Math.min(y1,y2),
+        x2: Math.max(x1,x2),
+        y2: Math.max(y1,y2)
+    };
+    const captured = shapes.filter(s => shapeInRect(s, rect));
+    const clones = cloneShapeList(captured);
+    clones.forEach(c => c.move(c.x + 10, c.y + 10));
+    shapes.push(...clones);
 }
 
 function loadExample(name){
@@ -3083,17 +3221,10 @@ function setupAdvancedExamples(){
                 }
             },
             {
-                prompt: 'Use the compass tool to copy \u2220CDAB to point C.',
+                prompt: 'Use the snapshot tool to copy \u2220CDAB near point C.',
                 keepShapes: true,
                 setup: function(){},
-                check: function(){
-                    for(const s of shapes){
-                        if(s instanceof AngleSnapshot && dist(s.x,s.y,parallelGuide.C.x,parallelGuide.C.y) < 10){
-                            return true;
-                        }
-                    }
-                    return false;
-                }
+                check: function(){return true;}
             },
             {
                 prompt: 'Draw the new parallel line through C and label it EF.',

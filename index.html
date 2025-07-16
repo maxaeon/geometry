@@ -65,7 +65,7 @@
             <button class="tool-btn" data-tool="circle" title="Circle">&#x25CB;</button>
             <button class="tool-btn" data-tool="line" title="Line">&#x2571;</button>
             <button class="tool-btn" data-tool="dotted" title="Dotted">&#x2022;&#x2022;&#x2022;</button>
-            <button class="tool-btn" data-tool="compass" title="Compass">🧭</button>
+            <button class="tool-btn" data-tool="snapshot" title="Snapshot">📸</button>
             <button class="tool-btn" data-tool="fill" title="Fill">🪣</button>
         </div>
         <select id="tool-select">
@@ -74,7 +74,7 @@
             <option value="circle">Circle</option>
             <option value="line">Solid Line</option>
             <option value="dotted">Dotted Line</option>
-            <option value="compass">Compass</option>
+            <option value="snapshot">Snapshot</option>
             <option value="fill">Fill</option>
         </select>
         <input id="color-input" type="color" value="#000000">
@@ -86,6 +86,7 @@
         <button id="undo-btn">Undo</button>
         <button id="redo-btn">Redo</button>
         <button id="delete-btn" class="tool-btn" title="Delete Selected">❌</button>
+        <button id="duplicate-btn" class="tool-btn" title="Duplicate Selected">⧉</button>
         <select id="activity-select">
             <option value="">Activities</option>
         </select>
@@ -103,6 +104,8 @@
             <li>Use the tool buttons to draw points, circles or lines.</li>
             <li>Select a shape and press Delete to remove it.</li>
             <li>Use the 🗋 button to clear the entire canvas.</li>
+            <li>Drag with the snapshot tool to copy a small 2x2 grid area.</li>
+            <li>Drag a box with the select tool to choose multiple shapes and use ⧉ to duplicate them.</li>
             <li>Use Back and Next to move through activity steps.</li>
         </ul>
     </div>
