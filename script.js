@@ -2169,16 +2169,18 @@ function setupKidsActivities(){
             prompt: 'Click the acute angle (<90\u00b0).',
             setup: function(){
                 const len = 80;
-                const leftX = width/2 - 120;
+                const leftX = width/2 - 80;
                 const y = height/2;
-                // acute angle on left
+                // acute angle on left (70°)
                 shapes.push(new LineSeg(leftX, y, leftX + len, y));
-                shapes.push(new LineSeg(leftX, y, leftX + len * Math.cos(-Math.PI/4), y + len * Math.sin(-Math.PI/4)));
+                const acuteAngle = -70 * Math.PI / 180;
+                shapes.push(new LineSeg(leftX, y, leftX + len * Math.cos(acuteAngle), y + len * Math.sin(acuteAngle)));
                 shapes.push(new Circle(leftX, y, 8, 'gray', true));
                 // obtuse example on right (not clickable)
-                const rightX = width/2 + 120;
-                shapes.push(new LineSeg(rightX, y, rightX - len, y));
-                shapes.push(new LineSeg(rightX, y, rightX - len * Math.cos(Math.PI/4), y - len * Math.sin(Math.PI/4)));
+                const rightX = width/2 + 80;
+                const obtuseExample = 110 * Math.PI / 180;
+                shapes.push(new LineSeg(rightX, y, rightX + len, y));
+                shapes.push(new LineSeg(rightX, y, rightX + len * Math.cos(obtuseExample), y + len * Math.sin(obtuseExample)));
                 shapes.push(new Circle(rightX, y, 8, 'gray'));
             },
             check: function(){
@@ -2197,15 +2199,16 @@ function setupKidsActivities(){
             prompt: 'Click the obtuse angle (>90\u00b0 and <180\u00b0).',
             setup: function(){
                 const len = 80;
-                const leftX = width/2 - 120;
+                const leftX = width/2 - 80;
                 const y = height/2;
                 // acute example on left (not clickable)
                 shapes.push(new LineSeg(leftX, y, leftX + len, y));
-                shapes.push(new LineSeg(leftX, y, leftX + len * Math.cos(-Math.PI/4), y + len * Math.sin(-Math.PI/4)));
+                const acuteExample = -70 * Math.PI / 180;
+                shapes.push(new LineSeg(leftX, y, leftX + len * Math.cos(acuteExample), y + len * Math.sin(acuteExample)));
                 shapes.push(new Circle(leftX, y, 8, 'gray'));
-                // obtuse angle on right
-                const rightX = width/2 + 120;
-                const obtuseAngle = 3 * Math.PI / 4;            // 135°
+                // obtuse angle on right (110°)
+                const rightX = width/2 + 80;
+                const obtuseAngle = 110 * Math.PI / 180;
                 shapes.push(new LineSeg(rightX, y, rightX + len, y));
                 shapes.push(new LineSeg(
                     rightX,
