@@ -97,7 +97,7 @@ let advancedInfo = {
     },
     'identify-right-angles': {
         formula: "Euclid's Fourth Postulate",
-        explanation: 'All right angles are congruent to one another. They build rectangles and lead to the Pythagorean theorem.'
+        explanation: 'All right angles are congruent. They are fundamental for rectangles and squares and lead to the Pythagorean theorem.'
     },
     'parallel-through-point': {
         formula: "Euclid's Fifth Postulate",
@@ -1940,6 +1940,123 @@ function setupKidsActivities(){
         }
         },
         {
+            id: 'acute-angle',
+            category: 'Basics',
+            title: 'Acute Angle',
+            prompt: 'Click the acute angle (<90\u00b0).',
+            setup: function(){
+                const len = 80;
+                const leftX = width/2 - 80;
+                const y = height/2;
+                // acute angle on left (70°)
+                shapes.push(new LineSeg(leftX, y, leftX + len, y));
+                const acuteAngle = -70 * Math.PI / 180;
+                shapes.push(new LineSeg(leftX, y, leftX + len * Math.cos(acuteAngle), y + len * Math.sin(acuteAngle)));
+                shapes.push(new Circle(leftX, y, 8, 'gray', true));
+                // obtuse example on right (not clickable)
+                const rightX = width/2 + 80;
+                const obtuseExample = 110 * Math.PI / 180;
+                shapes.push(new LineSeg(rightX, y, rightX + len, y));
+                shapes.push(new LineSeg(rightX, y, rightX + len * Math.cos(obtuseExample), y + len * Math.sin(obtuseExample)));
+                shapes.push(new Circle(rightX, y, 8, 'gray'));
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Circle && s.clickable && s.clicked){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            id: 'obtuse-angle',
+            category: 'Basics',
+            title: 'Obtuse Angle',
+            prompt: 'Click the obtuse angle (>90\u00b0 and <180\u00b0).',
+            setup: function(){
+                const len = 80;
+                const leftX = width/2 - 80;
+                const y = height/2;
+                // acute example on left (not clickable)
+                shapes.push(new LineSeg(leftX, y, leftX + len, y));
+                const acuteExample = -70 * Math.PI / 180;
+                shapes.push(new LineSeg(leftX, y, leftX + len * Math.cos(acuteExample), y + len * Math.sin(acuteExample)));
+                shapes.push(new Circle(leftX, y, 8, 'gray'));
+                // obtuse angle on right (110°)
+                const rightX = width/2 + 80;
+                const obtuseAngle = 110 * Math.PI / 180;
+                shapes.push(new LineSeg(rightX, y, rightX + len, y));
+                shapes.push(new LineSeg(
+                    rightX,
+                    y,
+                    rightX + len * Math.cos(obtuseAngle),
+                    y + len * Math.sin(obtuseAngle)
+                ));
+                shapes.push(new Circle(rightX, y, 8, 'gray', true));
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Circle && s.clickable && s.clicked){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            id: 'triangle-vertices',
+            category: 'Basics',
+            title: 'Triangle Vertices',
+            prompt: 'Click each vertex of the triangle to count its corners.',
+            setup: function(){
+                const p = [
+                    {x: width/2, y: height/2 - 80},
+                    {x: width/2 - 70, y: height/2 + 60},
+                    {x: width/2 + 70, y: height/2 + 60}
+                ];
+                shapes.push(new LineSeg(p[0].x,p[0].y,p[1].x,p[1].y));
+                shapes.push(new LineSeg(p[1].x,p[1].y,p[2].x,p[2].y));
+                shapes.push(new LineSeg(p[2].x,p[2].y,p[0].x,p[0].y));
+                for(const pt of p){
+                    shapes.push(new Circle(pt.x, pt.y, 8, 'gray', true));
+                }
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Circle && s.clickable && !s.clicked) return false;
+                }
+                return true;
+            }
+        },
+        {
+            id: 'parallel-through-point',
+            category: 'Basics',
+            title: 'Parallel Line Through a Point',
+            prompt: 'Draw a line through the red point that stays parallel to the black line.',
+            setup: function(){
+                const y = height/2 + 50;
+                const x1 = width/2 - 80;
+                const x2 = width/2 + 80;
+                this.base = new LineSeg(x1,y,x2,y,false);
+                shapes.push(this.base);
+                const px = width/2;
+                const py = height/2 - 50;
+                this.p = {x:px, y:py};
+                shapes.push(new Circle(px,py,6,'magenta'));
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof LineSeg && s !== this.base){
+                        if(lineThroughPoint(s,this.p) && areParallel(s,this.base)){
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        },
+        {
             id: 'circle-basics',
             category: 'Basics',
             title: 'Draw a Circle',
@@ -2269,31 +2386,6 @@ function setupKidsActivities(){
             }
         },
         {
-            id: 'triangle-vertices',
-            category: 'Basics',
-            title: 'Triangle Vertices',
-            prompt: 'Click each vertex of the triangle to count its corners.',
-            setup: function(){
-                const p = [
-                    {x: width/2, y: height/2 - 80},
-                    {x: width/2 - 70, y: height/2 + 60},
-                    {x: width/2 + 70, y: height/2 + 60}
-                ];
-                shapes.push(new LineSeg(p[0].x,p[0].y,p[1].x,p[1].y));
-                shapes.push(new LineSeg(p[1].x,p[1].y,p[2].x,p[2].y));
-                shapes.push(new LineSeg(p[2].x,p[2].y,p[0].x,p[0].y));
-                for(const pt of p){
-                    shapes.push(new Circle(pt.x, pt.y, 8, 'gray', true));
-                }
-            },
-            check: function(){
-                for(const s of shapes){
-                    if(s instanceof Circle && s.clickable && !s.clicked) return false;
-                }
-                return true;
-            }
-        },
-        {
             id: 'triangle-scalene',
             category: 'Basics',
             title: 'Scalene Triangle',
@@ -2398,71 +2490,6 @@ function setupKidsActivities(){
                         const c1 = dist(s.x1,s.y1,p1.x,p1.y) < 10 && dist(s.x2,s.y2,p2.x,p2.y) < 10;
                         const c2 = dist(s.x1,s.y1,p2.x,p2.y) < 10 && dist(s.x2,s.y2,p1.x,p1.y) < 10;
                         if(c1 || c2) return true;
-                    }
-                }
-                return false;
-            }
-        },
-        {
-            id: 'acute-angle',
-            category: 'Basics',
-            title: 'Acute Angle',
-            prompt: 'Click the acute angle (<90\u00b0).',
-            setup: function(){
-                const len = 80;
-                const leftX = width/2 - 80;
-                const y = height/2;
-                // acute angle on left (70°)
-                shapes.push(new LineSeg(leftX, y, leftX + len, y));
-                const acuteAngle = -70 * Math.PI / 180;
-                shapes.push(new LineSeg(leftX, y, leftX + len * Math.cos(acuteAngle), y + len * Math.sin(acuteAngle)));
-                shapes.push(new Circle(leftX, y, 8, 'gray', true));
-                // obtuse example on right (not clickable)
-                const rightX = width/2 + 80;
-                const obtuseExample = 110 * Math.PI / 180;
-                shapes.push(new LineSeg(rightX, y, rightX + len, y));
-                shapes.push(new LineSeg(rightX, y, rightX + len * Math.cos(obtuseExample), y + len * Math.sin(obtuseExample)));
-                shapes.push(new Circle(rightX, y, 8, 'gray'));
-            },
-            check: function(){
-                for(const s of shapes){
-                    if(s instanceof Circle && s.clickable && s.clicked){
-                        return true;
-                    }
-                }
-                return false;
-            }
-        },
-        {
-            id: 'obtuse-angle',
-            category: 'Basics',
-            title: 'Obtuse Angle',
-            prompt: 'Click the obtuse angle (>90\u00b0 and <180\u00b0).',
-            setup: function(){
-                const len = 80;
-                const leftX = width/2 - 80;
-                const y = height/2;
-                // acute example on left (not clickable)
-                shapes.push(new LineSeg(leftX, y, leftX + len, y));
-                const acuteExample = -70 * Math.PI / 180;
-                shapes.push(new LineSeg(leftX, y, leftX + len * Math.cos(acuteExample), y + len * Math.sin(acuteExample)));
-                shapes.push(new Circle(leftX, y, 8, 'gray'));
-                // obtuse angle on right (110°)
-                const rightX = width/2 + 80;
-                const obtuseAngle = 110 * Math.PI / 180;
-                shapes.push(new LineSeg(rightX, y, rightX + len, y));
-                shapes.push(new LineSeg(
-                    rightX,
-                    y,
-                    rightX + len * Math.cos(obtuseAngle),
-                    y + len * Math.sin(obtuseAngle)
-                ));
-                shapes.push(new Circle(rightX, y, 8, 'gray', true));
-            },
-            check: function(){
-                for(const s of shapes){
-                    if(s instanceof Circle && s.clickable && s.clicked){
-                        return true;
                     }
                 }
                 return false;
@@ -2807,33 +2834,6 @@ function setupKidsActivities(){
                 return true;
             }
         },
-        {
-            id: 'parallel-through-point',
-            category: 'Basics',
-            title: 'Parallel Line Through a Point',
-            prompt: 'Draw a line through the red point that stays parallel to the black line.',
-            setup: function(){
-                const y = height/2 + 50;
-                const x1 = width/2 - 80;
-                const x2 = width/2 + 80;
-                this.base = new LineSeg(x1,y,x2,y,false);
-                shapes.push(this.base);
-                const px = width/2;
-                const py = height/2 - 50;
-                this.p = {x:px, y:py};
-                shapes.push(new Circle(px,py,6,'magenta'));
-            },
-            check: function(){
-                for(const s of shapes){
-                    if(s instanceof LineSeg && s !== this.base){
-                        if(lineThroughPoint(s,this.p) && areParallel(s,this.base)){
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        }
     ];
 }
 
