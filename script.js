@@ -2,6 +2,34 @@ let shapes = [];
 let currentTool = 'select';
 let mode = null; // 'kids' or 'advanced'
 let kidsActivities = [];
+const firstStepIds = new Set([
+    'intro-plane',
+    'place-point',
+    'stretch-to-segment',
+    'connect-red-points',
+    'draw-square',
+    'triangle-equal',
+    'identify-right-angles',
+    'circle-basics',
+    'equilateral-point-a',
+    'right-angle-legs',
+    'identify-centers',
+    'rectangle-from-triangles',
+    'triangle-vertices',
+    'draw-diameter',
+    'acute-angle',
+    'obtuse-angle',
+    'shape-identify-sequence',
+    'compose-house',
+    'shape-attributes',
+    'square-add-points',
+    'polygon-add-points',
+    'fraction-square-quarters',
+    'polygon-perimeter',
+    'circle-circumference',
+    'shape-area',
+    'parallel-through-point'
+]);
 let currentActivity = 0;
 let drawingShape = null;
 let selectedShapes = [];
@@ -62,10 +90,6 @@ let advancedInfo = {
     'connect-red-points': {
         formula: "Euclid's First Postulate",
         explanation: 'Any two distinct points can be joined by a straight line.'
-    },
-    'extend-line': {
-        formula: "Euclid's Second Postulate",
-        explanation: 'A straight line segment can continue indefinitely in the same direction.'
     },
     'circle-basics': {
         formula: "Euclid's Third Postulate",
@@ -1383,6 +1407,7 @@ function populateActivitySelect(){
     if(Array.isArray(kidsActivities)){
         const groups = {};
         kidsActivities.forEach((act, i) => {
+            if(!firstStepIds.has(act.id)) return;
             const cat = act.category || 'Other';
             if(!groups[cat]){
                 const og = document.createElement('optgroup');
@@ -1416,6 +1441,7 @@ function populateActivitiesOverlay(){
     const cats = {};
     if(Array.isArray(kidsActivities)){
         kidsActivities.forEach((act, i) => {
+            if(!firstStepIds.has(act.id)) return;
             const cat = act.category || 'Other';
             if(!cats[cat]){
                 const h = document.createElement('h3');
@@ -1757,38 +1783,6 @@ function setupKidsActivities(){
                         const c1 = dist(s.x1,s.y1,x1,y) < 10 && dist(s.x2,s.y2,x2,y) < 10;
                         const c2 = dist(s.x1,s.y1,x2,y) < 10 && dist(s.x2,s.y2,x1,y) < 10;
                         if(c1 || c2) return true;
-                    }
-                }
-                return false;
-            }
-        },
-        {
-            id: 'extend-line',
-            category: 'Basics',
-            title: 'Extend the Line',
-            prompt: 'Extend your line segment so it goes beyond the magenta points. Only drag the line itself.',
-            keepShapes: true,
-            setup: function(){
-                const x1 = width/2 - 60;
-                const x2 = width/2 + 60;
-                const y = height/2;
-                // Use non-interactive circles so only the line can be adjusted
-                shapes.push(new Circle(x1, y, 6, 'magenta', true));
-                shapes.push(new Circle(x2, y, 6, 'magenta', true));
-            },
-            check: function(){
-                const x1 = width/2 - 60;
-                const x2 = width/2 + 60;
-                const y = height/2;
-                const baseLen = dist(x1, y, x2, y);
-                for(const s of shapes){
-                    if(s instanceof LineSeg){
-                        const match1 = dist(s.x1,s.y1,x1,y) < 10 && dist(s.x2,s.y2,x2,y) < 10;
-                        const match2 = dist(s.x1,s.y1,x2,y) < 10 && dist(s.x2,s.y2,x1,y) < 10;
-                        const len = dist(s.x1,s.y1,s.x2,s.y2);
-                        if((match1 || match2) && len > baseLen + 10){
-                            return true;
-                        }
                     }
                 }
                 return false;
