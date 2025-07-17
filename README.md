@@ -10,7 +10,7 @@ This interactive geometry webpage is designed for users ranging from kindergarte
 
 #### Key Features:
 
-* **Interactive Canvas:** Allows dynamic shape creation, manipulation, and exploration. A new snapshot tool lets you copy small sections of the canvas for comparing angles.
+* **Interactive Canvas:** Allows dynamic shape creation, manipulation, and exploration. A new copy shape tool lets you copy small sections of the canvas for comparing angles.
 * **Step-by-Step Activities:** Each activity is designed to provide detailed, interactive, and immediate feedback for learners. Shapes can be selected in groups and duplicated for further exploration.
 
 #### Activities (Status):
