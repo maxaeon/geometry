@@ -27,7 +27,13 @@ const firstStepIds = new Set([
     'polygon-perimeter',
     'circle-circumference',
     'shape-area',
-    'parallel-through-point'
+    'parallel-through-point',
+    'triangle-tutorial',
+    'square-tutorial',
+    'circle-tutorial',
+    'rectangle-tutorial',
+    'parallelogram-tutorial',
+    'trapezoid-tutorial'
 ]);
 let currentActivity = 0;
 let drawingShape = null;
@@ -234,6 +240,30 @@ let advancedInfo = {
     'polygon-connect': {
         formula: 'Closed shape = polygon',
         explanation: 'A polygon forms when every vertex connects to two edges, creating a loop of straight segments.'
+    },
+    'triangle-tutorial': {
+        formula: 'Perimeter = a + b + c, area = 1/2 × base × height',
+        explanation: 'Add the lengths of all three sides for the perimeter. Multiply the base by the height and divide by two for the area.'
+    },
+    'square-tutorial': {
+        formula: 'Perimeter = 4×side, area = side²',
+        explanation: 'All four sides are equal, so multiply one side by four for the perimeter. Square one side length for the area.'
+    },
+    'circle-tutorial': {
+        formula: 'Circumference = 2πr, area = πr²',
+        explanation: 'The radius determines both circumference and area: double π times r for circumference and π times r squared for area.'
+    },
+    'rectangle-tutorial': {
+        formula: 'Perimeter = 2(l + w), area = l × w',
+        explanation: 'Opposite sides match in length. Add length and width then double for perimeter; multiply them for area.'
+    },
+    'parallelogram-tutorial': {
+        formula: 'Perimeter = 2(a + b), area = base × height',
+        explanation: 'Opposite sides are equal. Use base and side lengths for perimeter and multiply base by height for area.'
+    },
+    'trapezoid-tutorial': {
+        formula: 'Area = (b₁ + b₂)/2 × h',
+        explanation: 'Add the two bases, divide by two, then multiply by the height. Perimeter is the sum of all sides.'
     },
     'circle-theorem': {
         formula: '∠AOB = 2∠ACB',
@@ -2844,6 +2874,199 @@ function setupKidsActivities(){
                 if(area === null) return false;
                 const units = (area/(25*25)).toFixed(1);
                 feedbackElem.textContent = 'Area \u2248 ' + units + ' square units';
+                return true;
+            }
+        },
+        {
+            id: 'triangle-tutorial',
+            category: 'More About Shapes',
+            title: 'Triangle Tutorial',
+            prompt: 'Connect the 3 red points to form a triangle and see its perimeter and area.',
+            preserveFeedback: true,
+            setup: function(){
+                showGrid = true;
+                const cx = width/2;
+                const cy = height/2;
+                this.pts = [
+                    {x: cx - 80, y: cy + 60},
+                    {x: cx + 80, y: cy + 60},
+                    {x: cx,      y: cy - 60}
+                ];
+                for(const p of this.pts){
+                    shapes.push(new Point(p.x, p.y, 'magenta'));
+                }
+            },
+            check: function(){
+                if(!triangleLinesDrawn(this.pts)) return false;
+                const segs = shapes.filter(s => s instanceof LineSeg);
+                const perim = calculatePolygonPerimeter(this.pts, segs);
+                const area = calculatePolygonArea(this.pts, segs);
+                if(perim === null || area === null) return false;
+                const pUnits = (perim/25).toFixed(1);
+                const aUnits = (area/(25*25)).toFixed(1);
+                feedbackElem.textContent = 'Perimeter \u2248 ' + pUnits + ' units, area \u2248 ' + aUnits + ' square units';
+                return true;
+            }
+        },
+        {
+            id: 'square-tutorial',
+            category: 'More About Shapes',
+            title: 'Square Tutorial',
+            prompt: 'Connect the 4 red points to make a square and view its measurements.',
+            preserveFeedback: true,
+            setup: function(){
+                showGrid = true;
+                const cx = width/2;
+                const cy = height/2;
+                this.pts = [
+                    {x: cx - 60, y: cy - 60},
+                    {x: cx + 60, y: cy - 60},
+                    {x: cx + 60, y: cy + 60},
+                    {x: cx - 60, y: cy + 60}
+                ];
+                for(const p of this.pts){
+                    shapes.push(new Point(p.x, p.y, 'magenta'));
+                }
+            },
+            check: function(){
+                const edges = [[0,1],[1,2],[2,3],[3,0]];
+                for(const [i,j] of edges){
+                    if(!hasLineBetween(this.pts[i], this.pts[j])) return false;
+                }
+                const segs = shapes.filter(s => s instanceof LineSeg);
+                const perim = calculatePolygonPerimeter(this.pts, segs);
+                const area = calculatePolygonArea(this.pts, segs);
+                if(perim === null || area === null) return false;
+                const pUnits = (perim/25).toFixed(1);
+                const aUnits = (area/(25*25)).toFixed(1);
+                feedbackElem.textContent = 'Perimeter \u2248 ' + pUnits + ' units, area \u2248 ' + aUnits + ' square units';
+                return true;
+            }
+        },
+        {
+            id: 'circle-tutorial',
+            category: 'More About Shapes',
+            title: 'Circle Tutorial',
+            prompt: 'Draw a circle to see its radius, circumference, and area.',
+            preserveFeedback: true,
+            setup: function(){
+                showGrid = true;
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Circle && s.r > 5){
+                        const rUnits = (s.r/25).toFixed(1);
+                        const cUnits = (calculateCircleCircumference(s.r)/25).toFixed(1);
+                        const aUnits = (Math.PI*s.r*s.r/(25*25)).toFixed(1);
+                        feedbackElem.textContent = 'Radius \u2248 ' + rUnits + ' units, circumference \u2248 ' + cUnits + ' units, area \u2248 ' + aUnits + ' square units';
+                        return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            id: 'rectangle-tutorial',
+            category: 'More About Shapes',
+            title: 'Rectangle Tutorial',
+            prompt: 'Connect the red points to complete the rectangle and calculate its measurements.',
+            preserveFeedback: true,
+            setup: function(){
+                showGrid = true;
+                const cx = width/2;
+                const cy = height/2;
+                this.pts = [
+                    {x: cx - 80, y: cy - 40},
+                    {x: cx + 80, y: cy - 40},
+                    {x: cx + 80, y: cy + 40},
+                    {x: cx - 80, y: cy + 40}
+                ];
+                for(const p of this.pts){
+                    shapes.push(new Point(p.x, p.y, 'magenta'));
+                }
+            },
+            check: function(){
+                const edges = [[0,1],[1,2],[2,3],[3,0]];
+                for(const [i,j] of edges){
+                    if(!hasLineBetween(this.pts[i], this.pts[j])) return false;
+                }
+                const segs = shapes.filter(s => s instanceof LineSeg);
+                const perim = calculatePolygonPerimeter(this.pts, segs);
+                const area = calculatePolygonArea(this.pts, segs);
+                if(perim === null || area === null) return false;
+                const pUnits = (perim/25).toFixed(1);
+                const aUnits = (area/(25*25)).toFixed(1);
+                feedbackElem.textContent = 'Perimeter \u2248 ' + pUnits + ' units, area \u2248 ' + aUnits + ' square units';
+                return true;
+            }
+        },
+        {
+            id: 'parallelogram-tutorial',
+            category: 'More About Shapes',
+            title: 'Parallelogram Tutorial',
+            prompt: 'Connect the red points to form a parallelogram and measure it.',
+            preserveFeedback: true,
+            setup: function(){
+                showGrid = true;
+                const cx = width/2;
+                const cy = height/2;
+                this.pts = [
+                    {x: cx - 80, y: cy + 40},
+                    {x: cx + 80, y: cy + 40},
+                    {x: cx + 120, y: cy - 40},
+                    {x: cx - 40, y: cy - 40}
+                ];
+                for(const p of this.pts){
+                    shapes.push(new Point(p.x, p.y, 'magenta'));
+                }
+            },
+            check: function(){
+                const edges = [[0,1],[1,2],[2,3],[3,0]];
+                for(const [i,j] of edges){
+                    if(!hasLineBetween(this.pts[i], this.pts[j])) return false;
+                }
+                const segs = shapes.filter(s => s instanceof LineSeg);
+                const perim = calculatePolygonPerimeter(this.pts, segs);
+                const area = calculatePolygonArea(this.pts, segs);
+                if(perim === null || area === null) return false;
+                const pUnits = (perim/25).toFixed(1);
+                const aUnits = (area/(25*25)).toFixed(1);
+                feedbackElem.textContent = 'Perimeter \u2248 ' + pUnits + ' units, area \u2248 ' + aUnits + ' square units';
+                return true;
+            }
+        },
+        {
+            id: 'trapezoid-tutorial',
+            category: 'More About Shapes',
+            title: 'Trapezoid Tutorial',
+            prompt: 'Finish the trapezoid by connecting the points and see its perimeter and area.',
+            preserveFeedback: true,
+            setup: function(){
+                showGrid = true;
+                const cx = width/2;
+                const cy = height/2;
+                this.pts = [
+                    {x: cx - 80, y: cy + 40},
+                    {x: cx + 80, y: cy + 40},
+                    {x: cx + 40, y: cy - 40},
+                    {x: cx - 40, y: cy - 40}
+                ];
+                for(const p of this.pts){
+                    shapes.push(new Point(p.x, p.y, 'magenta'));
+                }
+            },
+            check: function(){
+                const edges = [[0,1],[1,2],[2,3],[3,0]];
+                for(const [i,j] of edges){
+                    if(!hasLineBetween(this.pts[i], this.pts[j])) return false;
+                }
+                const segs = shapes.filter(s => s instanceof LineSeg);
+                const perim = calculatePolygonPerimeter(this.pts, segs);
+                const area = calculatePolygonArea(this.pts, segs);
+                if(perim === null || area === null) return false;
+                const pUnits = (perim/25).toFixed(1);
+                const aUnits = (area/(25*25)).toFixed(1);
+                feedbackElem.textContent = 'Perimeter \u2248 ' + pUnits + ' units, area \u2248 ' + aUnits + ' square units';
                 return true;
             }
         },
