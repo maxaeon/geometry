@@ -3619,6 +3619,23 @@ function areParallel(l1, l2){
 }
 
 function calculatePolygonPerimeter(points, segments){
+    if(points.length === 0){
+        const verts = [];
+        const addVert = (x, y) => {
+            let v = verts.find(p => dist(p.x, p.y, x, y) < 10);
+            if(!v){
+                v = {x, y};
+                verts.push(v);
+            }
+        };
+        for(const s of segments){
+            if(s instanceof LineSeg){
+                addVert(s.x1, s.y1);
+                addVert(s.x2, s.y2);
+            }
+        }
+        points = verts;
+    }
     if(points.length < 3) return null;
     const near = (p, x, y) => dist(p.x, p.y, x, y) < 10;
     const adj = new Map(points.map(p => [p, []]));
@@ -3656,6 +3673,23 @@ function calculatePolygonPerimeter(points, segments){
 }
 
 function calculatePolygonArea(points, segments){
+    if(points.length === 0){
+        const verts = [];
+        const addVert = (x, y) => {
+            let v = verts.find(p => dist(p.x, p.y, x, y) < 10);
+            if(!v){
+                v = {x, y};
+                verts.push(v);
+            }
+        };
+        for(const s of segments){
+            if(s instanceof LineSeg){
+                addVert(s.x1, s.y1);
+                addVert(s.x2, s.y2);
+            }
+        }
+        points = verts;
+    }
     if(points.length < 3) return null;
     const near = (p, x, y) => dist(p.x, p.y, x, y) < 10;
     const counts = new Map(points.map(p => [p, 0]));
