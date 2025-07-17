@@ -206,6 +206,21 @@ canvas {
     border: 1px solid #ccc;
     border-radius: 4px;
     z-index: 200;
+    opacity: 1;
+    transition: top 0.8s ease, left 0.8s ease, right 0.8s ease,
+                transform 0.8s ease, opacity 0.8s ease;
+}
+
+#instruction-panel.intro {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+}
+
+#instruction-panel.intro.show {
+    opacity: 1;
 }
 
 #prev-activity, #next-activity, #skip-activity {
