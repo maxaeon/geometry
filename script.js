@@ -63,6 +63,7 @@ let parallelGuide = {};
 let snapshotStart = null;
 let selectionRect = null;
 let groupOffsets = null;
+let instructionIntroPlayed = false;
 
 
 const CANVAS_PADDING_PCT = 0;
@@ -301,6 +302,20 @@ function positionInstructionPanel(){
         const offset = toolbar.offsetHeight + 10;
         panel.style.top = offset + 'px';
     }
+}
+
+function playInstructionIntro(){
+    if(instructionIntroPlayed) return;
+    const panel = document.getElementById('instruction-panel');
+    if(!panel) return;
+    instructionIntroPlayed = true;
+    panel.classList.add('intro');
+    requestAnimationFrame(() => panel.classList.add('show'));
+    setTimeout(() => {
+        panel.classList.remove('intro');
+        panel.classList.remove('show');
+        positionInstructionPanel();
+    }, 2000);
 }
 
 function showTutorial(){
@@ -3325,6 +3340,7 @@ function loadKidsActivity(i){
     symmetryDemo = null;
     act.setup();
     feedbackElem.textContent = act.prompt;
+    playInstructionIntro();
     document.getElementById('prev-activity').disabled = i === 0;
     const nextBtn = document.getElementById('next-activity');
     const skipBtn = document.getElementById('skip-activity');
@@ -3367,6 +3383,7 @@ function loadAdvancedStep(i){
     }
     step.setup();
     feedbackElem.textContent = step.prompt;
+    playInstructionIntro();
     document.getElementById('prev-activity').disabled = i === 0;
     const nextBtn = document.getElementById('next-activity');
     nextBtn.disabled = true;
