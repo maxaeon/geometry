@@ -10,6 +10,7 @@ const firstStepIds = new Set([
     'triangle-equal',
     'intro-angle',
     'identify-right-angles',
+    'complementary-angles',
     'circle-basics',
     'equilateral-point-a',
     'right-angle-legs',
@@ -106,6 +107,10 @@ let advancedInfo = {
     'identify-right-angles': {
         formula: "Euclid's Fourth Postulate",
         explanation: 'All right angles are congruent. They are fundamental for rectangles and squares and lead to the Pythagorean theorem.'
+    },
+    'complementary-angles': {
+        formula: 'a + b = 90\u00b0',
+        explanation: 'Two angles are complementary when their measures sum to a right angle. They often appear together in right triangles.'
     },
     'parallel-through-point': {
         formula: "Euclid's Fifth Postulate",
@@ -311,6 +316,7 @@ let flashcardDefinitions = {
     'vertex': 'The point where two sides meet.',
     'edge': 'A straight side where two surfaces meet.',
     'parallel': 'Lines in a plane that never meet.',
+    'complementary angles': 'Two angles whose measures add up to 90\u00b0.',
     'perpendicular': 'Lines that meet to form right angles.'
 };
 
@@ -2059,6 +2065,42 @@ function setupKidsActivities(){
                 }
         return allClicked;
         }
+        },
+        {
+            id: 'complementary-angles',
+            category: 'Basics',
+            title: 'Complementary Angles',
+            prompt: 'Two angles whose measures add up to a right angle are complementary. Click the vertex points for both pairs.',
+            setup: function(){
+                const len = 80;
+                const cx = width/2;
+                const cy = height/2;
+                const off = 100;
+
+                const ax = cx - off;
+                const ay = cy;
+                shapes.push(new LineSeg(ax, ay, ax + len, ay));
+                shapes.push(new LineSeg(ax, ay, ax, ay - len));
+                const aDiag = -45 * Math.PI / 180;
+                shapes.push(new LineSeg(ax, ay, ax + len * Math.cos(aDiag), ay + len * Math.sin(aDiag)));
+                shapes.push(new Circle(ax, ay, 8, 'gray', true));
+
+                const bx = cx + off;
+                const by = cy;
+                shapes.push(new LineSeg(bx, by, bx + len, by));
+                shapes.push(new LineSeg(bx, by, bx, by - len));
+                const bDiag = -30 * Math.PI / 180;
+                shapes.push(new LineSeg(bx, by, bx + len * Math.cos(bDiag), by + len * Math.sin(bDiag)));
+                shapes.push(new Circle(bx, by, 8, 'gray', true));
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Circle && s.clickable && !s.clicked){
+                        return false;
+                    }
+                }
+                return true;
+            }
         },
         {
             id: 'acute-angle',
