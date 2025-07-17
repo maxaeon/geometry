@@ -120,7 +120,7 @@ let advancedInfo = {
     },
     'draw-square': {
         formula: 'Square perimeter = 4×side, area = side²',
-        explanation: 'All four sides of a square are equal and meet at right angles.'
+        explanation: 'A square lives in flat 2‑D space. Stacking squares forms a cube in 3‑D, and repeating that idea hints at a 4‑D hypercube.'
     },
     'cube-dotted': {
         formula: 'Dotted lines show hidden or imaginary edges.',
@@ -1789,7 +1789,7 @@ function setupKidsActivities(){
             id: 'draw-square',
             category: 'Basics',
             title: 'Construct a Square',
-            prompt: 'Connect the 4 red points to make a square.',
+            prompt: 'Connect the 4 red points to make a square. This 2-D shape sets up the next cube step and even hints at a 4-D version.',
             setup: function(){
                 placeSquareDots();
             },
@@ -3939,7 +3939,8 @@ function showAdvancedInfo(){
     const formulaEl = document.getElementById('advanced-formula');
     const explEl = document.getElementById('advanced-explanation');
     const canvas = document.getElementById('advanced-canvas');
-    if(!overlay || !formulaEl || !explEl || !canvas) return;
+    const image = document.getElementById('advanced-image');
+    if(!overlay || !formulaEl || !explEl || !canvas || !image) return;
     explEl.style.display = 'none';
     let act = null;
     let info = null;
@@ -3958,21 +3959,30 @@ function showAdvancedInfo(){
                 ctx.clearRect(0,0,canvas.width,canvas.height);
                 drawCubeImage(ctx);
                 canvas.style.display = 'block';
+                image.style.display = 'none';
             } else if(act.id === 'obtuse-angle'){
                 const ctx = canvas.getContext('2d');
                 ctx.clearRect(0,0,canvas.width,canvas.height);
                 drawReflexAngleImage(ctx);
                 canvas.style.display = 'block';
+                image.style.display = 'none';
+            } else if(act.id === 'draw-square'){
+                image.src = '4d.png';
+                image.style.display = 'block';
+                canvas.style.display = 'none';
             } else {
                 canvas.style.display = 'none';
+                image.style.display = 'none';
             }
         } else {
             canvas.style.display = 'none';
+            image.style.display = 'none';
         }
     } else {
         formulaEl.textContent = 'No additional information for this step.';
         explEl.textContent = '';
         canvas.style.display = 'none';
+        image.style.display = 'none';
     }
     overlay.style.display = 'flex';
 }
