@@ -531,10 +531,6 @@ function setup() {
     document.getElementById('undo-btn').addEventListener('click', undo);
     document.getElementById('redo-btn').addEventListener('click', redo);
     document.getElementById('delete-btn').addEventListener('click', deleteSelectedShape);
-    const dupBtn = document.getElementById('duplicate-btn');
-    if(dupBtn){
-        dupBtn.addEventListener('click', duplicateSelectedShapes);
-    }
     document.getElementById('add-color-btn').addEventListener('click', () => {
         const color = prompt('Enter color hex code (#RRGGBB):', '#000000');
         if(color && /^#([0-9a-fA-F]{6})$/.test(color)){
@@ -2312,10 +2308,10 @@ function setupKidsActivities(){
                 shapes.push(circleCenter);
                 // square
                 const s = 80;
-                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2));
-                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2));
-                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2));
-                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2));
+                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2, false, 'gray'));
+                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2, false, 'gray'));
+                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2, false, 'gray'));
+                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2, false, 'gray'));
                 const squareCenter = new Circle(cx, cy, 8, 'magenta', true);
                 shapes.push(squareCenter);
                 // triangle
@@ -2325,9 +2321,9 @@ function setupKidsActivities(){
                     {x: tx + 40, y: cy + 40},
                     {x: tx, y: cy - 40}
                 ];
-                shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y));
-                shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y));
-                shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y));
+                shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y, false, 'gray'));
+                shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y, false, 'gray'));
+                shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y, false, 'gray'));
                 const triangleCenter = new Circle(tx, cy, 8, 'magenta', true);
                 shapes.push(triangleCenter);
                 identifyCenterCircles.push(circleCenter, squareCenter, triangleCenter);
@@ -2510,10 +2506,10 @@ function setupKidsActivities(){
                 shapes.push(circ);
                 this.shapes.circle = circ;
                 const s = 80;
-                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2));
-                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2));
-                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2));
-                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2));
+                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2, false, 'gray'));
+                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2, false, 'gray'));
+                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2, false, 'gray'));
+                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2, false, 'gray'));
                 const squareDot = new Circle(cx, cy, 8, 'gray', true);
                 shapes.push(squareDot);
                 this.shapes.square = squareDot;
@@ -2523,9 +2519,9 @@ function setupKidsActivities(){
                     {x: tx + 40, y: cy + 40},
                     {x: tx, y: cy - 40}
                 ];
-                shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y));
-                shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y));
-                shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y));
+                shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y, false, 'gray'));
+                shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y, false, 'gray'));
+                shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y, false, 'gray'));
                 const triDot = new Circle(tx, cy, 8, 'gray', true);
                 shapes.push(triDot);
                 this.shapes.triangle = triDot;
@@ -3275,7 +3271,7 @@ function setupAdvancedExamples(){
                 }
             },
             {
-                prompt: 'Use the snapshot tool to copy \u2220CDAB near point C.',
+                prompt: 'Use the copy shape tool to copy \u2220CDAB near point C.',
                 keepShapes: true,
                 setup: function(){},
                 check: function(){return true;}
