@@ -72,6 +72,7 @@ let currentExample = null;
 let exampleShapes = [];
 let advancedExamples = {};
 let currentExampleStep = 0;
+let currentAutoNext = false;
 let triangleAGroup = null;
 let triangleBGroup = null;
 let advancedInfo = {
@@ -3081,6 +3082,7 @@ function setupAdvancedExamples(){
         'pythagorean': [
             {
                 prompt: 'Connect the magenta points to form a right triangle.',
+                autoNext: true,
                 setup: function(){
                     pythGuide = {};
                     const base = 160;
@@ -3098,6 +3100,7 @@ function setupAdvancedExamples(){
             },
             {
                 prompt: 'Sides are automatically labelled a, b and c.',
+                autoNext: true,
                 keepShapes: true,
                 setup: function(){
                     const A = pythGuide.A, B = pythGuide.B, C = pythGuide.C;
@@ -3112,6 +3115,7 @@ function setupAdvancedExamples(){
             },
             {
                 prompt: 'Construct squares on each side of the triangle.',
+                autoNext: true,
                 keepShapes: true,
                 setup: function(){
                     const {A,B,C} = pythGuide;
@@ -3121,6 +3125,7 @@ function setupAdvancedExamples(){
             },
             {
                 prompt: 'Draw a matching triangle inside each square.',
+                autoNext: true,
                 keepShapes: true,
                 setup: function(){},
                 check: function(){
@@ -3131,6 +3136,7 @@ function setupAdvancedExamples(){
             },
             {
                 prompt: 'Calculate to see that a^2 + b^2 equals c^2.',
+                autoNext: true,
                 keepShapes: true,
                 setup: function(){
                     const {A,B,C} = pythGuide;
@@ -3383,6 +3389,7 @@ function loadAdvancedStep(i){
     const steps = advancedExamples[currentExample];
     const step = steps[i];
     currentExampleStep = i;
+    currentAutoNext = step.autoNext || false;
     if(!step.keepShapes){
         shapes = [];
     }
@@ -3403,8 +3410,11 @@ function checkAdvancedStep(){
     if(step.check && step.check()){
         feedbackElem.textContent = '\u2713';
         const nextBtn = document.getElementById('next-activity');
-        if(nextBtn && currentExampleStep < steps.length - 1){
-            nextBtn.disabled = false;
+        if(currentExampleStep < steps.length - 1){
+            if(nextBtn) nextBtn.disabled = false;
+            if(currentAutoNext){
+                setTimeout(() => loadAdvancedStep(currentExampleStep + 1), 400);
+            }
         }
     }
 }
