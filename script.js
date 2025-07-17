@@ -3983,8 +3983,9 @@ function showAdvancedInfo(){
                 drawReflexAngleImage(ctx);
                 canvas.style.display = 'block';
                 image.style.display = 'none';
-            } else if(act.id === 'draw-square'){
+            } else if(act.id === 'draw-square' || act.id === 'enhanced-square'){
                 image.src = '4d.png';
+                image.alt = 'illustration of a 4D human shape.';
                 image.style.display = 'block';
                 canvas.style.display = 'none';
             } else {
