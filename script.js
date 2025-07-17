@@ -2079,147 +2079,6 @@ function setupKidsActivities(){
             }
         },
         {
-            id: 'equilateral-point-a',
-            category: 'More About Shapes',
-            title: 'Equilateral: Point A',
-            prompt: 'Place the first point (point A) anywhere on the canvas.',
-            keepShapes: false,
-            setup: function(){
-                triangleGuide = {};
-            },
-            check: function(){
-                for(const s of shapes){
-                    if(s instanceof Point){
-                        triangleGuide.A = {x:s.x, y:s.y};
-                        if(!s.label) s.label = 'A';
-                        return true;
-                    }
-                }
-                return false;
-            }
-        },
-        {
-            id: 'equilateral-circle-a',
-            category: 'More About Shapes',
-            title: 'Equilateral: Circle A',
-            prompt: 'Draw a circle centered at point A.',
-            keepShapes: true,
-            setup: function(){
-                if(triangleGuide.A){
-                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
-                }
-            },
-            check: function(){
-                if(!triangleGuide.A) return false;
-                for(const s of shapes){
-                    if(s instanceof Circle && s.r > 10){
-                        if(dist(s.x,s.y,triangleGuide.A.x,triangleGuide.A.y) < 5){
-                            triangleGuide.radius = s.r;
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        },
-        {
-            id: 'equilateral-point-b',
-            category: 'More About Shapes',
-            title: 'Equilateral: Point B',
-            prompt: 'Place a second point (point B) on the circle\u2019s circumference.',
-            keepShapes: true,
-            setup: function(){
-                if(triangleGuide.A){
-                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
-                }
-            },
-            check: function(){
-                if(!triangleGuide.A || !triangleGuide.radius) return false;
-                for(const s of shapes){
-                    if(s instanceof Point){
-                        const d = dist(s.x,s.y,triangleGuide.A.x,triangleGuide.A.y);
-                        if(abs(d - triangleGuide.radius) < 5){
-                            triangleGuide.B = {x:s.x, y:s.y};
-                            if(!s.label) s.label = 'B';
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        },
-        {
-            id: 'equilateral-circle-b',
-            category: 'More About Shapes',
-            title: 'Equilateral: Circle B',
-            prompt: 'Draw a second circle centered at B with the same radius as the first.',
-            keepShapes: true,
-            setup: function(){
-                if(triangleGuide.B){
-                    shapes.push(new Point(triangleGuide.B.x, triangleGuide.B.y, 'magenta'));
-                }
-            },
-            check: function(){
-                if(!triangleGuide.B || !triangleGuide.radius) return false;
-                for(const s of shapes){
-                    if(s instanceof Circle && s.r > 10){
-                        if(dist(s.x,s.y,triangleGuide.B.x,triangleGuide.B.y) < 5 && abs(s.r - triangleGuide.radius) < 5){
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        },
-        {
-            id: 'equilateral-connect',
-            category: 'More About Shapes',
-            title: 'Equilateral: Connect Points',
-            prompt: 'Mark the intersection of both circles as point C and connect A-B-C with line segments.',
-            keepShapes: true,
-            setup: function(){
-                if(triangleGuide.A && triangleGuide.B && triangleGuide.radius){
-                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
-                    shapes.push(new Point(triangleGuide.B.x, triangleGuide.B.y, 'magenta'));
-                    const c1 = new Circle(triangleGuide.A.x, triangleGuide.A.y, triangleGuide.radius);
-                    const c2 = new Circle(triangleGuide.B.x, triangleGuide.B.y, triangleGuide.radius);
-                    triangleGuide.COptions = circleCircleIntersection(c1,c2) || [];
-                }
-            },
-            check: function(){
-                if(!triangleGuide.COptions || !triangleGuide.COptions.length) return false;
-                let cShape = null;
-                for(const s of shapes){
-                    if(s instanceof Point){
-                        for(const p of triangleGuide.COptions){
-                            if(dist(s.x,s.y,p.x,p.y) < 5){
-                                cShape = s;
-                                triangleGuide.C = {x:s.x, y:s.y};
-                                break;
-                            }
-                        }
-                    }
-                    if(cShape) break;
-                }
-                if(!cShape) return false;
-                cShape.label = 'C';
-                let cPoint = {x:cShape.x, y:cShape.y};
-                let ab=false, bc=false, ca=false;
-                function near(px,py,qx,qy){ return dist(px,py,qx,qy) < 5; }
-                for(const s of shapes){
-                    if(s instanceof LineSeg){
-                        if((near(s.x1,s.y1,triangleGuide.A.x,triangleGuide.A.y) && near(s.x2,s.y2,triangleGuide.B.x,triangleGuide.B.y)) ||
-                           (near(s.x2,s.y2,triangleGuide.A.x,triangleGuide.A.y) && near(s.x1,s.y1,triangleGuide.B.x,triangleGuide.B.y))) ab=true;
-                        if((near(s.x1,s.y1,triangleGuide.B.x,triangleGuide.B.y) && near(s.x2,s.y2,cPoint.x,cPoint.y)) ||
-                           (near(s.x2,s.y2,triangleGuide.B.x,triangleGuide.B.y) && near(s.x1,s.y1,cPoint.x,cPoint.y))) bc=true;
-                        if((near(s.x1,s.y1,triangleGuide.A.x,triangleGuide.A.y) && near(s.x2,s.y2,cPoint.x,cPoint.y)) ||
-                           (near(s.x2,s.y2,triangleGuide.A.x,triangleGuide.A.y) && near(s.x1,s.y1,cPoint.x,cPoint.y))) ca=true;
-                    }
-                }
-                return ab && bc && ca;
-            }
-        },
-        {
             id: 'right-angle-legs',
             category: 'Basics',
             title: 'Right Triangle Legs',
@@ -2801,6 +2660,147 @@ function setupKidsActivities(){
                 }
                 feedbackElem.textContent = '';
                 return false;
+            }
+        },
+        {
+            id: 'equilateral-point-a',
+            category: 'More About Shapes',
+            title: 'Equilateral Triangle',
+            prompt: 'Place the first point (point A) anywhere on the canvas.',
+            keepShapes: false,
+            setup: function(){
+                triangleGuide = {};
+            },
+            check: function(){
+                for(const s of shapes){
+                    if(s instanceof Point){
+                        triangleGuide.A = {x:s.x, y:s.y};
+                        if(!s.label) s.label = 'A';
+                        return true;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            id: 'equilateral-circle-a',
+            category: 'More About Shapes',
+            title: 'Equilateral: Circle A',
+            prompt: 'Draw a circle centered at point A.',
+            keepShapes: true,
+            setup: function(){
+                if(triangleGuide.A){
+                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
+                }
+            },
+            check: function(){
+                if(!triangleGuide.A) return false;
+                for(const s of shapes){
+                    if(s instanceof Circle && s.r > 10){
+                        if(dist(s.x,s.y,triangleGuide.A.x,triangleGuide.A.y) < 5){
+                            triangleGuide.radius = s.r;
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            id: 'equilateral-point-b',
+            category: 'More About Shapes',
+            title: 'Equilateral: Point B',
+            prompt: 'Place a second point (point B) on the circle\u2019s circumference.',
+            keepShapes: true,
+            setup: function(){
+                if(triangleGuide.A){
+                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
+                }
+            },
+            check: function(){
+                if(!triangleGuide.A || !triangleGuide.radius) return false;
+                for(const s of shapes){
+                    if(s instanceof Point){
+                        const d = dist(s.x,s.y,triangleGuide.A.x,triangleGuide.A.y);
+                        if(abs(d - triangleGuide.radius) < 5){
+                            triangleGuide.B = {x:s.x, y:s.y};
+                            if(!s.label) s.label = 'B';
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            id: 'equilateral-circle-b',
+            category: 'More About Shapes',
+            title: 'Equilateral: Circle B',
+            prompt: 'Draw a second circle centered at B with the same radius as the first.',
+            keepShapes: true,
+            setup: function(){
+                if(triangleGuide.B){
+                    shapes.push(new Point(triangleGuide.B.x, triangleGuide.B.y, 'magenta'));
+                }
+            },
+            check: function(){
+                if(!triangleGuide.B || !triangleGuide.radius) return false;
+                for(const s of shapes){
+                    if(s instanceof Circle && s.r > 10){
+                        if(dist(s.x,s.y,triangleGuide.B.x,triangleGuide.B.y) < 5 && abs(s.r - triangleGuide.radius) < 5){
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            id: 'equilateral-connect',
+            category: 'More About Shapes',
+            title: 'Equilateral: Connect Points',
+            prompt: 'Mark the intersection of both circles as point C and connect A-B-C with line segments.',
+            keepShapes: true,
+            setup: function(){
+                if(triangleGuide.A && triangleGuide.B && triangleGuide.radius){
+                    shapes.push(new Point(triangleGuide.A.x, triangleGuide.A.y, 'magenta'));
+                    shapes.push(new Point(triangleGuide.B.x, triangleGuide.B.y, 'magenta'));
+                    const c1 = new Circle(triangleGuide.A.x, triangleGuide.A.y, triangleGuide.radius);
+                    const c2 = new Circle(triangleGuide.B.x, triangleGuide.B.y, triangleGuide.radius);
+                    triangleGuide.COptions = circleCircleIntersection(c1,c2) || [];
+                }
+            },
+            check: function(){
+                if(!triangleGuide.COptions || !triangleGuide.COptions.length) return false;
+                let cShape = null;
+                for(const s of shapes){
+                    if(s instanceof Point){
+                        for(const p of triangleGuide.COptions){
+                            if(dist(s.x,s.y,p.x,p.y) < 5){
+                                cShape = s;
+                                triangleGuide.C = {x:s.x, y:s.y};
+                                break;
+                            }
+                        }
+                    }
+                    if(cShape) break;
+                }
+                if(!cShape) return false;
+                cShape.label = 'C';
+                let cPoint = {x:cShape.x, y:cShape.y};
+                let ab=false, bc=false, ca=false;
+                function near(px,py,qx,qy){ return dist(px,py,qx,qy) < 5; }
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        if((near(s.x1,s.y1,triangleGuide.A.x,triangleGuide.A.y) && near(s.x2,s.y2,triangleGuide.B.x,triangleGuide.B.y)) ||
+                           (near(s.x2,s.y2,triangleGuide.A.x,triangleGuide.A.y) && near(s.x1,s.y1,triangleGuide.B.x,triangleGuide.B.y))) ab=true;
+                        if((near(s.x1,s.y1,triangleGuide.B.x,triangleGuide.B.y) && near(s.x2,s.y2,cPoint.x,cPoint.y)) ||
+                           (near(s.x2,s.y2,triangleGuide.B.x,triangleGuide.B.y) && near(s.x1,s.y1,cPoint.x,cPoint.y))) bc=true;
+                        if((near(s.x1,s.y1,triangleGuide.A.x,triangleGuide.A.y) && near(s.x2,s.y2,cPoint.x,cPoint.y)) ||
+                           (near(s.x2,s.y2,triangleGuide.A.x,triangleGuide.A.y) && near(s.x1,s.y1,cPoint.x,cPoint.y))) ca=true;
+                    }
+                }
+                return ab && bc && ca;
             }
         },
         {
