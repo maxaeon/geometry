@@ -193,11 +193,11 @@ let advancedInfo = {
     },
     'acute-angle': {
         formula: 'Acute angle < 90°',
-        explanation: 'Angles smaller than a right angle are called acute.'
+        explanation: 'Right angles also help us classify and measure other angles. Angles smaller than a right angle are called acute angles, while those larger are called obtuse angles.'
     },
     'obtuse-angle': {
         formula: 'Obtuse angle > 90° and < 180°',
-        explanation: 'Angles bigger than a right angle but less than a straight line are obtuse. If the angle continues past 180° it becomes a reflex angle.'
+        explanation: 'Angles bigger than a right angle but less than a straight line are obtuse. If the angle continues past 180° it becomes a reflex angle. Right angles also help us classify and measure other angles. Angles smaller than a right angle are called acute angles, while those larger are called obtuse angles.'
     },
     'shape-identify-sequence': {
         formula: 'Circle=0 sides, triangle=3, square=4',
@@ -2064,7 +2064,7 @@ function setupKidsActivities(){
             id: 'acute-angle',
             category: 'Basics',
             title: 'Acute Angle',
-            prompt: 'Click the acute angle (<90\u00b0).',
+            prompt: 'Click the acute angle (<90\u00b0). Right angles also help us classify and measure other angles. Angles smaller than a right angle are called acute angles, while those larger are called obtuse angles.',
             setup: function(){
                 const len = 80;
                 const leftX = width/2 - 80;
@@ -2094,7 +2094,7 @@ function setupKidsActivities(){
             id: 'obtuse-angle',
             category: 'Basics',
             title: 'Obtuse Angle',
-            prompt: 'Click the obtuse angle (>90\u00b0 and <180\u00b0).',
+            prompt: 'Click the obtuse angle (>90\u00b0 and <180\u00b0). Right angles also help us classify and measure other angles. Angles smaller than a right angle are called acute angles, while those larger are called obtuse angles.',
             setup: function(){
                 const len = 80;
                 const leftX = width/2 - 80;
