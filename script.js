@@ -1885,7 +1885,7 @@ function setupKidsActivities(){
             id: 'draw-square',
             category: 'Basics',
             title: 'Construct a Square',
-            prompt: 'Connect the 4 red points to make a square. This 2-D shape sets up the next cube step and even hints at a 4-D version.',
+            prompt: 'Connect the 4 red points to make a square. This 2-D shape sets up the next cube step.',
             setup: function(){
                 placeSquareDots();
             },
