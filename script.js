@@ -8,6 +8,7 @@ const firstStepIds = new Set([
     'connect-red-points',
     'draw-square',
     'triangle-equal',
+    'intro-angle',
     'identify-right-angles',
     'circle-basics',
     'equilateral-point-a',
@@ -137,6 +138,10 @@ let advancedInfo = {
     'triangle-equal': {
         formula: 'Isosceles triangle → at least two equal sides',
         explanation: 'When two sides match, the angles opposite them are also equal.'
+    },
+    'intro-angle': {
+        formula: 'Angle = two rays sharing a vertex',
+        explanation: 'Draw two rays from one point. The turn between them is the angle.'
     },
     'equilateral-point-a': {
         formula: 'Equilateral △ → all sides equal, all angles 60°',
@@ -1997,6 +2002,31 @@ function setupKidsActivities(){
                     }
                 }
                 return false;
+            }
+        },
+        {
+            id: 'intro-angle',
+            category: 'Basics',
+            title: 'Create an Angle',
+            prompt: 'Draw two rays from the same point to create an angle. An angle measures the turn between the rays.',
+            setup: function(){
+                const cx = width/2;
+                const cy = height/2;
+                this.vertex = {x: cx, y: cy};
+                shapes.push(new Point(cx, cy, 'magenta'));
+            },
+            check: function(){
+                let count = 0;
+                for(const s of shapes){
+                    if(s instanceof LineSeg){
+                        const near1 = dist(s.x1,s.y1,this.vertex.x,this.vertex.y) < 10;
+                        const near2 = dist(s.x2,s.y2,this.vertex.x,this.vertex.y) < 10;
+                        if((near1 || near2) && dist(s.x1,s.y1,s.x2,s.y2) > 20){
+                            count++;
+                        }
+                    }
+                }
+                return count >= 2;
             }
         },
         {
