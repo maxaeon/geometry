@@ -5,7 +5,6 @@ let kidsActivities = [];
 const firstStepIds = new Set([
     'intro-plane',
     'place-point',
-    'stretch-to-segment',
     'connect-red-points',
     'draw-square',
     'triangle-equal',
