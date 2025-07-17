@@ -2033,7 +2033,7 @@ function setupKidsActivities(){
             id: 'identify-right-angles',
             category: 'Basics',
             title: 'Identify Right Angles',
-            prompt: 'Click each corner point of the square to find the right angles. An angle is the space between two lines that meet.',
+            prompt: 'Click each corner point of the square to find the right angles. When two straight lines intersect so that they form two equal adjacent angles, each of those angles is a right angle. Squares and rectangles have four right angles for corners.',
             setup: function(){
                 const size=120;
                 const cx=width/2;
