@@ -2640,6 +2640,7 @@ function setupKidsActivities(){
             category: 'More About Shapes',
             title: 'Polygon Perimeter',
             prompt: 'Draw a closed polygon. Its perimeter shows up by adding all the side lengths.',
+            preserveFeedback: true,
             setup: function(){
                 showGrid = true;
             },
@@ -2661,6 +2662,7 @@ function setupKidsActivities(){
             category: 'More About Shapes',
             title: 'Circle Circumference',
             prompt: 'Draw a circle to automatically see its 2\u03C0r circumference in units.',
+            preserveFeedback: true,
             setup: function(){
                 showGrid = true;
             },
@@ -2823,6 +2825,7 @@ function setupKidsActivities(){
             category: 'More About Shapes',
             title: 'Shape Area',
             prompt: 'Draw a closed polygon or circle. The area appears in square units—count squares or use πr² for a circle.',
+            preserveFeedback: true,
             keepShapes: true,
             setup: function(){
                 showGrid = true;
@@ -3367,7 +3370,9 @@ function checkKidsActivity(){
     if(mode !== 'kids') return;
     const act = kidsActivities[currentActivity];
     if(act.check && act.check()){
-        feedbackElem.textContent = '\u2713';
+        if(!act.preserveFeedback){
+            feedbackElem.textContent = '\u2713';
+        }
         const nextBtn = document.getElementById('next-activity');
         if(nextBtn && currentActivity < kidsActivities.length - 1){
             nextBtn.disabled = false;
