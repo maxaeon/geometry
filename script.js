@@ -1801,6 +1801,56 @@ function setupKidsActivities(){
             }
         },
         {
+            id: 'shape-identify-sequence',
+            category: 'Basics',
+            title: 'Shape Identification',
+            prompt: 'Click the circle.',
+            setup: function(){
+                const cx = width/2;
+                const cy = height/2;
+                const gap = 150;
+                this.step = 0;
+                this.shapes = {};
+                const circ = new Circle(cx - gap, cy, 40, 'gray', true);
+                shapes.push(circ);
+                this.shapes.circle = circ;
+                const s = 80;
+                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2, false, 'gray'));
+                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2, false, 'gray'));
+                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2, false, 'gray'));
+                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2, false, 'gray'));
+                const squareDot = new Circle(cx, cy, 8, 'gray', true);
+                shapes.push(squareDot);
+                this.shapes.square = squareDot;
+                const tx = cx + gap;
+                const pts = [
+                    {x: tx - 40, y: cy + 40},
+                    {x: tx + 40, y: cy + 40},
+                    {x: tx, y: cy - 40}
+                ];
+                shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y, false, 'gray'));
+                shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y, false, 'gray'));
+                shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y, false, 'gray'));
+                const triDot = new Circle(tx, cy, 8, 'gray', true);
+                shapes.push(triDot);
+                this.shapes.triangle = triDot;
+                feedbackElem.textContent = 'Click the circle.';
+            },
+            check: function(){
+                const order = ['circle', 'square', 'triangle'];
+                if(this.step < order.length){
+                    const name = order[this.step];
+                    if(this.shapes[name].clicked){
+                        this.step++;
+                        if(this.step < order.length){
+                            feedbackElem.textContent = 'Now click the ' + order[this.step] + '.';
+                        }
+                    }
+                }
+                return this.step >= order.length;
+            }
+        },
+        {
             id: 'draw-square',
             category: 'Basics',
             title: 'Construct a Square',
@@ -2362,56 +2412,6 @@ function setupKidsActivities(){
                     }
                 }
                 return false;
-            }
-        },
-        {
-            id: 'shape-identify-sequence',
-            category: 'Basics',
-            title: 'Shape Identification',
-            prompt: 'Click the circle.',
-            setup: function(){
-                const cx = width/2;
-                const cy = height/2;
-                const gap = 150;
-                this.step = 0;
-                this.shapes = {};
-                const circ = new Circle(cx - gap, cy, 40, 'gray', true);
-                shapes.push(circ);
-                this.shapes.circle = circ;
-                const s = 80;
-                shapes.push(new LineSeg(cx - s/2, cy - s/2, cx + s/2, cy - s/2, false, 'gray'));
-                shapes.push(new LineSeg(cx + s/2, cy - s/2, cx + s/2, cy + s/2, false, 'gray'));
-                shapes.push(new LineSeg(cx + s/2, cy + s/2, cx - s/2, cy + s/2, false, 'gray'));
-                shapes.push(new LineSeg(cx - s/2, cy + s/2, cx - s/2, cy - s/2, false, 'gray'));
-                const squareDot = new Circle(cx, cy, 8, 'gray', true);
-                shapes.push(squareDot);
-                this.shapes.square = squareDot;
-                const tx = cx + gap;
-                const pts = [
-                    {x: tx - 40, y: cy + 40},
-                    {x: tx + 40, y: cy + 40},
-                    {x: tx, y: cy - 40}
-                ];
-                shapes.push(new LineSeg(pts[0].x, pts[0].y, pts[1].x, pts[1].y, false, 'gray'));
-                shapes.push(new LineSeg(pts[1].x, pts[1].y, pts[2].x, pts[2].y, false, 'gray'));
-                shapes.push(new LineSeg(pts[2].x, pts[2].y, pts[0].x, pts[0].y, false, 'gray'));
-                const triDot = new Circle(tx, cy, 8, 'gray', true);
-                shapes.push(triDot);
-                this.shapes.triangle = triDot;
-                feedbackElem.textContent = 'Click the circle.';
-            },
-            check: function(){
-                const order = ['circle', 'square', 'triangle'];
-                if(this.step < order.length){
-                    const name = order[this.step];
-                    if(this.shapes[name].clicked){
-                        this.step++;
-                        if(this.step < order.length){
-                            feedbackElem.textContent = 'Now click the ' + order[this.step] + '.';
-                        }
-                    }
-                }
-                return this.step >= order.length;
             }
         },
         {
