@@ -1,7 +1,9 @@
 let shapes = [];
 let currentTool = 'select';
 let mode = null; // 'kids' or 'advanced'
-let kidsActivities = [];
+let kidsActivities = Array.isArray(window.GeometryApp?.activities)
+    ? window.GeometryApp.activities
+    : [];
 const firstStepIds = new Set([
     'intro-plane',
     'place-point',
@@ -1452,9 +1454,12 @@ function populateActivitySelect(){
     def.value = '';
     def.textContent = 'Activities';
     select.appendChild(def);
-    if(Array.isArray(kidsActivities)){
+    const kids = Array.isArray(window.GeometryApp?.activities)
+        ? window.GeometryApp.activities
+        : kidsActivities;
+    if(Array.isArray(kids)){
         const groups = {};
-        kidsActivities.forEach((act, i) => {
+        kids.forEach((act, i) => {
             if(!firstStepIds.has(act.id)) return;
             const cat = act.category || 'Other';
             if(!groups[cat]){
@@ -1487,8 +1492,11 @@ function populateActivitiesOverlay(){
     if(!container) return;
     container.innerHTML = '';
     const cats = {};
-    if(Array.isArray(kidsActivities)){
-        kidsActivities.forEach((act, i) => {
+    const kids = Array.isArray(window.GeometryApp?.activities)
+        ? window.GeometryApp.activities
+        : kidsActivities;
+    if(Array.isArray(kids)){
+        kids.forEach((act, i) => {
             if(!firstStepIds.has(act.id)) return;
             const cat = act.category || 'Other';
             if(!cats[cat]){
@@ -1753,6 +1761,13 @@ function startAdvancedMode(){
 }
 
 function setupKidsActivities(){
+    if(kidsActivities.length){
+        return;
+    }
+    if(Array.isArray(window.GeometryApp?.activities)){
+        kidsActivities = window.GeometryApp.activities;
+        return;
+    }
     kidsActivities = [
         {
             id: 'intro-plane',

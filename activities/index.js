@@ -7,3 +7,7 @@ export const loadedActivities = Object.values(modules).flatMap(mod => {
   const activity = mod.default ?? mod;
   return Array.isArray(activity) ? activity : [activity];
 });
+
+// Expose activities for the main script
+window.GeometryApp = window.GeometryApp || {};
+window.GeometryApp.activities = loadedActivities;
