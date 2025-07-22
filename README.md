@@ -38,6 +38,7 @@ This interactive geometry webpage is designed for users ranging from kindergarte
 
 * Utilizes JavaScript libraries such as p5.js or Paper.js for responsive and dynamic geometry interactions.
 * Continuous improvements in user experience, including visual feedback and interaction clarity.
+* Standards registry stored in `data/standards.json` lists educational benchmarks referenced by the activities.
 
 #### Vertices and Edges
 
