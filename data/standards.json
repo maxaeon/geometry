@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "gradeBand": "9-12",
+    "description": "Prove and apply basic triangle congruence theorems",
+    "state": "CCSS.HSG-CO.D.12"
+  },
+  {
+    "id": 2,
+    "gradeBand": "9-12",
+    "description": "Use coordinates to prove simple geometric theorems algebraically",
+    "state": "CCSS.HSG-GPE.B.7"
+  },
+  {
+    "id": 3,
+    "gradeBand": "6-8",
+    "description": "Understand congruence in terms of rigid transformations",
+    "state": "CCSS.8.G.A.1"
+  }
+]
