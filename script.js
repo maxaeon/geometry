@@ -1,3 +1,11 @@
+// Initialize global namespace for activities if not already present
+window.GeometryApp = window.GeometryApp || { activities: [] };
+if (typeof window.GeometryApp.registerActivity !== 'function') {
+    window.GeometryApp.registerActivity = function(activity) {
+        if (activity) this.activities.push(activity);
+    };
+}
+
 let shapes = [];
 let currentTool = 'select';
 let mode = null; // 'kids' or 'advanced'
