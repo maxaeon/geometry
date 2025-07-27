@@ -2931,7 +2931,7 @@ function setupKidsActivities(){
                            (near(s.x2,s.y2,triangleGuide.A.x,triangleGuide.A.y) && near(s.x1,s.y1,cPoint.x,cPoint.y))) ca=true;
                     }
                 }
-                return ab && bc && ca;
+                return ab && bc && ca && isEquilateral([triangleGuide.A, triangleGuide.B, cPoint]);
             }
         },
         {
@@ -3481,7 +3481,7 @@ function setupAdvancedExamples(){
                 },
                 check: function(){
                     if(triangleLinesDrawn(similarityGuide.src)){
-                        similarityGuide.angles = triangleAngles(similarityGuide.src);
+                        similarityGuide.srcDone = true;
                         return true;
                     }
                     return false;
@@ -3506,9 +3506,7 @@ function setupAdvancedExamples(){
                 },
                 check: function(){
                     if(triangleLinesDrawn(similarityGuide.dst)){
-                        const ang = triangleAngles(similarityGuide.dst);
-                        const match = Math.abs(ang[0]-similarityGuide.angles[0])<0.1 &&
-                                     Math.abs(ang[1]-similarityGuide.angles[1])<0.1;
+                        const match = areSimilar(similarityGuide.src, similarityGuide.dst);
                         if(match && !similarityGuide.tri){
                             similarityGuide.tri = new TriangleGroup(similarityGuide.dst[0], similarityGuide.dst[1], similarityGuide.dst[2]);
                             similarityGuide.base1 = {x: similarityGuide.dst[1].x - similarityGuide.dst[0].x,

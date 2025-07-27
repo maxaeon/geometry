@@ -17,6 +17,13 @@ function angleAt(a, b, c){
   return diff;
 }
 
+/**
+ * Determine whether three nodes or points form an equilateral triangle.
+ *
+ * @param {Array<{x:number, y:number}|{shape:{x:number,y:number}}>} triangleNodes
+ *        Three graph nodes or plain point objects describing the vertices.
+ * @returns {boolean} True when all sides are equal within a 5% tolerance.
+ */
 export function isEquilateral(triangleNodes){
   if(!Array.isArray(triangleNodes) || triangleNodes.length !== 3) return false;
   const pts = triangleNodes.map(getShape);
@@ -30,6 +37,16 @@ export function isEquilateral(triangleNodes){
   return Math.abs(l1 - avg) < tol && Math.abs(l2 - avg) < tol && Math.abs(l3 - avg) < tol;
 }
 
+/**
+ * Check if two segments form a perpendicular bisector pair.
+ *
+ * @param {{x1:number,y1:number,x2:number,y2:number}|{shape:Object}} segA -
+ *        First segment or node.
+ * @param {{x1:number,y1:number,x2:number,y2:number}|{shape:Object}} segB -
+ *        Second segment or node.
+ * @returns {boolean} True when the segments intersect at a midpoint and are
+ *          perpendicular.
+ */
 export function isPerpBisector(segA, segB){
   const s1 = getShape(segA);
   const s2 = getShape(segB);
@@ -59,6 +76,16 @@ export function isPerpBisector(segA, segB){
   return perp && (isMid1 || isMid2);
 }
 
+/**
+ * Determine if two triangles are similar.
+ *
+ * @param {Array<{x:number,y:number}|{shape:{x:number,y:number}}>} tri1
+ *        First triangle vertices or nodes.
+ * @param {Array<{x:number,y:number}|{shape:{x:number,y:number}}>} tri2
+ *        Second triangle vertices or nodes.
+ * @returns {boolean} True when side ratios match within tolerance and
+ *          corresponding angles are equal.
+ */
 export function areSimilar(tri1, tri2){
   if(!Array.isArray(tri1) || tri1.length !== 3 || !Array.isArray(tri2) || tri2.length !== 3) return false;
   const a = tri1.map(getShape);
