@@ -7,6 +7,30 @@ if (typeof window.GeometryApp.registerActivity !== 'function') {
 }
 
 let shapes = [];
+function setupShapesArray(arr = []) {
+    shapes = arr;
+    shapes.push = function(...items) {
+        items.forEach(it => {
+            window.constraintGraph?.registerShape(it);
+            if(typeof getIntersections === 'function'){
+                shapes.forEach(existing => {
+                    if(existing !== it){
+                        const pts = getIntersections(it, existing);
+                        if(pts){
+                            pts.forEach(p => {
+                                window.constraintGraph.registerShape(p);
+                                window.constraintGraph.addIntersection(it, existing, p);
+                            });
+                        }
+                    }
+                });
+            }
+        });
+        return Array.prototype.push.apply(this, items);
+    };
+    return shapes;
+}
+setupShapesArray([]);
 let currentTool = 'select';
 let mode = null; // 'kids' or 'advanced'
 let kidsActivities = Array.isArray(window.GeometryApp?.activities)
@@ -435,7 +459,11 @@ function cloneState(){
 }
 
 function restoreState(state){
-    shapes = cloneShapeList(state.shapes);
+    setupShapesArray(cloneShapeList(state.shapes));
+    if(window.constraintGraph){
+        window.constraintGraph.clear();
+        window.constraintGraph.registerShapes(shapes);
+    }
     fillLayer.clear();
     fillLayer.image(state.fill, 0, 0);
 }
@@ -561,7 +589,8 @@ function setup() {
         showGrid = e.target.checked;
     });
     document.getElementById('clear-btn').addEventListener('click', () => {
-        shapes = [];
+        setupShapesArray([]);
+        if(window.constraintGraph) window.constraintGraph.clear();
         selectedShapes = [];
         selectedShape = null;
         if(mode === 'kids'){
@@ -1674,7 +1703,8 @@ function loadExample(name){
         loadKidsActivity(14);
         return;
     }
-    shapes = [];
+    setupShapesArray([]);
+    if(window.constraintGraph) window.constraintGraph.clear();
     currentExample = null;
     exampleShapes = [];
     if(advancedExamples[name]){
@@ -3618,7 +3648,8 @@ function loadKidsActivity(i){
     if(select) select.value = 'kid-' + i;
     const act = kidsActivities[i];
     if(!act.keepShapes){
-        shapes = [];
+        setupShapesArray([]);
+        if(window.constraintGraph) window.constraintGraph.clear();
     }
     currentExample = null;
     exampleShapes = [];
@@ -3667,7 +3698,8 @@ function loadAdvancedStep(i){
     currentExampleStep = i;
     currentAutoNext = step.autoNext || false;
     if(!step.keepShapes){
-        shapes = [];
+        setupShapesArray([]);
+        if(window.constraintGraph) window.constraintGraph.clear();
     }
     step.setup();
     feedbackElem.textContent = step.prompt;
@@ -3790,7 +3822,8 @@ function drawCube(x, y, size){
 }
 
 function demonstrateCircleSymmetry(){
-    shapes = [];
+    setupShapesArray([]);
+    if(window.constraintGraph) window.constraintGraph.clear();
     const centerX = width/2;
     const centerY = height/2;
     const radius = 80;
