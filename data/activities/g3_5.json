@@ -1,0 +1,53 @@
+[
+  {
+    "id": "g3_fraction_tiles",
+    "title": "Fraction Tiles on the Grid",
+    "gradeBand": "3-5",
+    "standards": ["3.G", "SMP4"],
+    "prereqs": ["g2_partition"],
+    "tools": ["Select", "SolidLine", "Fill"],
+    "steps": [
+      { "id": "compose_tiles", "prompt": "Build different rectangles with unit squares." },
+      { "id": "fraction_labels", "prompt": "Label each shape with the fraction of the whole it represents." },
+      { "id": "compare_shapes", "prompt": "Compare two shapes and explain which is larger." }
+    ],
+    "autoChecks": [
+      "equalAreaPartitions(['rectangle'])"
+    ],
+    "successCriteria": "Learner partitions shapes and relates the pieces to fractional names."
+  },
+  {
+    "id": "g4_lines_angles",
+    "title": "Classify Lines and Angles",
+    "gradeBand": "3-5",
+    "standards": ["4.G", "SMP5"],
+    "prereqs": ["g3_fraction_tiles"],
+    "tools": ["Select", "SolidLine", "Dotted", "Point"],
+    "steps": [
+      { "id": "create_lines", "prompt": "Draw intersecting lines and identify angle types." },
+      { "id": "use_protractor", "prompt": "Use the protractor overlay to measure at least two angles." },
+      { "id": "classify_shapes", "prompt": "Group shapes by their angle types." }
+    ],
+    "autoChecks": [
+      "angleClassification({ types: ['acute','right','obtuse'] })"
+    ],
+    "successCriteria": "Learner measures angles and labels each line pair correctly."
+  },
+  {
+    "id": "g5_coordinate_graphing",
+    "title": "Graph Polygons on the Coordinate Plane",
+    "gradeBand": "3-5",
+    "standards": ["5.G", "SMP4", "SMP6"],
+    "prereqs": ["g4_lines_angles"],
+    "tools": ["Select", "Point", "SolidLine", "Snapshot"],
+    "steps": [
+      { "id": "plot_points", "prompt": "Plot four points in quadrant I using the grid coordinates." },
+      { "id": "connect_vertices", "prompt": "Connect the points to form a polygon." },
+      { "id": "classify_polygon", "prompt": "Classify the polygon using side lengths or angle properties." }
+    ],
+    "autoChecks": [
+      "polygonClassification({ required: ['quadrilateral'] })"
+    ],
+    "successCriteria": "Learner plots and classifies a polygon by interpreting coordinates."
+  }
+]

@@ -1,0 +1,53 @@
+[
+  {
+    "id": "k_shape_hunt",
+    "title": "Shape Hunt with Positional Words",
+    "gradeBand": "K-2",
+    "standards": ["K.G", "SMP6"],
+    "prereqs": [],
+    "tools": ["Select", "Point", "SolidLine", "Fill"],
+    "steps": [
+      { "id": "intro_shapes", "prompt": "Use the point or line tools to outline shapes you see on the canvas." },
+      { "id": "position_words", "prompt": "Describe where each shape lives using words like above, below, or beside." },
+      { "id": "name_shapes", "prompt": "Click each shape and name it aloud or in the text box." }
+    ],
+    "autoChecks": [
+      "countShapes({ minimum: 3 })"
+    ],
+    "successCriteria": "Learner names at least three shapes and describes their position accurately."
+  },
+  {
+    "id": "g1_compose_shapes",
+    "title": "Compose Shapes from Parts",
+    "gradeBand": "K-2",
+    "standards": ["1.G", "SMP7"],
+    "prereqs": ["k_shape_hunt"],
+    "tools": ["Select", "Point", "SolidLine", "Fill", "Snapshot"],
+    "steps": [
+      { "id": "build_house", "prompt": "Use triangles and rectangles to compose a house." },
+      { "id": "identify_parts", "prompt": "Select each part and list which shapes you used." },
+      { "id": "share_strategy", "prompt": "Explain how the parts fit together to make the whole." }
+    ],
+    "autoChecks": [
+      "composedShape({ requiredParts: ['triangle','rectangle'] })"
+    ],
+    "successCriteria": "Learner creates a composite figure and explains how the pieces relate."
+  },
+  {
+    "id": "g2_partition",
+    "title": "Partition Shapes into Equal Shares",
+    "gradeBand": "K-2",
+    "standards": ["2.G", "SMP4"],
+    "prereqs": ["g1_compose_shapes"],
+    "tools": ["SolidLine", "Dotted", "Fill"],
+    "steps": [
+      { "id": "partition_rect", "prompt": "Partition the rectangle into four equal squares." },
+      { "id": "partition_circle", "prompt": "Partition the circle into three equal wedges." },
+      { "id": "explain_partitions", "prompt": "Explain why the shares are equal." }
+    ],
+    "autoChecks": [
+      "equalAreaPartitions(['rectangle','circle'])"
+    ],
+    "successCriteria": "Learner creates equal shares and justifies the equality."
+  }
+]

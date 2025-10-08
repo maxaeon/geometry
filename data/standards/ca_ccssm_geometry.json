@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "state": "CA",
+    "source": "CDE CA CCSSM (2013)",
+    "url": "https://www.cde.ca.gov/be/st/ss/documents/ccssmathstandardaug2013.pdf"
+  },
+  "standards": {
+    "K.G": {
+      "label": "Geometry—Kindergarten",
+      "bullets": [
+        "Identify and describe shapes; position words (above/below/beside…)."
+      ]
+    },
+    "1.G": { "label": "Reason with shapes and their attributes" },
+    "2.G": { "label": "Reason with shapes and their attributes" },
+    "3.G": { "label": "Reason with shapes and their attributes" },
+    "4.G": { "label": "Draw and identify lines and angles; classify shapes" },
+    "5.G": { "label": "Coordinate plane; classify 2D figures" },
+    "6.G": { "label": "Area, surface area, volume" },
+    "7.G": { "label": "Figures/relationships; angle measure, area, SA, volume" },
+    "8.G": { "label": "Congruence & similarity via transformations; Pythagorean Theorem" },
+    "G-CO.D.12": { "label": "Make formal geometric constructions" },
+    "G-CO.D.13": { "label": "Construct equilateral triangle, square, regular hexagon inscribed in a circle" },
+    "G-CO.C.9": { "label": "Prove theorems about lines and angles" },
+    "G-SRT.C.8": { "label": "Use trig ratios & Pythagorean Theorem to solve right triangles" },
+    "G-C.A": { "label": "Understand & apply theorems about circles" },
+    "G-GPE": { "label": "Express geometric properties with equations" },
+    "G-GMD": { "label": "Geometric measurement & dimension" },
+    "G-MG": { "label": "Modeling with geometry" }
+  },
+  "practices": ["SMP1","SMP2","SMP3","SMP4","SMP5","SMP6","SMP7","SMP8"]
+}

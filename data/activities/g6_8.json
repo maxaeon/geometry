@@ -1,0 +1,70 @@
+[
+  {
+    "id": "g6_area_surface_area",
+    "title": "Area and Surface Area Workshop",
+    "gradeBand": "6-8",
+    "standards": ["6.G", "SMP1"],
+    "prereqs": ["g5_coordinate_graphing"],
+    "tools": ["Select", "SolidLine", "Fill", "Snapshot"],
+    "steps": [
+      { "id": "compose_prism", "prompt": "Compose a rectangular prism net and record its dimensions." },
+      { "id": "calculate_area", "prompt": "Shade faces to show how you will compute surface area." },
+      { "id": "check_reasoning", "prompt": "Explain how the net proves your surface area calculation." }
+    ],
+    "autoChecks": [
+      "surfaceAreaCalculation({ tolerance: 0.1 })"
+    ],
+    "successCriteria": "Learner computes and justifies area and surface area using a net."
+  },
+  {
+    "id": "g7_circles_formulas",
+    "title": "Investigate Circle Formulas",
+    "gradeBand": "6-8",
+    "standards": ["7.G", "SMP5"],
+    "prereqs": ["g6_area_surface_area"],
+    "tools": ["Select", "Circle", "SolidLine", "Point"],
+    "steps": [
+      { "id": "draw_circle_pairs", "prompt": "Draw two circles with different radii." },
+      { "id": "measure_circumference", "prompt": "Estimate circumference using the measure tool." },
+      { "id": "compare_area", "prompt": "Relate radius changes to area changes." }
+    ],
+    "autoChecks": [
+      "circleMeasurements({ requireTwo: true })"
+    ],
+    "successCriteria": "Learner uses circle tools and measurements to connect radius with circumference and area."
+  },
+  {
+    "id": "g8_rigid_motions",
+    "title": "Rigid Motions Lab",
+    "gradeBand": "6-8",
+    "standards": ["8.G", "SMP2", "SMP5"],
+    "prereqs": ["g7_circles_formulas"],
+    "tools": ["Select", "Point", "SolidLine", "Snapshot"],
+    "steps": [
+      { "id": "translate_shape", "prompt": "Translate the given polygon using arrow handles." },
+      { "id": "rotate_shape", "prompt": "Rotate the shape around a vertex." },
+      { "id": "reflect_shape", "prompt": "Reflect the shape across a line and compare." }
+    ],
+    "autoChecks": [
+      "rigidMotionOverlay({ tolerance: 0.05 })"
+    ],
+    "successCriteria": "Learner demonstrates congruence through translations, rotations, and reflections."
+  },
+  {
+    "id": "g8_pythagorean_lab",
+    "title": "Pythagorean Theorem Lab",
+    "gradeBand": "6-8",
+    "standards": ["8.G", "SMP8"],
+    "prereqs": ["g8_rigid_motions"],
+    "tools": ["Select", "Point", "SolidLine", "Circle"],
+    "steps": [
+      { "id": "construct_right_triangle", "prompt": "Construct a right triangle on the grid." },
+      { "id": "build_squares", "prompt": "Construct squares on each side of the triangle." },
+      { "id": "compare_areas", "prompt": "Compare the areas to justify the Pythagorean relationship." }
+    ],
+    "autoChecks": [
+      "pythagoreanCheck({ tolerance: 0.1 })"
+    ],
+    "successCriteria": "Learner verifies the Pythagorean Theorem through area comparisons."
+  }
+]
