@@ -1,0 +1,123 @@
+[
+  {
+    "id": "hs_parallel_theorems",
+    "title": "Parallel Line Angle Theorems",
+    "gradeBand": "HS",
+    "standards": ["G-CO.C.9", "SMP3"],
+    "prereqs": ["g8_rigid_motions"],
+    "tools": ["Select", "SolidLine", "Point", "Dotted"],
+    "steps": [
+      { "id": "draw_transversal", "prompt": "Construct two parallel lines and a transversal." },
+      { "id": "label_angles", "prompt": "Label corresponding and alternate interior angles." },
+      { "id": "justify_relations", "prompt": "Explain why the angles are congruent or supplementary." }
+    ],
+    "autoChecks": [
+      "parallelBySlope('l1','l2', 1e-2)"
+    ],
+    "successCriteria": "Learner explains angle relationships with a justified argument."
+  },
+  {
+    "id": "hs_congruence_criteria",
+    "title": "Triangle Congruence Criteria",
+    "gradeBand": "HS",
+    "standards": ["G-CO.B.7", "G-CO.B.8", "SMP2"],
+    "prereqs": ["hs_parallel_theorems"],
+    "tools": ["Select", "Point", "SolidLine", "Snapshot"],
+    "steps": [
+      { "id": "build_triangles", "prompt": "Construct two triangles that satisfy SSS or SAS." },
+      { "id": "test_congruence", "prompt": "Use rigid motions to align the triangles." },
+      { "id": "explain_congruence", "prompt": "Explain which criteria guarantee congruence." }
+    ],
+    "autoChecks": [
+      "congruenceTest({ method: 'SSS' })"
+    ],
+    "successCriteria": "Learner uses transformations to argue triangle congruence."
+  },
+  {
+    "id": "hs_circles_theorems",
+    "title": "Dynamic Circle Theorems",
+    "gradeBand": "HS",
+    "standards": ["G-C.A", "SMP3"],
+    "prereqs": ["hs_congruence_criteria"],
+    "tools": ["Select", "Circle", "Point", "SolidLine"],
+    "steps": [
+      { "id": "construct_chords", "prompt": "Draw chords and tangents from a point on a circle." },
+      { "id": "measure_angles", "prompt": "Measure inscribed and central angles." },
+      { "id": "state_theorem", "prompt": "State and justify the relationship between the angles and arcs." }
+    ],
+    "autoChecks": [
+      "circleTheoremCheck({ type: 'inscribed' })"
+    ],
+    "successCriteria": "Learner demonstrates circle properties with measurements and reasoning."
+  },
+  {
+    "id": "hs_coordinate_proofs",
+    "title": "Coordinate Geometry Proofs",
+    "gradeBand": "HS",
+    "standards": ["G-GPE", "SMP7"],
+    "prereqs": ["g8_pythagorean_lab"],
+    "tools": ["Select", "Point", "SolidLine"],
+    "steps": [
+      { "id": "plot_vertices", "prompt": "Plot a quadrilateral with given coordinates." },
+      { "id": "analyze_slopes", "prompt": "Compute slopes to determine parallel or perpendicular sides." },
+      { "id": "write_proof", "prompt": "Summarize your argument in a brief proof." }
+    ],
+    "autoChecks": [
+      "slopeAnalysis({ tolerance: 1e-2 })"
+    ],
+    "successCriteria": "Learner proves properties using coordinate relationships."
+  },
+  {
+    "id": "hs_volume_wedges",
+    "title": "Volume by Slicing",
+    "gradeBand": "HS",
+    "standards": ["G-GMD", "SMP4"],
+    "prereqs": ["g6_area_surface_area"],
+    "tools": ["Select", "SolidLine", "Fill", "Snapshot"],
+    "steps": [
+      { "id": "slice_solid", "prompt": "Sketch parallel slices of a solid." },
+      { "id": "compare_volumes", "prompt": "Use Cavalieri's principle to compare with a known volume." },
+      { "id": "explain_model", "prompt": "Explain how slicing models the volume." }
+    ],
+    "autoChecks": [
+      "volumeComparison({ tolerance: 0.05 })"
+    ],
+    "successCriteria": "Learner models volume with cross sections and justifies the estimate."
+  },
+  {
+    "id": "hs_modeling_design",
+    "title": "Modeling with Geometry",
+    "gradeBand": "HS",
+    "standards": ["G-MG", "SMP4"],
+    "prereqs": ["hs_coordinate_proofs"],
+    "tools": ["Select", "Point", "SolidLine", "Fill"],
+    "steps": [
+      { "id": "interpret_problem", "prompt": "Analyze a design brief and identify constraints." },
+      { "id": "sketch_model", "prompt": "Draft a geometric model satisfying the constraints." },
+      { "id": "reflect_strategy", "prompt": "Reflect on assumptions and approximations." }
+    ],
+    "autoChecks": [
+      "modelingCheck({ requireConstraints: true })"
+    ],
+    "successCriteria": "Learner creates and critiques a mathematical model." },
+  {
+    "id": "hs_equilateral_triangle_in_circle",
+    "title": "Construct an Equilateral Triangle Inscribed in a Circle",
+    "gradeBand": "HS",
+    "standards": ["G-CO.D.13", "G-CO.D.12", "SMP3", "SMP5"],
+    "prereqs": ["8.G.Pythagorean", "hs_parallel_theorems"],
+    "tools": ["Point", "Circle", "SolidLine", "Select"],
+    "steps": [
+      { "id": "place_center", "prompt": "Place the circle's center point O." },
+      { "id": "draw_circle", "prompt": "With center O, draw a circle through point A." },
+      { "id": "mark_intersections", "prompt": "Mark intersection B on the circle using the same radius." },
+      { "id": "connect", "prompt": "Connect A–B–C to form △ABC." },
+      { "id": "justify", "prompt": "Explain why AB = BC = CA (typed or mic)." }
+    ],
+    "autoChecks": [
+      "equilateralByDistance('A','B','C', tolerance=1e-2)",
+      "verticesOnCircle(['A','B','C'],'O')"
+    ],
+    "successCriteria": "All three sides equal within tolerance, all vertices on circle, explanation submitted."
+  }
+]

@@ -1,50 +1,53 @@
-### Interactive Geometry Page README
+# Interactive Geometry
 
-#### Project Overview:
+An interactive Euclidean geometry playground with scaffolded activities, teacher tools, and a geometry dictionary. The live site is hosted at [https://maxaeon.github.io/geometry/](https://maxaeon.github.io/geometry/).
 
-This interactive geometry webpage is designed for users ranging from kindergarten through graduate school. It offers engaging, interactive activities that guide learners through the construction and exploration of geometric shapes and principles based on Euclidean geometry.
+## Current Status
 
-#### Current Status:
+* Standards-aligned activities for grades K–12 are being seeded across the activity runner. Each activity now surfaces its California and Michigan Common Core alignment through an on-canvas standards chip and a teacher-facing overlay.
+* The geometry engine is being hardened with reusable validators and measurement helpers to support robust automatic checks.
+* Accessibility, teacher evidence capture, and mathematical practice prompts are actively expanding.
 
-* The site is actively under development. Many features and activities are still in progress.
+## Standards Alignment (CA & MI)
 
-#### Key Features:
+California and Michigan both adopt the Common Core State Standards for Mathematics (CCSSM). The project maintains state-specific provenance in `data/standards/ca_ccssm_geometry.json` (California Department of Education, 2013) and `data/standards/mi_ccssm_geometry.json` (Michigan Department of Education, 2010). Core geometry identifiers (K.G–8.G, G-CO, G-SRT, G-C, G-GPE, G-GMD, G-MG) are shared across states, so a single crosswalk powers the multi-state alignment.
 
-* **Interactive Canvas:** Allows dynamic shape creation, manipulation, and exploration. A new copy shape tool lets you copy small sections of the canvas for comparing angles.
-* **Step-by-Step Activities:** Each activity is designed to provide detailed, interactive, and immediate feedback for learners. Shapes can be selected in groups and duplicated for further exploration.
+* CA CCSSM reference PDF: <https://www.cde.ca.gov/be/st/ss/documents/ccssmathstandardaug2013.pdf>
+* Michigan K-12 Mathematics Standards: <https://www.michigan.gov/-/media/Project/Websites/mde/Academic-Standards/Mathematics/Michigan_K-12_Mathematics_Standards.pdf>
 
-#### Activities (Status):
+Every activity exposes its content and practice codes in the standards chip located next to the toolbar. Teachers can toggle between CA and MI through the settings selector without reloading the activity. Detailed mappings live in [`docs/standards-alignment.md`](docs/standards-alignment.md).
 
-* **Equilateral Triangles:** Fully implemented interactive tutorial.
-* **Other Euclidean Activities:** Currently being developed and expanded.
+## Mathematical Practices
 
-  * Shape Identification
-  * Compose Shapes
-  * Shape Attributes
-  * Fractions with Shapes
-  * Proving Triangle Congruency
-  * Circle Theorems
-  * Pythagorean Theorem (interactive proof)
-  * Parallel Line Theorems
-  * Euclid's Five Postulates (advanced explanations under the brain icon)
+The Standards for Mathematical Practice (SMP 1–8) are embedded in the activity metadata. UI hooks encourage each practice—for example, SMP 3 prompts students to justify their reasoning, while SMP 5 nudges learners to try alternative tools. A concise reference to the practices is available from the Geometry Dictionary and the teacher overlay. Additional context: <https://www.cde.ca.gov/ci/ma/cf/documents/mathfwchapter2.pdf>
 
-#### Upcoming Goals:
+## Directory Highlights
 
-* Expand step-by-step interactive tutorials for all listed Euclidean activities.
-* Enhance user interface for improved visual appeal and intuitive interaction.
-* Further align activities clearly with educational standards from California and Michigan.
+```
+/data/standards           # CA & MI CCSSM geometry metadata
+/data/activities          # Grade-banded activity specifications
+/data/vocabulary.json     # Geometry dictionary entries
+/src/engine               # Geometry primitives, transforms, validators
+/src/standards            # Registry loader, crosswalk, assessment samplers
+/src/ui                   # Activity runner, dictionary, accessibility, teacher tools
+/tests                    # Jest unit tests & Cypress end-to-end specs
+```
 
-#### Technical Information:
+## Tooling
 
-* Utilizes JavaScript libraries such as p5.js or Paper.js for responsive and dynamic geometry interactions.
-* Continuous improvements in user experience, including visual feedback and interaction clarity.
-* Standards registry stored in `data/standards.json` lists educational benchmarks referenced by the activities.
+`package.json` defines scripts for local development:
 
-#### Vertices and Edges
+* `npm run dev` – start Vite for rapid prototyping
+* `npm run build` – produce a production bundle
+* `npm run test` – run Jest unit tests
+* `npm run cy:open` – launch the Cypress runner
+* `npm run lint` – execute ESLint with jsdoc rules
 
-A **vertex** is a point where two edges meet. An **edge** is the line segment connecting one vertex to another. When several points are connected so every vertex links to two edges and the path closes, those edges form a polygon.
+## Contributing
 
-#### Feedback and Contributions:
+1. Clone the repository and install dependencies with `npm install`.
+2. Run `npm run dev` to iterate locally; the site will hot-reload changes.
+3. Add unit tests in `tests/unit` or E2E flows in `tests/e2e` for new functionality.
+4. Verify accessibility and keyboard navigation before submitting a pull request.
 
-* Feedback is welcome to help refine and enhance the project.
-* Future contributions may include additional interactive features, instructional refinements, and educational resources aligned with school standards.
+Feedback and pull requests are welcome to expand the activity library, strengthen the geometry engine, and extend standards coverage.

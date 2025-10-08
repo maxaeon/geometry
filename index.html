@@ -86,6 +86,7 @@
         <button id="undo-btn" class="tool-btn" title="Undo">↺</button>
         <button id="redo-btn" class="tool-btn" title="Redo">↻</button>
         <button id="delete-btn" class="tool-btn" title="Delete Selected">❌</button>
+        <div id="standards-chip" role="note" aria-live="polite" class="chip hidden"></div>
         <select id="activity-select">
             <option value="">Activities</option>
         </select>
@@ -95,6 +96,19 @@
         <button id="info-btn" title="Show Tutorial">&#9432;</button>
         <button id="brain-btn" class="tool-btn" title="More Info">&#129504;</button>
         <button id="dictionary-btn-canvas" class="tool-btn" title="Dictionary">&#128214;</button>
+        <div id="teacher-controls">
+            <button id="settings-btn" class="tool-btn" title="Settings">⚙️</button>
+            <div id="settings-panel" class="hidden" role="region" aria-label="Teacher and settings panel">
+                <label for="state-selector">State</label>
+                <select id="state-selector">
+                    <option value="CA">California</option>
+                    <option value="MI">Michigan</option>
+                </select>
+                <label class="toggle"><input type="checkbox" id="teacher-toggle"> Teacher Mode</label>
+                <button id="open-standards-overlay" type="button">View Standards</button>
+                <button id="download-evidence" type="button">Download Evidence</button>
+            </div>
+        </div>
     </div>
     <div id="instruction-panel"></div>
     <div id="canvas-container" style="display:none"></div>
@@ -112,56 +126,21 @@
         <div class="dict-content">
             <button id="dict-close" title="Close">&times;</button>
             <h2>Geometry Dictionary</h2>
-            <div id="dictionary-book">
-                <div class="dict-page" id="dict-basic">
-                    <h3>Basic Terms</h3>
-                    <ul>
-                        <li><button class="flash-btn" data-term="angle">Angle</button></li>
-                        <li><button class="flash-btn" data-term="circle">Circle</button></li>
-                        <li><button class="flash-btn" data-term="hexagon">Hexagon</button></li>
-                        <li><button class="flash-btn" data-term="line">Line</button></li>
-                        <li><button class="flash-btn" data-term="pentagon">Pentagon</button></li>
-                        <li><button class="flash-btn" data-term="plane">Plane</button></li>
-                        <li><button class="flash-btn" data-term="point">Point</button></li>
-                        <li><button class="flash-btn" data-term="polygon">Polygon</button></li>
-                        <li><button class="flash-btn" data-term="radius">Radius</button></li>
-                        <li><button class="flash-btn" data-term="right angle">Right Angle</button></li>
-                        <li><button class="flash-btn" data-term="square">Square</button></li>
-                        <li><button class="flash-btn" data-term="triangle">Triangle</button></li>
-                    </ul>
-                </div>
-                <div class="dict-page" id="dict-intermediate">
-                    <h3>Intermediate Terms</h3>
-                    <ul>
-                        <li><button class="flash-btn" data-term="area">Area</button></li>
-                        <li><button class="flash-btn" data-term="circumference">Circumference</button></li>
-                        <li><button class="flash-btn" data-term="diameter">Diameter</button></li>
-                        <li><button class="flash-btn" data-term="perimeter">Perimeter</button></li>
-                    </ul>
-                </div>
-                <div class="dict-page" id="dict-advanced">
-                    <h3>Advanced Terms</h3>
-                    <ul>
-                        <li><button class="flash-btn" data-term="cube">Cube</button></li>
-                        <li><button class="flash-btn" data-term="dimension">Dimension</button></li>
-                        <li><button class="flash-btn" data-term="hypotenuse">Hypotenuse</button></li>
-                        <li><button class="flash-btn" data-term="similarity">Similarity</button></li>
-                        <li><button class="flash-btn" data-term="tangent">Tangent</button></li>
-                        <li><button class="flash-btn" data-term="congruent triangles">Congruent Triangles</button></li>
-                        <li><button class="flash-btn" data-term="SSS criterion">SSS Criterion</button></li>
-                        <li><button class="flash-btn" data-term="corresponding sides">Corresponding Sides</button></li>
-                    </ul>
-                </div>
+            <div id="dictionary-filter">
+                <label for="dictionary-grade">Grade band</label>
+                <select id="dictionary-grade">
+                    <option value="K-2">K–2</option>
+                    <option value="3-5">3–5</option>
+                    <option value="6-8">6–8</option>
+                    <option value="HS">HS</option>
+                </select>
             </div>
-            <div class="dict-nav">
-                <button id="dict-prev">&#9664;</button>
-                <button id="dict-next">&#9654;</button>
-            </div>
-            <div id="flashcard" style="display:none">
+            <ul id="dictionary-list" class="dictionary-list" aria-live="polite"></ul>
+            <div id="dictionary-detail" class="hidden">
                 <h3 id="flashcard-title"></h3>
                 <p id="flashcard-definition"></p>
-                <canvas id="flashcard-canvas" width="200" height="200"></canvas>
-                <div><button id="back-to-dictionary">Back</button></div>
+                <svg id="flashcard-svg" width="200" height="200" role="img" aria-label="Example"></svg>
+                <button id="back-to-dictionary">Back</button>
             </div>
         </div>
     </div>
@@ -176,6 +155,27 @@
             <div id="advanced-explanation" style="display:none"></div>
         </div>
     </div>
+    <div id="teacher-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="teacher-title">
+        <div class="teacher-content">
+            <button id="teacher-close" title="Close">&times;</button>
+            <h2 id="teacher-title">Teacher Mode</h2>
+            <p class="teacher-meta">Learning objectives, prerequisites, and exit tickets align with the selected state standards.</p>
+            <section>
+                <h3>Standards</h3>
+                <a class="standards-meta" target="_blank" rel="noopener">State source</a>
+                <ul class="standards-list"></ul>
+            </section>
+            <section>
+                <h3>Activity Planning</h3>
+                <p id="teacher-duration">Estimated time: <span data-duration>15 minutes</span></p>
+                <p id="teacher-prereqs">Prerequisites: <span data-prereqs>See activity metadata</span></p>
+            </section>
+            <section>
+                <h3>Exit Ticket Seeds</h3>
+                <ul class="exit-ticket-list"></ul>
+            </section>
+        </div>
+    </div>
     <div id="activities-overlay">
         <div class="activities-content">
             <button id="activities-close" title="Close">&times;</button>
@@ -185,7 +185,7 @@
     </div>
     <script type="module" src="activities/index.js"></script>
     <script src="src/constraints/constraintGraph.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
     <script>
         window.addEventListener('load', function(){
             const mc = document.getElementById('mode-content');

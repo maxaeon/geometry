@@ -1,0 +1,50 @@
+[
+  {
+    "term": "Point",
+    "gradeBand": "K-2",
+    "definition": "An exact location in space with no size, often represented by a dot.",
+    "exampleSVG": "<circle cx='20' cy='20' r='4' fill='#1f77b4' />"
+  },
+  {
+    "term": "Line",
+    "gradeBand": "K-2",
+    "definition": "A straight path that goes on forever in both directions.",
+    "exampleSVG": "<line x1='5' y1='20' x2='35' y2='20' stroke='#ff7f0e' stroke-width='2' />"
+  },
+  {
+    "term": "Right Angle",
+    "gradeBand": "3-5",
+    "definition": "An angle that measures exactly 90 degrees.",
+    "exampleSVG": "<path d='M10 30 L10 10 L30 10' stroke='#2ca02c' stroke-width='2' fill='none' />"
+  },
+  {
+    "term": "Radius",
+    "gradeBand": "3-5",
+    "definition": "A segment from the center of a circle to a point on the circle.",
+    "exampleSVG": "<circle cx='20' cy='20' r='15' stroke='#d62728' fill='none'/><line x1='20' y1='20' x2='35' y2='20' stroke='#d62728' stroke-width='2'/>"
+  },
+  {
+    "term": "Transformation",
+    "gradeBand": "6-8",
+    "definition": "A move such as a translation, rotation, or reflection that changes a shape's position but not its size.",
+    "exampleSVG": "<polygon points='5,25 15,5 25,25' fill='rgba(31,119,180,0.5)' /><polygon points='25,35 35,15 45,35' fill='rgba(31,119,180,0.5)' />"
+  },
+  {
+    "term": "Hypotenuse",
+    "gradeBand": "6-8",
+    "definition": "The longest side of a right triangle, opposite the right angle.",
+    "exampleSVG": "<polygon points='10,10 10,35 35,35' fill='rgba(148,103,189,0.2)' stroke='#9467bd'/><line x1='10' y1='10' x2='35' y2='35' stroke='#9467bd' stroke-width='2'/>"
+  },
+  {
+    "term": "Congruent",
+    "gradeBand": "HS",
+    "definition": "Figures that have the same size and shape, even if rotated or reflected.",
+    "exampleSVG": "<polygon points='10,30 20,10 30,30' fill='rgba(44,160,44,0.4)' /><polygon points='40,30 50,10 60,30' fill='rgba(44,160,44,0.4)' />"
+  },
+  {
+    "term": "Slope",
+    "gradeBand": "HS",
+    "definition": "A measure of the steepness of a line, calculated as rise over run.",
+    "exampleSVG": "<line x1='10' y1='30' x2='50' y2='10' stroke='#8c564b' stroke-width='2'/><line x1='10' y1='30' x2='50' y2='30' stroke='#8c564b' stroke-width='1' stroke-dasharray='4 2'/><line x1='50' y1='30' x2='50' y2='10' stroke='#8c564b' stroke-width='1' stroke-dasharray='4 2'/>"
+  }
+]

@@ -294,6 +294,132 @@ body.kids #skip-activity {
     z-index: 300;
 }
 
+.hidden {
+    display: none !important;
+}
+
+#standards-chip {
+    background: #002b5c;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+#standards-chip .code {
+    background: rgba(255,255,255,0.15);
+    padding: 2px 6px;
+    border-radius: 12px;
+}
+
+#teacher-controls {
+    position: relative;
+}
+
+#settings-btn {
+    width: 32px;
+    height: 32px;
+}
+
+#settings-panel {
+    position: absolute;
+    top: 36px;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 200px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 30;
+}
+
+#settings-panel label,
+#settings-panel select,
+#settings-panel button {
+    font-size: 0.85rem;
+}
+
+#teacher-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+}
+
+.teacher-content {
+    background: #fff;
+    color: #000;
+    padding: 1.5rem;
+    border-radius: 12px;
+    width: min(90%, 480px);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+.teacher-content section {
+    margin-bottom: 1rem;
+}
+
+.teacher-content button {
+    align-self: flex-end;
+}
+
+.dictionary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 6px;
+}
+
+.dictionary-term button {
+    width: 100%;
+    text-align: left;
+    padding: 6px;
+    border: 1px solid #ccc;
+    background: #fdfdfd;
+    cursor: pointer;
+}
+
+.dictionary-term button:hover,
+.dictionary-term button:focus {
+    background: #e3f2fd;
+    outline: 2px solid #2196f3;
+}
+
+#dictionary-detail {
+    margin-top: 1rem;
+    border-top: 1px solid #ccc;
+    padding-top: 1rem;
+}
+
+.smp-hint {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: #fffde7;
+    border-left: 4px solid #ffb300;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 #dictionary-overlay .dict-content {
     background: #fff;
     color: #000;

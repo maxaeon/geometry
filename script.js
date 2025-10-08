@@ -1,3 +1,9 @@
+import { loadStandards } from './src/standards/registry.js';
+import { hydrateActivityContext, persistEvidence, formatStandardsChip, loadGradeBand } from './src/ui/activity-runner.js';
+import { loadVocabulary, renderVocabularyList, applySmpPrompt } from './src/ui/dictionary.js';
+import { registerKeyboardShortcuts, applyAriaRoles, updatePressedState } from './src/ui/a11y.js';
+import { getUserState, initStateSelector, initTeacherToggle, renderStandardsOverlay, downloadEvidence, setUserState } from './src/ui/teacher.js';
+
 // Initialize global namespace for activities if not already present
 window.GeometryApp = window.GeometryApp || { activities: [] };
 if (typeof window.GeometryApp.registerActivity !== 'function') {
@@ -32,10 +38,43 @@ function setupShapesArray(arr = []) {
 }
 setupShapesArray([]);
 let currentTool = 'select';
-let mode = null; // 'kids' or 'advanced'
+let mode = null; // 'kids', 'advanced', or 'standards'
+
+const StandardsState = {
+    currentActivityId: null,
+    context: null,
+    stepIndex: 0,
+    startTime: null,
+    response: ''
+};
+
+const VocabularyState = {
+    entries: [],
+    gradeBand: 'K-2'
+};
+
+const EvidenceLogKey = 'geometry-evidence-log';
+
+const UserPrefs = {
+    get state() {
+        return getUserState();
+    },
+    set state(value) {
+        setUserState(value);
+    }
+};
+
+window.UserPrefs = UserPrefs;
 let kidsActivities = Array.isArray(window.GeometryApp?.activities)
     ? window.GeometryApp.activities
     : [];
+
+function logEvidence(entry) {
+    const key = EvidenceLogKey;
+    const records = JSON.parse(localStorage.getItem(key) || '[]');
+    records.push({ ...entry, timestamp: Date.now() });
+    localStorage.setItem(key, JSON.stringify(records));
+}
 const firstStepIds = new Set([
     'intro-plane',
     'place-point',
@@ -417,6 +456,7 @@ function setTool(tool){
     document.querySelectorAll('.tool-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tool === tool);
     });
+    updatePressedState(tool);
 }
 
 function cloneShapeList(list){
@@ -566,6 +606,10 @@ function setup() {
     fillLayer = createGraphics(size.width, size.height);
     fillLayer.pixelDensity(1);
     feedbackElem = document.getElementById('instruction-panel');
+    applyAriaRoles();
+    registerKeyboardShortcuts(setTool);
+    initializeSettingsPanel();
+    initializeDictionary();
     document.getElementById('tool-select').addEventListener('change', e => {
         setTool(e.target.value);
     });
@@ -611,9 +655,13 @@ function setup() {
             if(!isNaN(idx)){
                 if(mode!=='kids') startKidsMode();
                 loadKidsActivity(idx);
+                hideStandardsChip();
             }
-        } else {
+        } else if(advancedExamples[val]){
+            hideStandardsChip();
             loadExample(val);
+        } else {
+            loadStandardsActivity(val).catch(console.error);
         }
     });
 
@@ -655,6 +703,8 @@ function setup() {
                 animatePageTurn('next');
                 loadAdvancedStep(currentExampleStep + 1);
             }
+        } else if(mode === 'standards' && StandardsState.context){
+            advanceStandardsStep(1);
         }
     });
     document.getElementById('skip-activity').addEventListener('click', () => {
@@ -680,6 +730,8 @@ function setup() {
                 animatePageTurn('next');
                 loadAdvancedStep(currentExampleStep + 1);
             }
+        } else if(mode === 'standards' && StandardsState.context){
+            advanceStandardsStep(1);
         }
     });
     document.getElementById('prev-activity').addEventListener('click', () => {
@@ -693,6 +745,8 @@ function setup() {
                 animatePageTurn('prev');
                 loadAdvancedStep(currentExampleStep - 1);
             }
+        } else if(mode === 'standards' && StandardsState.context){
+            advanceStandardsStep(-1);
         }
     });
 
@@ -716,19 +770,12 @@ function setup() {
     }
     const backBtn = document.getElementById('back-to-dictionary');
     if(backBtn){
-        backBtn.addEventListener('click', showCategories);
+        backBtn.addEventListener('click', hideDictionaryDetail);
     }
-    const prevPage = document.getElementById('dict-prev');
-    if(prevPage){
-        prevPage.addEventListener('click', () => showBookPage(currentDictPage-1));
+    const dictList = document.getElementById('dictionary-list');
+    if(dictList){
+        dictList.addEventListener('click', handleDictionaryClick);
     }
-    const nextPage = document.getElementById('dict-next');
-    if(nextPage){
-        nextPage.addEventListener('click', () => showBookPage(currentDictPage+1));
-    }
-    document.querySelectorAll('.flash-btn').forEach(btn => {
-        btn.addEventListener('click', () => showFlashcard(btn.dataset.term));
-    });
     const brainBtn = document.getElementById('brain-btn');
     if(brainBtn){
         brainBtn.addEventListener('click', showAdvancedInfo);
@@ -765,6 +812,238 @@ function setup() {
     positionInstructionPanel();
 }
 
+function initializeSettingsPanel(){
+    const settingsBtn = document.getElementById('settings-btn');
+    const panel = document.getElementById('settings-panel');
+    if(settingsBtn && panel){
+        settingsBtn.addEventListener('click', () => {
+            panel.classList.toggle('hidden');
+        });
+    }
+    const stateSelector = document.getElementById('state-selector');
+    if(stateSelector){
+        initStateSelector(stateSelector);
+        stateSelector.addEventListener('statechange', event => {
+            const value = event.detail;
+            UserPrefs.state = value;
+            if(StandardsState.currentActivityId){
+                loadStandardsActivity(StandardsState.currentActivityId).catch(console.error);
+            }
+        });
+    }
+    const teacherToggle = document.getElementById('teacher-toggle');
+    if(teacherToggle){
+        initTeacherToggle(teacherToggle);
+    }
+    const openOverlay = document.getElementById('open-standards-overlay');
+    if(openOverlay){
+        openOverlay.addEventListener('click', async () => {
+            if(!StandardsState.currentActivityId) return;
+            const overlay = document.getElementById('teacher-overlay');
+            if(!overlay) return;
+            const container = overlay.querySelector('.teacher-content');
+            await renderStandardsOverlay(StandardsState.currentActivityId, container);
+            overlay.classList.remove('hidden');
+        });
+    }
+    const closeOverlay = document.getElementById('teacher-close');
+    if(closeOverlay){
+        closeOverlay.addEventListener('click', () => {
+            const overlay = document.getElementById('teacher-overlay');
+            if(overlay) overlay.classList.add('hidden');
+        });
+    }
+    const downloadBtn = document.getElementById('download-evidence');
+    if(downloadBtn){
+        downloadBtn.addEventListener('click', () => {
+            if(StandardsState.currentActivityId){
+                downloadEvidence(StandardsState.currentActivityId);
+            }
+        });
+    }
+}
+
+async function initializeDictionary(){
+    const gradeSelect = document.getElementById('dictionary-grade');
+    if(gradeSelect){
+        gradeSelect.value = VocabularyState.gradeBand;
+        gradeSelect.addEventListener('change', async () => {
+            VocabularyState.gradeBand = gradeSelect.value;
+            await refreshDictionaryList();
+            hideDictionaryDetail();
+        });
+    }
+    await refreshDictionaryList();
+}
+
+async function refreshDictionaryList(){
+    const list = document.getElementById('dictionary-list');
+    if(!list) return;
+    VocabularyState.entries = await loadVocabulary(VocabularyState.gradeBand);
+    renderVocabularyList(list, VocabularyState.entries);
+}
+
+function handleDictionaryClick(event){
+    const button = event.target.closest('button');
+    if(!button) return;
+    const term = button.dataset.term;
+    if(!term) return;
+    const entry = VocabularyState.entries.find(e => e.term === term);
+    if(entry){
+        showDictionaryDetail(entry);
+    }
+}
+
+function showDictionaryDetail(entry){
+    const detail = document.getElementById('dictionary-detail');
+    if(!detail) return;
+    detail.classList.remove('hidden');
+    document.getElementById('flashcard-title').textContent = entry.term;
+    document.getElementById('flashcard-definition').textContent = entry.definition;
+    const svg = document.getElementById('flashcard-svg');
+    if(svg){
+        svg.innerHTML = entry.exampleSVG;
+    }
+    detail.querySelectorAll('.smp-hint').forEach(h => h.remove());
+    const smpCode = StandardsState.context?.codes?.find(c => c.code.startsWith('SMP'))?.code;
+    if(smpCode){
+        applySmpPrompt(detail, smpCode);
+    }
+}
+
+function hideDictionaryDetail(){
+    const detail = document.getElementById('dictionary-detail');
+    if(detail){
+        detail.classList.add('hidden');
+    }
+}
+
+function showStandardsChip(codes, meta){
+    const chip = document.getElementById('standards-chip');
+    if(!chip) return;
+    chip.innerHTML = formatStandardsChip(codes);
+    if(meta){
+        chip.title = `${meta.state} • ${meta.source}`;
+    }
+    chip.classList.remove('hidden');
+}
+
+function hideStandardsChip(){
+    const chip = document.getElementById('standards-chip');
+    if(chip){
+        chip.classList.add('hidden');
+        chip.innerHTML = '';
+        chip.removeAttribute('title');
+    }
+    clearToolGate();
+    StandardsState.currentActivityId = null;
+    StandardsState.context = null;
+    StandardsState.stepIndex = 0;
+}
+
+function applyToolGate(tools){
+    const allowed = new Set((tools || []).map(t => t.toLowerCase()));
+    document.querySelectorAll('#tool-buttons .tool-btn').forEach(btn => {
+        const tool = btn.dataset.tool;
+        if(!allowed.size || allowed.has(tool) || tool === 'select'){
+            btn.disabled = false;
+        } else {
+            btn.disabled = true;
+        }
+    });
+}
+
+function clearToolGate(){
+    document.querySelectorAll('#tool-buttons .tool-btn').forEach(btn => {
+        btn.disabled = false;
+    });
+}
+
+async function loadStandardsActivity(activityId){
+    try {
+        await loadStandards(UserPrefs.state);
+        const context = await hydrateActivityContext(activityId, UserPrefs.state);
+        StandardsState.currentActivityId = activityId;
+        StandardsState.context = context;
+        StandardsState.stepIndex = 0;
+        StandardsState.startTime = performance.now();
+        StandardsState.response = '';
+        mode = 'standards';
+        applyToolGate(context.activity.tools || []);
+        showStandardsChip(context.codes, context.standards.meta);
+        renderStandardsStep();
+    } catch (error){
+        console.error('Failed to load standards activity', error);
+    }
+}
+
+function renderStandardsStep(){
+    if(!StandardsState.context) return;
+    const { activity, codes } = StandardsState.context;
+    const step = activity.steps[StandardsState.stepIndex];
+    if(!step) return;
+    const smpCodes = codes.filter(c => c.code.startsWith('SMP')).map(c => c.code);
+    feedbackElem.innerHTML = `
+        <div class="standards-step">
+            <h3>${activity.title}</h3>
+            <p>${step.prompt}</p>
+        </div>
+    `;
+    const prevBtn = document.getElementById('prev-activity');
+    if(prevBtn) prevBtn.disabled = StandardsState.stepIndex === 0;
+    const nextBtn = document.getElementById('next-activity');
+    if(nextBtn){
+        nextBtn.disabled = StandardsState.stepIndex >= activity.steps.length - 1;
+    }
+    persistEvidence(activity.id, { stepId: step.id, status: 'viewed', state: UserPrefs.state });
+    logEvidence({ activityId: activity.id, stepId: step.id, checks: [], smp: smpCodes, state: UserPrefs.state, event: 'viewed' });
+    if(step.id && step.id.toLowerCase().includes('justify')){
+        const input = document.createElement('textarea');
+        input.id = 'justify-input';
+        input.rows = 4;
+        input.placeholder = 'Explain your reasoning...';
+        input.addEventListener('input', () => {
+            StandardsState.response = input.value;
+            persistEvidence(activity.id, { stepId: step.id, status: 'response', response: input.value });
+            logEvidence({ activityId: activity.id, stepId: step.id, checks: [], smp: smpCodes, state: UserPrefs.state, event: 'response', response: input.value });
+            if(nextBtn){
+                nextBtn.disabled = input.value.trim().length === 0;
+            }
+        });
+        feedbackElem.appendChild(input);
+        if(nextBtn){
+            nextBtn.disabled = StandardsState.response.trim().length === 0;
+        }
+        if(StandardsState.response){
+            input.value = StandardsState.response;
+        }
+    }
+}
+
+function advanceStandardsStep(delta){
+    if(!StandardsState.context) return;
+    const { activity, codes } = StandardsState.context;
+    const steps = activity.steps;
+    const smpCodes = codes.filter(c => c.code.startsWith('SMP')).map(c => c.code);
+    const current = steps[StandardsState.stepIndex];
+    if(delta > 0){
+        persistEvidence(activity.id, { stepId: current.id, status: 'completed', state: UserPrefs.state });
+        const elapsed = StandardsState.startTime ? Math.round(performance.now() - StandardsState.startTime) : 0;
+        logEvidence({ activityId: activity.id, stepId: current.id, checks: [], smp: smpCodes, state: UserPrefs.state, event: 'completed', timeMs: elapsed });
+    }
+    const next = StandardsState.stepIndex + delta;
+    if(next < 0) return;
+    if(next >= steps.length){
+        feedbackElem.innerHTML = `<p>Great work! You completed ${activity.title}.</p>`;
+        const nextBtn = document.getElementById('next-activity');
+        if(nextBtn) nextBtn.disabled = true;
+        return;
+    }
+    StandardsState.stepIndex = next;
+    StandardsState.startTime = performance.now();
+    renderStandardsStep();
+}
+
 function windowResized() {
     const size = calcCanvasSize();
     resizeCanvas(size.width, size.height);
@@ -777,7 +1056,7 @@ function windowResized() {
 function mousePressed() {
     if(!isMouseOnCanvas()) return;
     if (mouseButton !== LEFT) return;
-    if(mode==='kids' || mode === 'advanced'){
+    if(mode==='kids' || mode === 'advanced' || mode === 'standards'){
         const act = kidsActivities[currentActivity];
         if(act && act.id === 'identify-centers'){
             for(const s of shapes){
@@ -1483,7 +1762,7 @@ function createColorPalette(){
     });
 }
 
-function populateActivitySelect(){
+async function populateActivitySelect(){
     const select = document.getElementById('activity-select');
     if(!select) return;
     select.innerHTML = '';
@@ -1521,6 +1800,25 @@ function populateActivitySelect(){
             og.appendChild(opt);
         });
         select.appendChild(og);
+    }
+    const gradeBands = ['K-2','3-5','6-8','HS'];
+    for (const band of gradeBands){
+        try {
+            const activities = await loadGradeBand(band);
+            if(!activities || !activities.length) continue;
+            const og = document.createElement('optgroup');
+            og.label = `${band} Standards`;
+            activities.forEach(activity => {
+                const opt = document.createElement('option');
+                opt.value = activity.id;
+                opt.textContent = activity.title;
+                opt.dataset.grade = band;
+                og.appendChild(opt);
+            });
+            select.appendChild(og);
+        } catch (error) {
+            console.warn('Unable to load activities for', band, error);
+        }
     }
 }
 
@@ -1698,6 +1996,7 @@ function captureSnapshot(x1,y1,x2,y2){
 }
 
 function loadExample(name){
+    hideStandardsChip();
     if(name==='equilateral'){
         if(mode!=='kids') startKidsMode();
         loadKidsActivity(14);
@@ -1738,6 +2037,8 @@ function transitionToMode(target){
 // ----- Mode Switching -----
 function startKidsMode(){
     mode = 'kids';
+    hideStandardsChip();
+    clearToolGate();
     currentExample = null;
     exampleShapes = [];
     document.body.classList.add('kids');
@@ -1759,7 +2060,7 @@ function startKidsMode(){
     introGuide = {};
     rightTriangleGuide = {};
     setupKidsActivities();
-    populateActivitySelect();
+    populateActivitySelect().catch(console.error);
     populateActivitiesOverlay();
     loadKidsActivity(0);
     updateBrainButton();
@@ -1768,6 +2069,8 @@ function startKidsMode(){
 
 function startAdvancedMode(){
     mode = 'advanced';
+    hideStandardsChip();
+    clearToolGate();
     currentExample = null;
     exampleShapes = [];
     // Ensure kids activities are loaded so they appear in the activity lists
@@ -1793,7 +2096,7 @@ function startAdvancedMode(){
     feedbackElem.textContent = '';
     updateBrainButton();
     setupAdvancedExamples();
-    populateActivitySelect();
+    populateActivitySelect().catch(console.error);
     populateActivitiesOverlay();
     positionInstructionPanel();
 }
@@ -3641,6 +3944,7 @@ function setupAdvancedExamples(){
     };
 }
 function loadKidsActivity(i){
+    hideStandardsChip();
     currentActivity = i;
     const select = document.getElementById('activity-select');
     if(select) select.value = 'kid-' + i;
@@ -4043,12 +4347,12 @@ function calculatePolygonArea(points, segments){
 function calculateCircleCircumference(radius){
     return 2 * Math.PI * radius;
 }
-function openDictionary(){
+async function openDictionary(){
     const overlay = document.getElementById('dictionary-overlay');
     if(overlay){
         overlay.style.display = 'flex';
-        currentDictPage = 0;
-        showCategories();
+        await refreshDictionaryList();
+        hideDictionaryDetail();
     }
 }
 
@@ -4056,10 +4360,6 @@ function closeDictionary(){
     const overlay = document.getElementById('dictionary-overlay');
     if(overlay){
         overlay.style.display = 'none';
-    }
-    if(dimensionInterval){
-        clearInterval(dimensionInterval);
-        dimensionInterval = null;
     }
 }
 
@@ -4081,229 +4381,17 @@ function closeActivities(){
 }
 
 function showBookPage(idx){
-    const pages = document.querySelectorAll('#dictionary-book .dict-page');
-    if(!pages.length) return;
-    if(idx < 0 || idx >= pages.length) return;
-    pages.forEach((p,i)=>{p.style.display = i===idx ? 'block' : 'none';});
-    currentDictPage = idx;
-    const prev = document.getElementById('dict-prev');
-    const next = document.getElementById('dict-next');
-    if(prev) prev.style.display = idx===0 ? 'none' : 'inline-block';
-    if(next) next.style.display = idx===pages.length-1 ? 'none' : 'inline-block';
+    void idx;
 }
 
 function showCategories(){
-    const book = document.getElementById('dictionary-book');
-    if(book) book.style.display = 'block';
-    showBookPage(currentDictPage);
-    const card = document.getElementById('flashcard');
-    if(dimensionInterval){
-        clearInterval(dimensionInterval);
-        dimensionInterval = null;
-    }
-    if(card) card.style.display = 'none';
+    hideDictionaryDetail();
 }
 
 function showFlashcard(term){
-    const book = document.getElementById('dictionary-book');
-    if(book) book.style.display = 'none';
-    const card = document.getElementById('flashcard');
-    if(!card) return;
-    if(dimensionInterval){
-        clearInterval(dimensionInterval);
-        dimensionInterval = null;
-    }
-    card.style.display = 'block';
-    document.getElementById('flashcard-title').textContent = term.charAt(0).toUpperCase() + term.slice(1);
-    const defEl = document.getElementById('flashcard-definition');
-    if(defEl){
-        defEl.textContent = flashcardDefinitions[term] || '';
-    }
-    const canvas = document.getElementById('flashcard-canvas');
-    if(canvas){
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        if(term === 'point'){
-            ctx.beginPath();
-            ctx.arc(canvas.width/2, canvas.height/2, 5, 0, Math.PI*2);
-            ctx.fill();
-        } else if(term === 'line'){
-            ctx.beginPath();
-            ctx.moveTo(20, canvas.height/2);
-            ctx.lineTo(canvas.width-20, canvas.height/2);
-            ctx.stroke();
-        } else if(term === 'plane'){
-            ctx.strokeRect(40, 40, canvas.width-80, canvas.height-80);
-        } else if(term === 'angle' || term === 'right angle'){
-            const vx = 60;
-            const vy = canvas.height - 60;
-            ctx.beginPath();
-            ctx.moveTo(vx, vy);
-            ctx.lineTo(vx, vy - 80);
-            ctx.moveTo(vx, vy);
-            ctx.lineTo(vx + 80, vy);
-            ctx.stroke();
-            if(term === 'right angle'){
-                ctx.strokeRect(vx, vy - 20, 20, 20);
-            }
-        } else if(term === 'radius'){
-            ctx.beginPath();
-            ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(canvas.width/2, canvas.height/2);
-            ctx.lineTo(canvas.width/2 + 60, canvas.height/2);
-            ctx.stroke();
-        } else if(term === 'circle' || term === 'circumference'){
-            ctx.beginPath();
-            ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
-            ctx.stroke();
-        } else if(term === 'triangle' || term === 'similarity'){
-            ctx.beginPath();
-            ctx.moveTo(canvas.width/2, 40);
-            ctx.lineTo(canvas.width-40, canvas.height-40);
-            ctx.lineTo(40, canvas.height-40);
-            ctx.closePath();
-            ctx.stroke();
-            if(term === 'similarity'){
-                ctx.strokeStyle = 'blue';
-                ctx.beginPath();
-                ctx.moveTo(canvas.width/2 - 40, 80);
-                ctx.lineTo(canvas.width-80, canvas.height-80);
-                ctx.lineTo(80, canvas.height-80);
-                ctx.closePath();
-                ctx.stroke();
-            }
-        } else if(term === 'hypotenuse'){
-            ctx.beginPath();
-            ctx.moveTo(40, canvas.height-40);
-            ctx.lineTo(canvas.width-40, canvas.height-40);
-            ctx.lineTo(40, 40);
-            ctx.closePath();
-            ctx.stroke();
-            ctx.strokeStyle = 'red';
-            ctx.beginPath();
-            ctx.moveTo(canvas.width-40, canvas.height-40);
-            ctx.lineTo(40, 40);
-            ctx.stroke();
-            ctx.strokeStyle = '#000';
-            ctx.strokeRect(40, canvas.height-60, 20, 20);
-        } else if(term === 'square'){
-            const size = canvas.width-100;
-            ctx.strokeRect(50, 50, size, size);
-        } else if(term === 'pentagon'){
-            const cx = canvas.width/2;
-            const cy = canvas.height/2;
-            const r = 60;
-            ctx.beginPath();
-            for(let i=0;i<5;i++){
-                const angle = Math.PI*2*i/5 - Math.PI/2;
-                const x = cx + r*Math.cos(angle);
-                const y = cy + r*Math.sin(angle);
-                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-            }
-            ctx.closePath();
-            ctx.stroke();
-        } else if(term === 'hexagon'){
-            const cx = canvas.width/2;
-            const cy = canvas.height/2;
-            const r = 60;
-            ctx.beginPath();
-            for(let i=0;i<6;i++){
-                const angle = Math.PI/3*i - Math.PI/6;
-                const x = cx + r*Math.cos(angle);
-                const y = cy + r*Math.sin(angle);
-                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-            }
-            ctx.closePath();
-            ctx.stroke();
-        } else if(term === 'cube'){
-            const size = 70;
-            // front square in solid lines
-            ctx.strokeRect(50, 70, size, size);
-            // back square and connecting edges with dashed lines
-            ctx.setLineDash([5,5]);
-            ctx.strokeRect(80, 40, size, size);
-            ctx.beginPath();
-            ctx.moveTo(50, 70);
-            ctx.lineTo(80, 40);
-            ctx.moveTo(50 + size, 70);
-            ctx.lineTo(80 + size, 40);
-            ctx.moveTo(50, 70 + size);
-            ctx.lineTo(80, 40 + size);
-            ctx.moveTo(50 + size, 70 + size);
-            ctx.lineTo(80 + size, 40 + size);
-            ctx.stroke();
-            ctx.setLineDash([]);
-        } else if(term === 'polygon'){
-            const cx = canvas.width/2;
-            const cy = canvas.height/2;
-            const r = 60;
-            ctx.beginPath();
-            for(let i=0;i<4;i++){
-                const angle = Math.PI*2*i/4 - Math.PI/4;
-                const x = cx + r*Math.cos(angle);
-                const y = cy + r*Math.sin(angle);
-                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-            }
-            ctx.closePath();
-            ctx.stroke();
-        } else if(term === 'congruent triangles' || term === 'SSS criterion' || term === 'corresponding sides'){
-            ctx.beginPath();
-            ctx.moveTo(40, canvas.height-40);
-            ctx.lineTo(80, 40);
-            ctx.lineTo(120, canvas.height-40);
-            ctx.closePath();
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(130, canvas.height-40);
-            ctx.lineTo(170, 40);
-            ctx.lineTo(canvas.width-40, canvas.height-40);
-            ctx.closePath();
-            ctx.stroke();
-        } else if(term === 'diameter'){
-            ctx.beginPath();
-            ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(canvas.width/2 - 60, canvas.height/2);
-            ctx.lineTo(canvas.width/2 + 60, canvas.height/2);
-            ctx.stroke();
-        } else if(term === 'perimeter'){
-            ctx.strokeRect(40, 40, canvas.width-80, canvas.height-80);
-            ctx.setLineDash([5,5]);
-            ctx.strokeRect(50, 50, canvas.width-100, canvas.height-100);
-            ctx.setLineDash([]);
-        } else if(term === 'area'){
-            ctx.strokeRect(40, 40, canvas.width-80, canvas.height-80);
-            ctx.fillStyle = 'rgba(0,0,255,0.2)';
-            ctx.fillRect(40, 40, canvas.width-80, canvas.height-80);
-        } else if(term === 'dimension'){
-            let step = 0;
-            const drawSteps = [
-                () => drawDimension1(ctx, canvas),
-                () => drawDimension2(ctx, canvas),
-                () => drawDimension3(ctx, canvas)
-            ];
-            drawSteps[step]();
-            dimensionInterval = setInterval(() => {
-                step = (step + 1) % drawSteps.length;
-                ctx.clearRect(0,0,canvas.width,canvas.height);
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2;
-                drawSteps[step]();
-            }, 1000);
-        } else if(term === 'tangent'){
-            ctx.beginPath();
-            ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI*2);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(canvas.width/2-60, canvas.height/2+50);
-            ctx.lineTo(canvas.width/2+60, canvas.height/2+50);
-            ctx.stroke();
-        }
+    const entry = VocabularyState.entries.find(e => e.term.toLowerCase() === term.toLowerCase());
+    if(entry){
+        showDictionaryDetail(entry);
     }
 }
 
@@ -4440,4 +4528,9 @@ function drawDimension3(ctx, canvas){
     drawArrowLine(ctx, midX, canvas.height - 20, midX, 20);
     drawArrowLine(ctx, midX - 40, midY + 40, midX + 40, midY - 40);
 }
+
+window.transitionToMode = transitionToMode;
+window.openDictionary = openDictionary;
+window.closeDictionary = closeDictionary;
+window.logEvidence = logEvidence;
 
